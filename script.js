@@ -115,15 +115,21 @@ function salvaTask(e) {
 
 // Collega la funzione al click del pulsante
 document.getElementById('btnAggiungi').addEventListener('click', salvaTask);
-
-// DELETE
-function confermaEliminazione(taskId) {
+//DELETE
+function confermaEliminazione(taskId, apiId) {
   if (confirm("Sei sicuro di voler procedere con l'eliminazione?")) {
-    // Rimuove il task dal DOM
-    const taskElement = document.getElementById(taskId);
-    if (taskElement) {
-      taskElement.remove();
-    }
+    fetch(`https://localhost:7000/api/Task/${apiId}`, {
+      method: 'DELETE'
+    })
+    .then(() => {
+      // Rimuove il task dal DOM
+      const taskElement = document.getElementById(taskId);
+      if (taskElement) {
+        taskElement.remove();
+      }
+      // Aggiorna la lista (opzionale, se necessario)
+      caricaTasks();
+    });
   }
 }
 
