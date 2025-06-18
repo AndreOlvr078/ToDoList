@@ -64,16 +64,16 @@ function caricaTasks() {
               <span class="mx-3"><strong>Scadenza:</strong> ${task.scadenza}</span>
               <span class="mx-3"><strong>Utente:</strong> ${task.utente}</span>
               <div class="ms-auto d-flex gap-2">
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                  style="width: 48px; height: 48px; padding: 0;"
-                  data-bs-toggle="modal" data-bs-target="#modificaModal" onclick="modificaTask(${task.id})">
-                  <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i></button>
-
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                  style="width: 48px; height: 48px; padding: 0;"
-                  data-bs-toggle="modal" data-bs-target="#eliminaModal" onclick="eliminaTask(${task.id})">
-                  <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-                </button>
+          <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+            style="width: 48px; height: 48px; padding: 0;"
+            onclick="modificaTask(${task.id})">
+            <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
+          </button>
+          <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+            style="width: 48px; height: 48px; padding: 0;"
+            onclick="confermaEliminazione(${task.id})">
+            <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+          </button>
               </div>
             </div>
           </div>
@@ -117,11 +117,14 @@ function salvaTask(e) {
 document.getElementById('btnAggiungi').addEventListener('click', salvaTask);
 
 // DELETE
-function eliminaTask(id) {
-  fetch(`https://localhost:7000/api/Task/${id}`, {
-    method: 'DELETE'
-  })
-  .then(() => caricaTasks());
+function confermaEliminazione(taskId) {
+  if (confirm("Sei sicuro di voler procedere con l'eliminazione?")) {
+    // Rimuove il task dal DOM
+    const taskElement = document.getElementById(taskId);
+    if (taskElement) {
+      taskElement.remove();
+    }
+  }
 }
 
 // PUT
