@@ -38,9 +38,8 @@ function caricaTasks() {
     });
 }
 
-// POST
+// POST/PUT
 function salvaTask(e) {
-  // Se chiamata da un event, previeni il submit
   if (e) e.preventDefault();
 
   const titolo = document.getElementById('titolo').value;
@@ -48,24 +47,32 @@ function salvaTask(e) {
   const scadenza = document.getElementById('scadenza').value;
   const utente = document.getElementById('utente').value;
 
-  const url = taskDaModificare
-    ? `'https://localhost:7000/api/Task/${taskDaModificare}`
-    :  'https://localhost:7000/api/Task';
-  const method = taskDaModificare ? 'PUT' : 'POST';
+  let url = 'https://localhost:7000/api/Task';
+  let method = 'POST';
+
+  if (taskDaModificare) {
+    url = `https://localhost:7000/api/Task/${taskDaModificare}`;
+    method = 'PUT';
+  }
 
   fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ titolo, categoria, scadenza, utente })
   })
-  .then(res => res.json())
+  .then(res => {
+    if (!res.ok) throw new Error('Errore nel salvataggio');
+    return res.json();
+  })
   .then(() => {
     const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
     modal.hide();
-    document.querySelector('#exampleModal form').reset();
+    document.getElementById('taskForm').reset();
     taskDaModificare = null;
+    document.getElementById('btnAggiungi').textContent = 'Aggiungi';
     caricaTasks();
-  });
+  })
+  .catch(err => alert(err.message));
 }
 
 // Collega la funzione al click del pulsante
@@ -81,9 +88,9 @@ function eliminaTask(id) {
   }
 }
 
-// PUT
+// MODIFICA
 function modificaTask(id) {
-  fetch(`http://localhost:7000/api/tasks/${id}`)
+  fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
     .then(task => {
       document.getElementById('titolo').value = task.titolo;
@@ -96,69 +103,8 @@ function modificaTask(id) {
       modal.show();
     });
 }
-// Modifica task PUT
-function salvaTaskmod(e) {
-  if (e) e.preventDefault();
 
-  const titolo = document.getElementById('titolo').value;
-  const categoria = document.getElementById('categoria').value;
-  const scadenza = document.getElementById('scadenza').value;
-  const utente = document.getElementById('utente').value;
+// EVENTI
+document.getElementById('taskForm').addEventListener('submit', salvaTask);
 
-  let url = 'http://localhost:7000/api/tasks';
-  let method = 'POST';
 
-  if (taskDaModificare) {
-    url = `http://localhost:7000/api/tasks/${taskDaModificare}`;
-    method = 'PUT';
-  }
-
-  fetch(url, {
-    method,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ titolo, categoria, scadenza, utente })
-  })
-  .then(res => {
-    if (!res.ok) throw new Error('Errore nel salvataggio');
-    return res.json();
-  })
-  .then(() => {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal1'));
-    modal.hide();
-    document.getElementById('taskForm').reset();
-    taskDaModificare = null;
-    document.getElementById('btnAggiungi').textContent = 'Aggiungi';
-    caricaTasks();
-  })
-  .catch(err => alert(err.message));
-}
-
-function salvaModificaTask(e) {
-  e.preventDefault();
-
-  const titolo = document.getElementById('modTitolo').value;
-  const categoria = document.getElementById('modCategoria').value;
-  const scadenza = document.getElementById('modScadenza').value;
-  const utente = document.getElementById('modUtente').value;
-
-  fetch(`http://localhost:7000/api/tasks/${taskDaModificare}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ titolo, categoria, scadenza, utente })
-  })
-  .then(res => {
-    if (!res.ok) throw new Error('Errore nel salvataggio');
-    return res.json();
-  })
-  .then(() => {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('modificaModal1'));
-    modal.hide();
-    document.getElementById('modificaForm').reset();
-    taskDaModificare = null;
-    caricaTasks();
-  })
-  .catch(err => alert(err.message));
-}
-
-// Carica le task all'avvio
-//document.addEventListener('DOMContentLoaded', caricaTasks);
