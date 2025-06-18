@@ -27,6 +27,17 @@ namespace ToDoListAPI.Controllers
             return Ok(tasks);
         }
 
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
+        {
+            var task = _context.Task.Find(id);
+
+            if (task == null)
+                return NotFound();
+
+            return Ok(task);
+        }
+
         [HttpPost]
         public IActionResult Create([FromBody] TaskCreateDto dto)
         {
@@ -52,39 +63,32 @@ namespace ToDoListAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] TaskCreateDto dto)
         {
-            var existingTask = _context.Task.Find(id);
-    
-            if (existingTask == null)
-            {
-              return NotFound();
-            }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            existingTask.Titolo = dto.Titolo;
-            existingTask.Descrizione = dto.Descrizione;
-            existingTask.Scadenza = dto.Scadenza;
-            existingTask.Stato = dto.Stato;
-            existingTask.CategoriaID = dto.CategoriaID;
-            existingTask.UtenteID = dto.UtenteID;
+            var sql = "EXEC AggiornaTask @p0, @p1, @p2, @p3, @p4, @p5, @p6";
 
-            _context.SaveChanges();
-        
-            return Ok(existingTask);
-        }   
+            _context.Database.ExecuteSqlRaw(
+                sql,
+                id,
+                dto.Titolo,
+                dto.Descrizione,
+                dto.Scadenza,
+                dto.Stato,
+                dto.CategoriaID,
+                dto.UtenteID
+            );
+
+            return Ok(new { message = "Task aggiornato tramite stored procedure." });
+        }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var task = _context.Task.Find(id);
+            var sql = "EXEC EliminaTask @p0";
+            _context.Database.ExecuteSqlRaw(sql, id);
 
-            if (task == null)
-            {
-                return NotFound();
-            }
-
-            _context.Task.Remove(task);
-            _context.SaveChanges();
-
-            return NoContent();
+            return Ok(new { message = "Task eliminato tramite stored procedure." });
         }
     }
 }

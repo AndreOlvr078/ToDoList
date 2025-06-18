@@ -6,6 +6,7 @@ function caricaTasks() {
   fetch('https://localhost:7000/api/Task')
     .then(res => res.json())
     .then(tasks => {
+      console.log(tasks)
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
       tasks.forEach(task => {
@@ -14,6 +15,7 @@ function caricaTasks() {
         box.innerHTML = `
           <div class="card-body p-2">
             <div class="d-flex flex-row align-items-center justify-content-between flex-wrap">
+              <span class="badge bg-primary">${task.id}</span>
               <span class="mx-3"><strong>Titolo:</strong> ${task.titolo}</span>
               <span class="mx-3"><strong>Categoria:</strong> ${task.categoria}</span>
               <span class="mx-3"><strong>Scadenza:</strong> ${task.scadenza}</span>
@@ -43,9 +45,11 @@ function salvaTask(e) {
   if (e) e.preventDefault();
 
   const titolo = document.getElementById('titolo').value;
-  const categoria = document.getElementById('categoria').value;
+  const descrizione = document.getElementById('descrizione').value;  // Assicurati che esista questo input
   const scadenza = document.getElementById('scadenza').value;
-  const utente = document.getElementById('utente').value;
+  const stato = document.getElementById('stato').value;              // Anche questo input deve esistere
+  const categoriaID = parseInt(document.getElementById('categoria').value);
+  const utenteID = parseInt(document.getElementById('utente').value);
 
   let url = 'https://localhost:7000/api/Task';
   let method = 'POST';
@@ -58,7 +62,14 @@ function salvaTask(e) {
   fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ titolo, categoria, scadenza, utente })
+    body: JSON.stringify({
+      titolo,
+      descrizione,
+      scadenza,
+      stato,
+      categoriaID,
+      utenteID
+    })
   })
   .then(res => {
     if (!res.ok) throw new Error('Errore nel salvataggio');
@@ -88,22 +99,32 @@ function eliminaTask(id) {
   }
 }
 
-// MODIFICA
+// MODIFICA - Carica i dati del task e apre il form per modificarlo
 function modificaTask(id) {
-  fetch(`https://localhost:7000/api/Task/${id}`)
-    .then(res => res.json())
+  fetch(`https://localhost:7000/api/Task/${id}`, {
+    method: 'GET'  // ✅ Metodo corretto per ottenere i dati
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Errore nel recupero del task");
+      return res.json();
+    })
     .then(task => {
       document.getElementById('titolo').value = task.titolo;
-      document.getElementById('categoria').value = task.categoria;
-      document.getElementById('scadenza').value = task.scadenza;
-      document.getElementById('utente').value = task.utente;
+      document.getElementById('categoria').value = task.categoriaID; // ⚠️ assicurati che sia categoriaID e non descrizione
+      document.getElementById('scadenza').value = task.scadenza.split('T')[0]; // elimina orario se presente
+      document.getElementById('utente').value = task.utenteID;
+      
       taskDaModificare = id;
       document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
+
       const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
       modal.show();
+    })
+    .catch(err => {
+      console.error("Errore:", err);
+      alert("Impossibile caricare il task.");
     });
 }
-
 // EVENTI
 document.getElementById('taskForm').addEventListener('submit', salvaTask);
 
