@@ -1,7 +1,7 @@
 let modalDiv = null;
 let taskDaModificare = null;
 
-// GET
+// GET funzionante
 function caricaTasks() {
   fetch('https://localhost:7000/api/Task')
     .then(res => res.json())
@@ -22,7 +22,7 @@ function caricaTasks() {
           <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
             style="width: 48px; height: 48px; padding: 0;"
             onclick="modificaTask(${task.id})">
-              <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
+            <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
           </button>
           <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
             style="width: 48px; height: 48px; padding: 0;"
@@ -83,52 +83,54 @@ function eliminaTask(id) {
 
 // PUT
 function modificaTask(id) {
-  fetch(`http://localhost:7000/api/Task/${id}`)
+  fetch(`http://localhost:7000/api/tasks/${id}`)
     .then(res => res.json())
     .then(task => {
-      // Se il modal non esiste, crealo
-      if (!modalDiv) {
-        modalDiv = document.createElement('div');
-        modalDiv.innerHTML = `
-          <div class="modal fade" id="modificaModal" tabindex="-1" aria-labelledby="modificaModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <form id="modificaForm">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="modificaModalLabel">Modifica Task</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
-                  </div>
-                  <div class="modal-body">
-                    <input id="modTitolo" class="form-control mb-2" placeholder="Titolo" required>
-                    <input id="modCategoria" class="form-control mb-2" placeholder="Categoria" required>
-                    <input id="modScadenza" class="form-control mb-2" placeholder="Scadenza" required>
-                    <input id="modUtente" class="form-control mb-2" placeholder="Utente" required>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Salva modifiche</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        `;
-        document.body.appendChild(modalDiv);
-
-        // Associa l'evento submit solo la prima volta
-        document.getElementById('modificaForm').addEventListener('submit', salvaModificaTask);
-      }
-
-      // Popola i campi
-      document.getElementById('modTitolo').value = task.titolo;
-      document.getElementById('modCategoria').value = task.categoria;
-      document.getElementById('modScadenza').value = task.scadenza;
-      document.getElementById('modUtente').value = task.utente;
+      document.getElementById('titolo').value = task.titolo;
+      document.getElementById('categoria').value = task.categoria;
+      document.getElementById('scadenza').value = task.scadenza;
+      document.getElementById('utente').value = task.utente;
       taskDaModificare = id;
-
-      // Mostra il modal
-      const modal = new bootstrap.Modal(document.getElementById('modificaModal'));
+      document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
+      const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
       modal.show();
     });
+}
+// Modifica task PUT
+function salvaTask(e) {
+  if (e) e.preventDefault();
+
+  const titolo = document.getElementById('titolo').value;
+  const categoria = document.getElementById('categoria').value;
+  const scadenza = document.getElementById('scadenza').value;
+  const utente = document.getElementById('utente').value;
+
+  let url = 'http://localhost:7000/api/tasks';
+  let method = 'POST';
+
+  if (taskDaModificare) {
+    url = `http://localhost:7000/api/tasks/${taskDaModificare}`;
+    method = 'PUT';
+  }
+
+  fetch(url, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ titolo, categoria, scadenza, utente })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Errore nel salvataggio');
+    return res.json();
+  })
+  .then(() => {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+    modal.hide();
+    document.getElementById('taskForm').reset();
+    taskDaModificare = null;
+    document.getElementById('btnAggiungi').textContent = 'Aggiungi';
+    caricaTasks();
+  })
+  .catch(err => alert(err.message));
 }
 
 function salvaModificaTask(e) {
