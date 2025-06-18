@@ -64,8 +64,12 @@ function caricaTasks() {
               <span class="mx-3"><strong>Scadenza:</strong> ${task.scadenza}</span>
               <span class="mx-3"><strong>Utente:</strong> ${task.utente}</span>
               <div class="ms-auto">
-                <button class="btn btn-primary btn-sm me-2" onclick="modificaTask(${task.id})">Modifica</button>
-                <button class="btn btn-primary btn-sm" onclick="eliminaTask(${task.id})">Elimina</button>
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                  style="width: 48px; height: 48px; padding: 0;"
+                  data-bs-toggle="modal" data-bs-target="#modificaModal" onclick="modificaTask(${task.id})"<i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i></button>
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                  style="width: 48px; height: 48px; padding: 0;"
+                  data-bs-toggle="modal" data-bs-target="#eliminaModal" onclick="eliminaTask(${task.id})"><i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i></button>
               </div>
             </div>
           </div>
