@@ -83,7 +83,7 @@ function eliminaTask(id) {
 
 // PUT
 function modificaTask(id) {
-  fetch(`http://localhost:7000/api/tasks/${id}`)
+  fetch(`http://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
     .then(task => {
       // Se il modal non esiste, crealo
