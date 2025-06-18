@@ -2,3 +2,5 @@ Aggiungere dropdown per categoria è utenti
 Aggiungere una barra per creare nuovi utenti e categorie
 date di scadenza funzionanti
 migliorare visualizzazione dati
+aggiustare stato, trasformarso in bool
+creare una checkbox per stato, esso se messo a true deve chiedere se si vuole cancellare la task essendo stata completata
