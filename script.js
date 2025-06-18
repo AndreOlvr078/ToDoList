@@ -1,49 +1,4 @@
-document.querySelector('#exampleModal form').addEventListener('submit', function(e) {
-  e.preventDefault();
-
-  // Prendi i valori dai campi
-  const titolo = document.getElementById('titolo').value;
-  const categoria = document.getElementById('categoria').value;
-  const scadenza = document.getElementById('scadenza').value;
-  const utente = document.getElementById('utente').value;
-
-  // Crea la box su un'unica riga e larga tutta la pagina, con testi spaziati e due pulsanti in fondo
-  const box = document.createElement('div');
-  box.className = 'card mb-2 w-100';
-  box.innerHTML = `
-    <div class="card-body p-2">
-      <div class="d-flex flex-row align-items-center justify-content-between flex-wrap">
-        <span class="mx-3"><strong>Titolo:</strong> ${titolo}</span>
-        <span class="mx-3"><strong>Categoria:</strong> ${categoria}</span>
-        <span class="mx-3"><strong>Scadenza:</strong> ${scadenza}</span>
-        <span class="mx-3"><strong>Utente:</strong> ${utente}</span>
-        <div class="ms-auto d-flex gap-2">
-          <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                  style="width: 48px; height: 48px; padding: 0;" 
-                  data-bs-toggle="modal" data-bs-target="#modificaModal">
-            <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
-          </button>
-          <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                  style="width: 48px; height: 48px; padding: 0;"
-                  data-bs-toggle="modal" data-bs-target="#eliminaModal">
-            <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Aggiungi la box alla lista
-  document.getElementById('lista-box').appendChild(box);
-
-  // Chiudi il modal
-  const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
-  modal.hide();
-
-  // Resetta il form
-  e.target.reset();
-});
-// Variabile per gestire la modifica
+let modalDiv = null;
 let taskDaModificare = null;
 
 // GET
@@ -67,11 +22,11 @@ function caricaTasks() {
           <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
             style="width: 48px; height: 48px; padding: 0;"
             onclick="modificaTask(${task.id})">
-            <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
+              <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
           </button>
           <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
             style="width: 48px; height: 48px; padding: 0;"
-            onclick="confermaEliminazione(${task.id})">
+            onclick="eliminaTask(${task.id})">
             <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
           </button>
               </div>
@@ -116,23 +71,13 @@ function salvaTask(e) {
 // Collega la funzione al click del pulsante
 document.getElementById('btnAggiungi').addEventListener('click', salvaTask);
 
-//DELETE
-function confermaEliminazione(taskId, apiId) {
-  if (confirm("Sei sicuro di voler procedere con l'eliminazione?")) {
-    fetch(`https://localhost:7000/api/Task/${apiId}`, {
+// DELETE
+function eliminaTask(id) {
+  if (confirm("Sei sicuro di voler eliminare questa task?")) {
+    fetch(`https://localhost:7000/api/Task/${id}`, {
       method: 'DELETE'
     })
-    .then(response => {
-      if (!response.ok) {
-        alert("Errore nell'eliminazione del task!");
-        return;
-      }
-      caricaTasks();
-    })
-    .catch(error => {
-      alert("Errore di rete o server non raggiungibile!");
-      console.error(error);
-    });
+    .then(() => caricaTasks());
   }
 }
 
@@ -141,44 +86,76 @@ function modificaTask(id) {
   fetch(`http://localhost:7000/api/tasks/${id}`)
     .then(res => res.json())
     .then(task => {
-      document.getElementById('titolo').value = task.titolo;
-      document.getElementById('categoria').value = task.categoria;
-      document.getElementById('scadenza').value = task.scadenza;
-      document.getElementById('utente').value = task.utente;
+      // Se il modal non esiste, crealo
+      if (!modalDiv) {
+        modalDiv = document.createElement('div');
+        modalDiv.innerHTML = `
+          <div class="modal fade" id="modificaModal" tabindex="-1" aria-labelledby="modificaModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form id="modificaForm">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modificaModalLabel">Modifica Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                  </div>
+                  <div class="modal-body">
+                    <input id="modTitolo" class="form-control mb-2" placeholder="Titolo" required>
+                    <input id="modCategoria" class="form-control mb-2" placeholder="Categoria" required>
+                    <input id="modScadenza" class="form-control mb-2" placeholder="Scadenza" required>
+                    <input id="modUtente" class="form-control mb-2" placeholder="Utente" required>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Salva modifiche</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modalDiv);
+
+        // Associa l'evento submit solo la prima volta
+        document.getElementById('modificaForm').addEventListener('submit', salvaModificaTask);
+      }
+
+      // Popola i campi
+      document.getElementById('modTitolo').value = task.titolo;
+      document.getElementById('modCategoria').value = task.categoria;
+      document.getElementById('modScadenza').value = task.scadenza;
+      document.getElementById('modUtente').value = task.utente;
       taskDaModificare = id;
 
-      // Cambia il testo del pulsante (opzionale)
-      document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
-
       // Mostra il modal
-      const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+      const modal = new bootstrap.Modal(document.getElementById('modificaModal'));
       modal.show();
     });
 }
 
-// Dopo il salvataggio, ripristina il testo del pulsante
-function salvaTask(e) {
-  if (e) e.preventDefault();
+function salvaModificaTask(e) {
+  e.preventDefault();
 
-  // ...existing code...
+  const titolo = document.getElementById('modTitolo').value;
+  const categoria = document.getElementById('modCategoria').value;
+  const scadenza = document.getElementById('modScadenza').value;
+  const utente = document.getElementById('modUtente').value;
 
-  fetch(url, {
-    method,
+  fetch(`http://localhost:7000/api/tasks/${taskDaModificare}`, {
+    method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ titolo, categoria, scadenza, utente })
   })
-  .then(res => res.json())
+  .then(res => {
+    if (!res.ok) throw new Error('Errore nel salvataggio');
+    return res.json();
+  })
   .then(() => {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modificaModal'));
     modal.hide();
-    document.querySelector('#exampleModal form').reset();
+    document.getElementById('modificaForm').reset();
     taskDaModificare = null;
-
-    // Ripristina il testo del pulsante
-    document.getElementById('btnAggiungi').textContent = 'Aggiungi';
-
     caricaTasks();
-  });
+  })
+  .catch(err => alert(err.message));
 }
 
 // Carica le task all'avvio
