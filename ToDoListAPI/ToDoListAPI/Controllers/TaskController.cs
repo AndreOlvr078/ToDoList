@@ -26,27 +26,27 @@ namespace ToDoListAPI.Controllers
 
         }
 
-       [HttpPut("{id}")]
-public IActionResult Update(int id, [FromBody] TaskCreateDto dto)
-{
-    var existingTask = _context.Task.Find(id);
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody] TaskCreateDto dto)
+        {
+            var existingTask = _context.Task.Find(id);
+    
+            if (existingTask == null)
+            {
+              return NotFound();
+            }
 
-    if (existingTask == null)
-    {
-        return NotFound();
-    }
+            existingTask.Titolo = dto.Titolo;
+            existingTask.Descrizione = dto.Descrizione;
+            existingTask.Scadenza = dto.Scadenza;
+            existingTask.Stato = dto.Stato;
+            existingTask.CategoriaID = dto.CategoriaID;
+            existingTask.UtenteID = dto.UtenteID;
 
-    existingTask.Titolo = dto.Titolo;
-    existingTask.Descrizione = dto.Descrizione;
-    existingTask.Scadenza = dto.Scadenza;
-    existingTask.Stato = dto.Stato;
-    existingTask.CategoriaID = dto.CategoriaID;
-    existingTask.UtenteID = dto.UtenteID;
-
-    _context.SaveChanges();
-
-    return Ok(existingTask);
-}
+            _context.SaveChanges();
+        
+            return Ok(existingTask);
+        }   
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
