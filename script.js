@@ -129,7 +129,7 @@ function confermaEliminazione(taskId) {
 
 // PUT
 function modificaTask(id) {
-  fetch(`https://localhost:7000/api/Task/${id}`)
+  fetch('http://localhost:3000/api/tasks/${id}')
     .then(res => res.json())
     .then(task => {
       document.getElementById('titolo').value = task.titolo;
@@ -137,9 +137,39 @@ function modificaTask(id) {
       document.getElementById('scadenza').value = task.scadenza;
       document.getElementById('utente').value = task.utente;
       taskDaModificare = id;
+
+      // Cambia il testo del pulsante (opzionale)
+      document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
+
+      // Mostra il modal
       const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
       modal.show();
     });
+}
+
+// Dopo il salvataggio, ripristina il testo del pulsante
+function salvaTask(e) {
+  if (e) e.preventDefault();
+
+  // ...existing code...
+
+  fetch(url, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ titolo, categoria, scadenza, utente })
+  })
+  .then(res => res.json())
+  .then(() => {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+    modal.hide();
+    document.querySelector('#exampleModal form').reset();
+    taskDaModificare = null;
+
+    // Ripristina il testo del pulsante
+    document.getElementById('btnAggiungi').textContent = 'Aggiungi';
+
+    caricaTasks();
+  });
 }
 
 // Carica le task all'avvio
