@@ -135,7 +135,7 @@ function confermaEliminazione(taskId, apiId) {
 
 // PUT
 function modificaTask(id) {
-  fetch('http://localhost:3000/api/tasks/${id}')
+  fetch('http://localhost:7000/api/tasks/${id}')
     .then(res => res.json())
     .then(task => {
       document.getElementById('titolo').value = task.titolo;
