@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ToDoListAPI.Data;
+using ToDoListAPI.Models;
 
 namespace ToDoListAPI.Controllers
 {
@@ -25,12 +26,42 @@ namespace ToDoListAPI.Controllers
 
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Create(Data.Task task)
-        //{
-        //    _context.Task.Add(task);
-        //    await _context.SaveChangesAsync();
-        //    return CreatedAtAction(nameof(GetAll), new { id = task.Id }, task);
-        //}
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] TaskCreateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var task = new Data.Task
+            {
+                Titolo = dto.Titolo,
+                Descrizione = dto.Descrizione,
+                Scadenza = dto.Scadenza,
+                Stato = dto.Stato,
+                CategoriaID = dto.CategoriaID,
+                UtenteID = dto.UtenteID
+            };
+
+            _context.Task.Add(task);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetAll), new { id = task.Id }, task);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var task = await _context.Task.FindAsync(id);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            _context.Task.Remove(task);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
