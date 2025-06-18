@@ -71,7 +71,7 @@ function salvaTask(e) {
 // Collega la funzione al click del pulsante
 document.getElementById('btnAggiungi').addEventListener('click', salvaTask);
 
-// DELETE
+// DELETE funzona
 function eliminaTask(id) {
   if (confirm("Sei sicuro di voler eliminare questa task?")) {
     fetch(`https://localhost:7000/api/Task/${id}`, {
@@ -159,4 +159,4 @@ function salvaModificaTask(e) {
 }
 
 // Carica le task all'avvio
-document.addEventListener('DOMContentLoaded', caricaTasks);
+//document.addEventListener('DOMContentLoaded', caricaTasks);
