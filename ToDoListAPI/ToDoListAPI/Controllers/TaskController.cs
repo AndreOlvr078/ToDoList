@@ -18,16 +18,15 @@ namespace ToDoListAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public IActionResult GetAll()
         {
-            var tasks = await _context.Task.ToListAsync();
+            var tasks = _context.Task.ToList();
 
             return Ok(tasks);
 
         }
-
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] TaskCreateDto dto)
+        public IActionResult Create([FromBody] TaskCreateDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -42,16 +41,39 @@ namespace ToDoListAPI.Controllers
                 UtenteID = dto.UtenteID
             };
 
-            _context.Task.Add(task);
-            await _context.SaveChangesAsync();
+            _context.Task.Add(task);     
+            _context.SaveChanges();       
 
             return CreatedAtAction(nameof(GetAll), new { id = task.Id }, task);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody] TaskCreateDto dto)
         {
-            var task = await _context.Task.FindAsync(id);
+            var existingTask = _context.Task.Find(id);
+    
+            if (existingTask == null)
+            {
+              return NotFound();
+            }
+
+            existingTask.Titolo = dto.Titolo;
+            existingTask.Descrizione = dto.Descrizione;
+            existingTask.Scadenza = dto.Scadenza;
+            existingTask.Stato = dto.Stato;
+            existingTask.CategoriaID = dto.CategoriaID;
+            existingTask.UtenteID = dto.UtenteID;
+
+            _context.SaveChanges();
+        
+            return Ok(existingTask);
+        }   
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var task = _context.Task.Find(id);
 
             if (task == null)
             {
@@ -59,7 +81,7 @@ namespace ToDoListAPI.Controllers
             }
 
             _context.Task.Remove(task);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return NoContent();
         }
