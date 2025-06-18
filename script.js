@@ -115,27 +115,30 @@ function salvaTask(e) {
 
 // Collega la funzione al click del pulsante
 document.getElementById('btnAggiungi').addEventListener('click', salvaTask);
+
 //DELETE
 function confermaEliminazione(taskId, apiId) {
   if (confirm("Sei sicuro di voler procedere con l'eliminazione?")) {
     fetch(`https://localhost:7000/api/Task/${apiId}`, {
       method: 'DELETE'
     })
-    .then(() => {
-      // Rimuove il task dal DOM
-      const taskElement = document.getElementById(taskId);
-      if (taskElement) {
-        taskElement.remove();
+    .then(response => {
+      if (!response.ok) {
+        alert("Errore nell'eliminazione del task!");
+        return;
       }
-      // Aggiorna la lista (opzionale, se necessario)
       caricaTasks();
+    })
+    .catch(error => {
+      alert("Errore di rete o server non raggiungibile!");
+      console.error(error);
     });
   }
 }
 
 // PUT
 function modificaTask(id) {
-  fetch('http://localhost:7000/api/tasks/${id}')
+  fetch(`http://localhost:7000/api/tasks/${id}`)
     .then(res => res.json())
     .then(task => {
       document.getElementById('titolo').value = task.titolo;
