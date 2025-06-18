@@ -84,8 +84,9 @@ function caricaTasks() {
 }
 
 // POST
-document.querySelector('#exampleModal form').addEventListener('submit', function(e) {
-  e.preventDefault();
+function salvaTask(e) {
+  // Se chiamata da un event, previeni il submit
+  if (e) e.preventDefault();
 
   const titolo = document.getElementById('titolo').value;
   const categoria = document.getElementById('categoria').value;
@@ -106,11 +107,14 @@ document.querySelector('#exampleModal form').addEventListener('submit', function
   .then(() => {
     const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
     modal.hide();
-    e.target.reset();
+    document.querySelector('#exampleModal form').reset();
     taskDaModificare = null;
     caricaTasks();
   });
-});
+}
+
+// Collega la funzione al click del pulsante
+document.getElementById('btnAggiungi').addEventListener('click', salvaTask);
 
 // DELETE
 function eliminaTask(id) {
