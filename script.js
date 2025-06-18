@@ -97,7 +97,7 @@ function modificaTask(id) {
     });
 }
 // Modifica task PUT
-function salvaTask(e) {
+function salvaTaskmod(e) {
   if (e) e.preventDefault();
 
   const titolo = document.getElementById('titolo').value;
@@ -123,7 +123,7 @@ function salvaTask(e) {
     return res.json();
   })
   .then(() => {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+    const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal1'));
     modal.hide();
     document.getElementById('taskForm').reset();
     taskDaModificare = null;
@@ -151,7 +151,7 @@ function salvaModificaTask(e) {
     return res.json();
   })
   .then(() => {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('modificaModal'));
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modificaModal1'));
     modal.hide();
     document.getElementById('modificaForm').reset();
     taskDaModificare = null;

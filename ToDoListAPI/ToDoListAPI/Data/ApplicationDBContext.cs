@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ToDoListAPI.Models;
 namespace ToDoListAPI.Data
 {
     public class ApplicationDbContext : DbContext
@@ -9,6 +10,7 @@ namespace ToDoListAPI.Data
         public DbSet<Task> Task { get; set; }
         public DbSet<Categorie> Categorie { get; set; }
         public DbSet<Utente> Utente { get; set; }
+        public DbSet<TaskJoinDto> TaskJoinDto { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -21,6 +23,7 @@ namespace ToDoListAPI.Data
                 .HasOne(t => t.Utente)
                 .WithMany(u => u.Task)
                 .HasForeignKey(t => t.UtenteID);
+            modelBuilder.Entity<TaskJoinDto>().HasNoKey();
         }
     }
 }

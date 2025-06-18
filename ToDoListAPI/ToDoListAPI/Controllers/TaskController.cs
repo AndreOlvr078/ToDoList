@@ -20,11 +20,13 @@ namespace ToDoListAPI.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var tasks = _context.Task.ToList();
+            var tasks = _context.TaskJoinDto
+                .FromSqlRaw("EXEC TabelleJoinate")
+                .ToList();
 
             return Ok(tasks);
-
         }
+
         [HttpPost]
         public IActionResult Create([FromBody] TaskCreateDto dto)
         {
