@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ToDoListAPI.Data;
+using ToDoListAPI.Models;
 
 namespace ToDoListAPI.Controllers
 {
@@ -33,15 +35,24 @@ namespace ToDoListAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] Categorie categoria)
+        public IActionResult Create([FromBody] CategorieDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var categoria = new Data.Categorie
+            {
+                Descrizione = dto.Descrizione,
+            };
+
             _context.Categorie.Add(categoria);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(GetById), new { id = categoria.ID }, categoria);
+
+            return CreatedAtAction(nameof(GetAll), new { id = categoria.ID }, categoria);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Categorie updated)
+        public IActionResult Update(int id, [FromBody] CategorieDto updated)
         {
             var categoria = _context.Categorie.Find(id);
             if (categoria == null)

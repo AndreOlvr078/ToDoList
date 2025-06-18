@@ -7,15 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.AllowAnyOrigin() 
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
+
 // 🔧 REGISTRA IL DbContext PRIMA DI app.Build()
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -33,4 +25,12 @@ app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthorization();
 app.MapControllers();
-app.Run();
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"❌ Errore all'avvio: {ex.Message}");
+    throw;
+}

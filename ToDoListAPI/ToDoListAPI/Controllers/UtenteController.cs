@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ToDoListAPI.Data;
-
+using ToDoListAPI.Models;
 namespace ToDoListAPI.Controllers
 {
     [ApiController]
@@ -33,15 +34,24 @@ namespace ToDoListAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] Utente utente)
+        public IActionResult Create([FromBody] UtenteDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var utente = new Data.Utente
+            {
+                Nome = dto.Nome,
+            };
+
             _context.Utente.Add(utente);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(GetById), new { id = utente.ID }, utente);
+
+            return CreatedAtAction(nameof(GetAll), new { id = utente.ID }, utente);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Utente updated)
+        public IActionResult Update(int id, [FromBody] UtenteDto updated)
         {
             var utente = _context.Utente.Find(id);
             if (utente == null)
