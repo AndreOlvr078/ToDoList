@@ -94,8 +94,8 @@ function salvaTask(e) {
   const utente = document.getElementById('utente').value;
 
   const url = taskDaModificare
-    ? `http://localhost:3000/api/tasks/${taskDaModificare}`
-    : 'http://localhost:3000/api/tasks';
+    ? `'https://localhost:7000/api/Task/${taskDaModificare}`
+    :  'https://localhost:7000/api/Task';
   const method = taskDaModificare ? 'PUT' : 'POST';
 
   fetch(url, {
@@ -118,7 +118,7 @@ document.getElementById('btnAggiungi').addEventListener('click', salvaTask);
 
 // DELETE
 function eliminaTask(id) {
-  fetch(`http://localhost:3000/api/tasks/${id}`, {
+  fetch(`https://localhost:7000/api/Task/${id}`, {
     method: 'DELETE'
   })
   .then(() => caricaTasks());
@@ -126,7 +126,7 @@ function eliminaTask(id) {
 
 // PUT
 function modificaTask(id) {
-  fetch(`http://localhost:3000/api/tasks/${id}`)
+  fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
     .then(task => {
       document.getElementById('titolo').value = task.titolo;
