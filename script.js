@@ -1,7 +1,44 @@
+document.querySelector('#exampleModal form').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  // Prendi i valori dai campi
+  const titolo = document.getElementById('titolo').value;
+  const categoria = document.getElementById('categoria').value;
+  const scadenza = document.getElementById('scadenza').value;
+  const utente = document.getElementById('utente').value;
+
+  // Crea la box su un'unica riga e larga tutta la pagina, con testi spaziati e due pulsanti in fondo
+  const box = document.createElement('div');
+  box.className = 'card mb-2 w-100';
+  box.innerHTML = `
+    <div class="card-body p-2">
+      <div class="d-flex flex-row align-items-center justify-content-between flex-wrap">
+        <span class="mx-3"><strong>Titolo:</strong> ${titolo}</span>
+        <span class="mx-3"><strong>Categoria:</strong> ${categoria}</span>
+        <span class="mx-3"><strong>Scadenza:</strong> ${scadenza}</span>
+        <span class="mx-3"><strong>Utente:</strong> ${utente}</span>
+        <div class="ms-auto">
+          <button class="btn btn-primary btn-sm me-2">Modifica</button>
+          <button class="btn btn-primary btn-sm">Elimina</button>
+          </div>
+      </div>
+    </div>
+  `;
+
+  // Aggiungi la box alla lista
+  document.getElementById('lista-box').appendChild(box);
+
+  // Chiudi il modal
+  const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+  modal.hide();
+
+  // Resetta il form
+  e.target.reset();
+});
 // Variabile per gestire la modifica
 let taskDaModificare = null;
 
-// Carica tutte le task dal backend e visualizzale
+// GET
 function caricaTasks() {
   fetch('http://localhost:3000/api/tasks')
     .then(res => res.json())
@@ -30,7 +67,7 @@ function caricaTasks() {
     });
 }
 
-// Gestione submit form per aggiunta o modifica
+// POST
 document.querySelector('#exampleModal form').addEventListener('submit', function(e) {
   e.preventDefault();
 
@@ -59,7 +96,7 @@ document.querySelector('#exampleModal form').addEventListener('submit', function
   });
 });
 
-// Elimina una task
+// DELETE
 function eliminaTask(id) {
   fetch(`http://localhost:3000/api/tasks/${id}`, {
     method: 'DELETE'
@@ -67,7 +104,7 @@ function eliminaTask(id) {
   .then(() => caricaTasks());
 }
 
-// Modifica una task (precompila il modal)
+// PUT
 function modificaTask(id) {
   fetch(`http://localhost:3000/api/tasks/${id}`)
     .then(res => res.json())
