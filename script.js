@@ -48,7 +48,7 @@ let taskDaModificare = null;
 
 // GET
 function caricaTasks() {
-  fetch('http://localhost:3000/api/tasks')
+  fetch('https://localhost:7000/api/Task')
     .then(res => res.json())
     .then(tasks => {
       const lista = document.getElementById('lista-box');
