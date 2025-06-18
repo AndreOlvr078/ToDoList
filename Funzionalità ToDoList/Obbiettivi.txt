@@ -1,4 +1,4 @@
 Aggiungere dropdown per categoria è utenti
 Aggiungere una barra per creare nuovi utenti e categorie
 date di scadenza funzionanti
-e bho
+migliorare visualizzazione dati
