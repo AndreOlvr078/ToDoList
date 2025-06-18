@@ -25,6 +25,28 @@ namespace ToDoListAPI.Controllers
             return Ok(tasks);
 
         }
+        [HttpPost]
+        public IActionResult Create([FromBody] TaskCreateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var task = new Data.Task
+            {
+                Titolo = dto.Titolo,
+                Descrizione = dto.Descrizione,
+                Scadenza = dto.Scadenza,
+                Stato = dto.Stato,
+                CategoriaID = dto.CategoriaID,
+                UtenteID = dto.UtenteID
+            };
+
+            _context.Task.Add(task);     
+            _context.SaveChanges();       
+
+            return CreatedAtAction(nameof(GetAll), new { id = task.Id }, task);
+        }
+
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] TaskCreateDto dto)
