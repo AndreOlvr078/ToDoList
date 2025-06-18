@@ -17,10 +17,18 @@ document.querySelector('#exampleModal form').addEventListener('submit', function
         <span class="mx-3"><strong>Categoria:</strong> ${categoria}</span>
         <span class="mx-3"><strong>Scadenza:</strong> ${scadenza}</span>
         <span class="mx-3"><strong>Utente:</strong> ${utente}</span>
-        <div class="ms-auto">
-          <button class="btn btn-primary btn-sm me-2">Modifica</button>
-          <button class="btn btn-primary btn-sm">Elimina</button>
-          </div>
+        <div class="ms-auto d-flex gap-2">
+          <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                  style="width: 48px; height: 48px; padding: 0;"
+                  data-bs-toggle="modal" data-bs-target="#modificaModal">
+            <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
+          </button>
+          <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                  style="width: 48px; height: 48px; padding: 0;"
+                  data-bs-toggle="modal" data-bs-target="#eliminaModal">
+            <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+          </button>
+        </div>
       </div>
     </div>
   `;
