@@ -1,5 +1,7 @@
 let modalDiv = null;
 let taskDaModificare = null;
+let taskIdDaEliminare = null;
+
 
 // GET funzionante
 function caricaTasks() {
@@ -98,13 +100,25 @@ document.getElementById('btnAggiungi').addEventListener('click', salvaTask);
 
 // DELETE funzona
 function eliminaTask(id) {
-  if (confirm("Sei sicuro di voler eliminare questa task?")) {
-    fetch(`https://localhost:7000/api/Task/${id}`, {
-      method: 'DELETE'
-    })
-    .then(() => caricaTasks());
-  }
+    taskIdDaEliminare = id;
+    var modal = new bootstrap.Modal(document.getElementById('confermaEliminaModal'));
+    modal.show();
 }
+
+// Conferma eliminazione
+document.getElementById('btnConfermaElimina').addEventListener('click', function() {
+    if (taskIdDaEliminare !== null) {
+        fetch(`https://localhost:7000/api/Task/${taskIdDaEliminare}`, {
+            method: 'DELETE'
+        })
+        .then(() => {
+            taskIdDaEliminare = null;
+            var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
+            modal.hide();
+            caricaTasks();
+        });
+    }
+});
 
 // MODIFICA - Carica i dati del task e apre il form per modificarlo
 function modificaTask(id) {

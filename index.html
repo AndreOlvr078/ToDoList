@@ -79,6 +79,8 @@
     <div class="container-fluid mt-4" id="lista-box">
         
     </div>
+
+    <!-- Modal per visualizzare le descrizioni -->
     <div class="modal fade" id="descrizioneModal" tabindex="-1" aria-labelledby="descrizioneModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -88,6 +90,24 @@
                 </div>
                 <div class="modal-body" id="modalDescrizioneTesto">
 
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal per l'eliminazione -->
+    <div class="modal fade" id="confermaEliminaModal" tabindex="-1" aria-labelledby="confermaEliminaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confermaEliminaModalLabel">Conferma Eliminazione</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                </div>
+                <div class="modal-body">
+                    Sei sicuro di voler eliminare questa task?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-primary" id="btnConfermaElimina">Elimina</button>
                 </div>
             </div>
         </div>
