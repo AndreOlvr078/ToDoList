@@ -328,9 +328,10 @@ function notaTask(id) {
     .then(task => {
       // Mostra descrizione, utente e categoria nella modale
       document.getElementById('modalDescrizioneTesto').innerHTML = `
+              <div><strong>Titolo:</strong> ${task.titolo}</div>
         <div><strong>Descrizione:</strong> ${task.descrizione}</div>
-        <div><strong>Utente:</strong> ${task.utente}</div>
-        <div><strong>Categoria:</strong> ${task.categoria}</div>
+        <div><strong>Utente:</strong> ${u.nome}</div>
+        <div><strong>Categoria:</strong> ${cat.descrizione}</div>
       `;
       var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
       modal.show();
