@@ -54,11 +54,20 @@ namespace ToDoListAPI.Controllers
             return Ok(tasks);
         }
 
-        [HttpGet("Stato")]
-        public IActionResult GetTasksByStato() // Recupera i task filtrati per stato (completati o non completati) tramite la stored procedure "OrdinaStato".
+        [HttpGet("StatoNo")]
+        public IActionResult GetTasksByStatoNo() // Recupera i task filtrati per stato (completati o non completati) tramite la stored procedure "OrdinaStato".
         {
             var tasks = _context.TaskJoinDto
                 .FromSqlRaw("EXEC OrdinaStatoNo")
+                .ToList();
+            return Ok(tasks);
+        }
+
+        [HttpGet("StatoSi")]
+        public IActionResult GetTasksByStatoSi() // Recupera i task filtrati per stato (completati o non completati) tramite la stored procedure "OrdinaStato".
+        {
+            var tasks = _context.TaskJoinDto
+                .FromSqlRaw("EXEC OrdinaStatoSi")
                 .ToList();
             return Ok(tasks);
         }
