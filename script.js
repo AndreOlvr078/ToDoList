@@ -57,8 +57,6 @@ function caricaTasksPerUtente(UtenteId) {
                 ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
               </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-              <div class="col-auto mx-2"><span><strong>Categoria:</strong> ${task.categoria}</span></div>
-              <div class="col-auto mx-2"><span><strong>Utente:</strong> ${task.utente}</span></div>
               <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${task.scadenza}</span></div>
               <div class="col-auto ms-auto d-flex gap-2">
                   <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
@@ -155,7 +153,7 @@ function caricaTasks() {
             <div class="row align-items-center flex-wrap">
               <div class="col-auto mx-2">
                 <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
-${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
+              ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
             </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
               <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${task.scadenza}</span></div>
