@@ -178,11 +178,31 @@ function caricaCategorie() {
     });
 }
 
+function caricaUtenti() {
+  fetch('https://localhost:7000/api/Utente') // assicurati che questo endpoint esista
+    .then(res => res.json())
+    .then(utenti => {
+      const select = document.getElementById('utente');
+      select.innerHTML = '<option value="">Seleziona utente...</option>';
+      utenti.forEach(u => {
+        const option = document.createElement('option');
+        option.value = u.id; // o u.utenteID, dipende dal tuo modello
+        option.textContent = u.nome; // o u.username, dipende dal tuo campo
+        select.appendChild(option);
+      });
+    })
+    .catch(() => {
+      alert("Errore nel caricamento degli utenti.");
+    });
+}
+
+
 
 // Quando la pagina è pronta, carica tasks e categorie
 document.addEventListener('DOMContentLoaded', () => {
   caricaTasks();
   caricaCategorie();
+  caricaUtenti();
 });
 
 // EVENTI
