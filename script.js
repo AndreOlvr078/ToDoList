@@ -162,6 +162,28 @@ function notaTask(id) {
     });
 }
 
+function caricaCategorie() {
+  fetch('https://localhost:7000/api/Categorie')
+    .then(res => res.json())
+    .then(categorie => {
+      const select = document.getElementById('categoria');
+      select.innerHTML = '<option value="">Seleziona categoria...</option>';
+      categorie.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.id; // o cat.categoriaID, dipende dal tuo modello
+        option.textContent = cat.nome; // o cat.descrizione
+        select.appendChild(option);
+      });
+    });
+}
+
+
+// Quando la pagina è pronta, carica tasks e categorie
+document.addEventListener('DOMContentLoaded', () => {
+  caricaTasks();
+  caricaCategorie();
+});
+
 // EVENTI
 document.getElementById('taskForm').addEventListener('submit', salvaTask);
 
