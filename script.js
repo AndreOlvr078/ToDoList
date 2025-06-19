@@ -30,7 +30,7 @@ function apriModalUtente() {
 document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
   const UtenteId = document.getElementById('utenteDropdown').value;
   if (UtenteId) {
-    utenteSelezionato = UtenteId;  
+    utenteSelezionato = UtenteId;
     caricaTasksPerUtente(UtenteId);
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
     modal.hide();
