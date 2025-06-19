@@ -88,6 +88,31 @@ function caricaTasksPerUtente(UtenteId) {
     });
 }
 
+function aggiungiCategoria(e) {
+  e.preventDefault();
+  const nome = document.getElementById('nomeCategoria').value;
+
+  fetch('https://localhost:7000/api/Categorie', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nome })
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Errore nell\'aggiunta categoria');
+      return res.json();
+    })
+    .then(() => {
+      document.getElementById('formAggiungiCategoria').reset();
+      caricaCategorie && caricaCategorie();
+      const modal = bootstrap.Modal.getInstance(document.getElementById('aggiungiCategoriaModal'));
+      modal.hide();
+      alert('Categoria aggiunta!');
+    })
+    .catch(err => alert(err.message));
+}
+
+document.getElementById('formAggiungiCategoria').addEventListener('submit', aggiungiCategoria)
+
 function aggiungiUtente(e) {
   e.preventDefault();
   const nome = document.getElementById('nomeUtente').value;
@@ -97,19 +122,19 @@ function aggiungiUtente(e) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ nome })
   })
-  .then(res => {
-    if (!res.ok) throw new Error('Errore nell\'aggiunta utente');
-    return res.json();
-  })
-  .then(() => {
-    document.getElementById('formAggiungiUtente').reset();
-    caricaUtentiForm && caricaUtentiForm();
-    caricaUtentiDropdown && caricaUtentiDropdown();
-    const modal = bootstrap.Modal.getInstance(document.getElementById('aggiungiUtenteModal'));
-    modal.hide();
-    alert('Utente aggiunto!');
-  })
-  .catch(err => alert(err.message));
+    .then(res => {
+      if (!res.ok) throw new Error('Errore nell\'aggiunta utente');
+      return res.json();
+    })
+    .then(() => {
+      document.getElementById('formAggiungiUtente').reset();
+      caricaUtentiForm && caricaUtentiForm();
+      caricaUtentiDropdown && caricaUtentiDropdown();
+      const modal = bootstrap.Modal.getInstance(document.getElementById('aggiungiUtenteModal'));
+      modal.hide();
+      alert('Utente aggiunto!');
+    })
+    .catch(err => alert(err.message));
 }
 
 document.getElementById('formAggiungiUtente').addEventListener('submit', aggiungiUtente);

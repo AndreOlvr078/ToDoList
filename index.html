@@ -35,6 +35,30 @@
         </div>
     </nav>
 
+    <!-- Modal per aggiungere categoria -->
+    <div class="modal fade" id="aggiungiCategoriaModal" tabindex="-1" aria-labelledby="aggiungiCategoriaLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="formAggiungiCategoria">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="aggiungiCategoriaLabel">Aggiungi Categoria</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" id="nomeCategoria" class="form-control mb-2" placeholder="Nome categoria"
+                            required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Aggiungi categoria</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal per aggiungere utente -->
     <div class="modal fade" id="aggiungiUtenteModal" tabindex="-1" aria-labelledby="aggiungiUtenteLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -109,7 +133,7 @@
                                 <button
                                     class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
                                     style="width: 48px; height: 48px; padding: 0;" data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal">
+                                    data-bs-target="#aggiungiCategoriaModal">
                                     <i class="bi bi-folder-plus" style="font-size: 2rem; font-weight: bold;"></i>
                                 </button>
                             </div>
