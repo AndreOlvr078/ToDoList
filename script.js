@@ -7,7 +7,7 @@ let checkboxDaRipristinare = null;
 
 // Selezione utente
 function caricaUtenti() {
-  fetch('https://localhost:7000/api/Utenti')
+  fetch('https://localhost:7000/api/UtenteID')
     .then(res => res.json())
     .then(utenti => {
       const select = document.getElementById('utenteDropdown');
