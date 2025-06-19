@@ -53,17 +53,26 @@ namespace ToDoListAPI.Controllers
             return Ok(tasks);
         }
 
-
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)  //Recupera un task specifico per ID dalla tabella Task.
+        [HttpGet("Stato")]
+        public IActionResult GetTasksByStato() // Recupera i task filtrati per stato (completati o non completati) tramite la stored procedure "OrdinaStato".
         {
-            var task = _context.Task.Find(id);
-
-            if (task == null)
-                return NotFound();
-
-            return Ok(task);
+            var tasks = _context.TaskJoinDto
+                .FromSqlRaw("EXEC OrdinaStatoNo")
+                .ToList();
+            return Ok(tasks);
         }
+
+
+        //[HttpGet("{id}")]
+        //public IActionResult GetById(int id)  //Recupera un task specifico per ID dalla tabella Task.
+        //{
+        //    var task = _context.Task.Find(id);
+
+        //    if (task == null)
+        //        return NotFound();
+
+        //    return Ok(task);
+        //}
 
         [HttpPost]
         public IActionResult Create([FromBody] TaskCreateDto dto) // Crea un nuovo task eseguendo la stored procedure "AggiungiTask" con i dati forniti nel body della richiesta.
@@ -115,6 +124,13 @@ namespace ToDoListAPI.Controllers
             _context.Database.ExecuteSqlRaw(sql, id);
 
             return Ok(new { message = "Task eliminato tramite stored procedure." });
+        }
+
+        [HttpDelete("EliminaCompletate")]
+        public IActionResult DeleteCompletedTasks() // Elimina tutti i task completati eseguendo la stored procedure "EliminaCompletate".
+        {
+            _context.Database.ExecuteSqlRaw("EXEC EliminaCompletate");
+            return Ok(new { message = "Task completati eliminati." });
         }
     }
 }
