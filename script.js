@@ -80,19 +80,19 @@ function salvaTask(e) {
       utenteID
     })
   })
-  .then(res => {
-    if (!res.ok) throw new Error('Errore nel salvataggio');
-    return res.json();
-  })
-  .then(() => {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
-    modal.hide();
-    document.getElementById('taskForm').reset();
-    taskDaModificare = null;
-    document.getElementById('btnAggiungi').textContent = 'Aggiungi';
-    caricaTasks();
-  })
-  .catch(err => alert(err.message));
+    .then(res => {
+      if (!res.ok) throw new Error('Errore nel salvataggio');
+      return res.json();
+    })
+    .then(() => {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+      modal.hide();
+      document.getElementById('taskForm').reset();
+      taskDaModificare = null;
+      document.getElementById('btnAggiungi').textContent = 'Aggiungi';
+      caricaTasks();
+    })
+    .catch(err => alert(err.message));
 }
 
 // Collega la funzione al click del pulsante
@@ -100,24 +100,24 @@ document.getElementById('btnAggiungi').addEventListener('click', salvaTask);
 
 // DELETE funzona
 function eliminaTask(id) {
-    taskIdDaEliminare = id;
-    var modal = new bootstrap.Modal(document.getElementById('confermaEliminaModal'));
-    modal.show();
+  taskIdDaEliminare = id;
+  var modal = new bootstrap.Modal(document.getElementById('confermaEliminaModal'));
+  modal.show();
 }
 
 // Conferma eliminazione
-document.getElementById('btnConfermaElimina').addEventListener('click', function() {
-    if (taskIdDaEliminare !== null) {
-        fetch(`https://localhost:7000/api/Task/${taskIdDaEliminare}`, {
-            method: 'DELETE'
-        })
-        .then(() => {
-            taskIdDaEliminare = null;
-            var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
-            modal.hide();
-            caricaTasks();
-        });
-    }
+document.getElementById('btnConfermaElimina').addEventListener('click', function () {
+  if (taskIdDaEliminare !== null) {
+    fetch(`https://localhost:7000/api/Task/${taskIdDaEliminare}`, {
+      method: 'DELETE'
+    })
+      .then(() => {
+        taskIdDaEliminare = null;
+        var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
+        modal.hide();
+        caricaTasks();
+      });
+  }
 });
 
 // MODIFICA - Carica i dati del task e apre il form per modificarlo
@@ -134,7 +134,7 @@ function modificaTask(id) {
       document.getElementById('categoria').value = task.categoriaID; //  assicurati che sia categoriaID e non descrizione
       document.getElementById('scadenza').value = task.scadenza.split('T')[0]; // elimina orario se presente
       document.getElementById('utente').value = task.utenteID;
-      
+
       taskDaModificare = id;
       document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
 
@@ -148,18 +148,18 @@ function modificaTask(id) {
 }
 
 function notaTask(id) {
-    fetch(`https://localhost:7000/api/Task/${id}`)
-        .then(res => res.json())
-        .then(task => {
-            document.getElementById('modalDescrizioneTesto').textContent = task.descrizione;
-            var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
-            modal.show();
-        })
-        .catch(() => {
-            document.getElementById('modalDescrizioneTesto').textContent = "Descrizione non trovata.";
-            var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
-            modal.show();
-        });
+  fetch(`https://localhost:7000/api/Task/${id}`)
+    .then(res => res.json())
+    .then(task => {
+      document.getElementById('modalDescrizioneTesto').textContent = task.descrizione;
+      var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+      modal.show();
+    })
+    .catch(() => {
+      document.getElementById('modalDescrizioneTesto').textContent = "Descrizione non trovata.";
+      var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+      modal.show();
+    });
 }
 
 // EVENTI
