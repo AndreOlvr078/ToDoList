@@ -14,26 +14,26 @@ function caricaTasks() {
         box.className = 'card mb-2 w-100';
         box.innerHTML = `
           <div class="card-body p-2">
-            <div class="d-flex flex-row align-items-center justify-content-between flex-wrap">
-              <span class="mx-3">${task.id}</span>
-              <span class="mx-3"><strong>Titolo:</strong> ${task.titolo}</span>
-              <span class="mx-3"><strong>Descrizione:</strong> ${task.descrizione}</span>
-              <span class="mx-3"><strong>Categoria:</strong> ${task.categoria}</span>
-              <span class="mx-3"><strong>Utente:</strong> ${task.utente}</span>
-              <span class="mx-3"><strong>Stato:</strong> ${task.stato}</span>
-              <span class="mx-3"><strong>Scadenza:</strong> ${task.scadenza}</span>
-              <div class="ms-auto d-flex gap-2">
-          <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-            style="width: 48px; height: 48px; padding: 0;"
-            onclick="modificaTask(${task.id})">
-            <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
-          </button>
-          <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-            style="width: 48px; height: 48px; padding: 0;"
-            onclick="eliminaTask(${task.id})">
-            <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-          </button>
-              </div>
+            <div class="row align-items-center flex-wrap">
+              <div class="col-auto mx-2"><span><strong>ID:</strong> ${task.id}</span></div>
+              <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
+              <div class="col-auto mx-2"><span><strong>Descrizione:</strong> ${task.descrizione}</span></div>
+              <div class="col-auto mx-2"><span><strong>Categoria:</strong> ${task.categoria}</span></div>
+              <div class="col-auto mx-2"><span><strong>Utente:</strong> ${task.utente}</span></div>
+              <div class="col-auto mx-2"><span><strong>Stato:</strong> ${task.stato}</span></div>
+              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${task.scadenza}</span></div>
+              <div class="col-auto ms-auto d-flex gap-2">
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="modificaTask(${task.id})">
+                          <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="eliminaTask(${task.id})">
+                          <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                </div>
             </div>
           </div>
         `;
