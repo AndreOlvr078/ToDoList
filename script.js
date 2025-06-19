@@ -42,8 +42,7 @@ function caricaTasks() {
           <div class="card-body p-2">
             <div class="row align-items-center flex-wrap">
               <div class="col-auto mx-2">
-                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
-                  checked disabled>
+                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);">
               </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
               <div class="col-auto mx-2"><span><strong>Categoria:</strong> ${task.categoria}</span></div>
