@@ -27,6 +27,30 @@ function apriModalUtente() {
   modal.show();
 }
 
+document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
+  const utenteId = document.getElementById('utenteDropdown').value;
+  if (utenteId) {
+    caricaTasksPerUtente(utenteId);
+    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
+    modal.hide();
+  } else {
+    alert('Seleziona un utente!');
+  }
+});
+
+function caricaTasksPerUtente(utenteId) {
+  fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
+    .then(res => res.json())
+    .then(tasks => {
+      // Qui aggiorna la lista come già fai in caricaTasks
+      const lista = document.getElementById('lista-box');
+      lista.innerHTML = '';
+      tasks.forEach(task => {
+        // ...crea e aggiungi i box delle task come già fai...
+      });
+    });
+}
+
 // GET funzionante
 function caricaTasks() {
   fetch('https://localhost:7000/api/Task')
