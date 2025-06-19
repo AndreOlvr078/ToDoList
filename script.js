@@ -87,6 +87,33 @@ function caricaTasksPerUtente(UtenteId) {
       alert("Errore nel caricamento tasks per utente: " + err.message);
     });
 }
+
+function aggiungiUtente(e) {
+  e.preventDefault();
+  const nome = document.getElementById('nomeUtente').value;
+
+  fetch('https://localhost:7000/api/Utente', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nome })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Errore nell\'aggiunta utente');
+    return res.json();
+  })
+  .then(() => {
+    document.getElementById('formAggiungiUtente').reset();
+    caricaUtentiForm && caricaUtentiForm();
+    caricaUtentiDropdown && caricaUtentiDropdown();
+    const modal = bootstrap.Modal.getInstance(document.getElementById('aggiungiUtenteModal'));
+    modal.hide();
+    alert('Utente aggiunto!');
+  })
+  .catch(err => alert(err.message));
+}
+
+document.getElementById('formAggiungiUtente').addEventListener('submit', aggiungiUtente);
+
 // GET funzionante
 function caricaTasks() {
   fetch('https://localhost:7000/api/Task')
