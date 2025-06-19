@@ -17,12 +17,13 @@ function caricaTasks() {
         box.innerHTML = `
           <div class="card-body p-2">
             <div class="row align-items-center flex-wrap">
-              <div class="col-auto mx-2"><span><strong>ID:</strong> ${task.id}</span></div>
+              <div class="col-auto mx-2">
+                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);" 
+              ${task.stato ? 'checked' : ''} disabled>
+            </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-              <div class="col-auto mx-2"><span><strong>Descrizione:</strong> ${task.descrizione}</span></div>
               <div class="col-auto mx-2"><span><strong>Categoria:</strong> ${task.categoria}</span></div>
               <div class="col-auto mx-2"><span><strong>Utente:</strong> ${task.utente}</span></div>
-              <div class="col-auto mx-2"><span><strong>Stato:</strong> ${task.stato}</span></div>
               <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${task.scadenza}</span></div>
               <div class="col-auto ms-auto d-flex gap-2">
                   <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
@@ -68,7 +69,7 @@ function salvaTask(e) {
     method = 'PUT';
   }
 
-  fetch(url , {
+  fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -132,7 +133,7 @@ function modificaTask(id) {
     .then(task => {
       document.getElementById('titolo').value = task.titolo;
       document.getElementById('categoria').value = task.categoriaID; //  assicurati che sia categoriaID e non descrizione
-      if(task.scadenza !== null) 
+      if (task.scadenza !== null)
         document.getElementById('scadenza').value = task.scadenza.split('T')[0]; // elimina orario se presente
       document.getElementById('utente').value = task.utenteID;
 
