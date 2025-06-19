@@ -6,7 +6,7 @@ let checkboxDaRipristinare = null;
 
 
 // Selezione utente
-function caricaUtenti() {
+function caricaUtentiDropdown() {
   fetch('https://localhost:7000/api/UtenteID')
     .then(res => res.json())
     .then(utenti => {
@@ -32,18 +32,19 @@ function caricaTasks() {
   fetch('https://localhost:7000/api/Task')
     .then(res => res.json())
     .then(tasks => {
+      console.log(tasks)
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
-      // Mostra solo le task NON completate
-      tasks.filter(task => !task.stato).forEach(task => {
+      tasks.forEach(task => {
         const box = document.createElement('div');
         box.className = 'card mb-2 w-100';
         box.innerHTML = `
           <div class="card-body p-2">
             <div class="row align-items-center flex-wrap">
               <div class="col-auto mx-2">
-                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);">
-              </div>
+                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
+${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
+            </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
               <div class="col-auto mx-2"><span><strong>Categoria:</strong> ${task.categoria}</span></div>
               <div class="col-auto mx-2"><span><strong>Utente:</strong> ${task.utente}</span></div>
@@ -260,7 +261,7 @@ function caricaCategorie() {
     });
 }
 
-function caricaUtenti() {
+function caricaUtentiForm() {
   fetch('https://localhost:7000/api/Utente') // assicurati che questo endpoint esista
     .then(res => res.json())
     .then(utenti => {
@@ -284,7 +285,7 @@ function caricaUtenti() {
 document.addEventListener('DOMContentLoaded', () => {
   caricaTasks();
   caricaCategorie();
-  caricaUtenti();
+  caricaUtentiForm();
 });
 
 // EVENTI
