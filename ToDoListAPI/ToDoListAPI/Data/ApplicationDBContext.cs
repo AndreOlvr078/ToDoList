@@ -13,7 +13,7 @@ namespace ToDoListAPI.Data
         public DbSet<Categorie> Categorie { get; set; } //CATEGORIE A CUI APPARTENGONO LE TASK
         public DbSet<Utente> Utente { get; set; } //RAPPRESENTA GLI UTENTI DELL'APPLICAZIONE
         public DbSet<TaskJoinDto> TaskJoinDto { get; set; } //utilizzato per mappare i risultati di una stored procedure (senza chiave primaria).
-
+        public DbSet<CountResultDto> CountResultDto { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -32,6 +32,7 @@ namespace ToDoListAPI.Data
                 .WithMany(u => u.Task)      // Relazione inversa: Utente -> molti Task
                 .HasForeignKey(t => t.UtenteID);   // Chiave esterna in Task: UtenteID
 
+            modelBuilder.Entity<CountResultDto>().HasNoKey();
             modelBuilder.Entity<TaskJoinDto>().HasNoKey(); // Mappa TaskJoinDto come entità senza chiave primaria, usata solo per leggere dati (es. stored procedure)
         }
     }

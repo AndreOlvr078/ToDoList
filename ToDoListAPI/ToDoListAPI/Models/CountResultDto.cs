@@ -1,6 +1,7 @@
 ﻿namespace ToDoListAPI.Models
 {
-    public class CountResultDTO
+    public class CountResultDto
     {
+        public int Totale { get; set; }
     }
 }

@@ -84,6 +84,29 @@ namespace ToDoListAPI.Controllers
             return Ok(task);
         }
 
+        [HttpGet("CountCompletate")]
+        public IActionResult ContaCompletate()
+        {
+            var risultato = _context.Set<CountResultDto>()
+                .FromSqlRaw("EXEC CountStatoSi")
+                .AsEnumerable()
+                .FirstOrDefault();
+
+            return Ok(risultato);
+        }
+
+        [HttpGet("CountDaFare")]
+        public IActionResult ContaDaFare()
+        {
+            var risultato = _context.Set<CountResultDto>()
+                .FromSqlRaw("EXEC CountStatoNo")
+                .AsEnumerable()
+                .FirstOrDefault();
+
+            return Ok(risultato);
+        }
+
+
         [HttpPost]
         public IActionResult Create([FromBody] TaskCreateDto dto) // Crea un nuovo task eseguendo la stored procedure "AggiungiTask" con i dati forniti nel body della richiesta.
         {
