@@ -326,15 +326,26 @@ function notaTask(id) {
   fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
     .then(task => {
-      // Mostra descrizione, utente e categoria nella modale
-      document.getElementById('modalDescrizioneTesto').innerHTML = `
-              <div><strong>Titolo:</strong> ${task.titolo}</div>
-        <div><strong>Descrizione:</strong> ${task.descrizione}</div>
-        <div><strong>Utente:</strong> ${u.nome}</div>
-        <div><strong>Categoria:</strong> ${cat.descrizione}</div>
-      `;
-      var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
-      modal.show();
+      // Recupera utente e categoria in parallelo
+      Promise.all([
+        fetch(`https://localhost:7000/api/Utente/${task.utenteID}`).then(r => r.json()),
+        fetch(`https://localhost:7000/api/Categorie/${task.categoriaID}`).then(r => r.json())
+      ])
+      .then(([utente, categoria]) => {
+        document.getElementById('modalDescrizioneTesto').innerHTML = `
+          <div><strong>Titolo:</strong> ${task.titolo}</div>
+          <div><strong>Descrizione:</strong> ${task.descrizione}</div>
+          <div><strong>Utente:</strong> ${utente.nome}</div>
+          <div><strong>Categoria:</strong> ${categoria.descrizione}</div>
+        `;
+        var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+        modal.show();
+      })
+      .catch(() => {
+        document.getElementById('modalDescrizioneTesto').textContent = "Errore nel caricamento di utente o categoria.";
+        var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+        modal.show();
+      });
     })
     .catch(() => {
       document.getElementById('modalDescrizioneTesto').textContent = "Descrizione non trovata.";
