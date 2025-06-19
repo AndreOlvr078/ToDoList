@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using ToDoListAPI.Data;
 using ToDoListAPI.Models;
@@ -18,7 +19,7 @@ namespace ToDoListAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAllTasks()
         {
             var tasks = _context.TaskJoinDto
                 .FromSqlRaw("EXEC TabelleJoinate")
@@ -26,6 +27,29 @@ namespace ToDoListAPI.Controllers
 
             return Ok(tasks);
         }
+
+        [HttpGet("Utente/{UtenteId}")]
+        public IActionResult GetTasksByUser(int UtenteId)
+        {
+            var tasks = _context.TaskJoinDto
+                .FromSqlRaw("EXEC OrdinaUtente @UtenteId",
+                    new SqlParameter("@UtenteId", UtenteId))
+                .ToList();
+
+            return Ok(tasks);
+        }
+
+        [HttpGet("Categoria/{CategoriaId}")]
+        public IActionResult GetTasksByCategoria(int CategoriaId)
+        {
+            var tasks = _context.TaskJoinDto
+                .FromSqlRaw("EXEC OrdinaCategoria @CategoriaId",
+                    new SqlParameter("@CategoriaId", CategoriaId))
+                .ToList();
+
+            return Ok(tasks);
+        }
+
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
@@ -58,7 +82,6 @@ namespace ToDoListAPI.Controllers
 
             return Ok(new { message = "Task inserito." });
         }
-
 
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] TaskCreateDto dto)
