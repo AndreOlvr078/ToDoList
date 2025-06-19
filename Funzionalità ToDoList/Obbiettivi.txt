@@ -1,5 +1,5 @@
-- date di scadenza funzionanti
+- date di scadenza funzionanti con il time 
 - completare la seconda pagina in cui si visualizzano le task completate
-- sistemare il pulsante descrizione: nella lista visualizzata ci devono essere solo il nome della task e la data, il resto va visualizzato   al click di quel pulsante
 - inserire gif caricamento all'apertura della pagina
+
 
