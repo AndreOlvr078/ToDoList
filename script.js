@@ -3,7 +3,7 @@ let taskDaModificare = null;
 let taskIdDaEliminare = null;
 let taskIdDaCompletare = null;
 let checkboxDaRipristinare = null;
-
+let utenteSelezionato = null;
 
 // Selezione utente
 function caricaUtentiDropdown() {
@@ -30,6 +30,7 @@ function apriModalUtente() {
 document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
   const UtenteId = document.getElementById('utenteDropdown').value;
   if (UtenteId) {
+    utenteSelezionato = UtenteId;  
     caricaTasksPerUtente(UtenteId);
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
     modal.hide();
@@ -224,7 +225,13 @@ function aggiornaStatoTask(id, nuovoStato) {
       if (!res.ok) throw new Error("Errore nel salvataggio");
       return res.json();
     })
-    .then(() => caricaTasks())
+    .then(() => {
+      if (utenteSelezionato) {
+        caricaTasksPerUtente(utenteSelezionato);
+      } else {
+        caricaTasks();
+      }
+    })
     .catch(err => alert(err.message));
 }
 document.getElementById('btnConfermaCompleta').addEventListener('click', function () {
