@@ -1,6 +1,7 @@
 ﻿using System.Runtime.ConstrainedExecution;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,7 @@ namespace ToDoListAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TaskController : ControllerBase
+    public class TaskController : ControllerBase  //LA CARTELLA CONTROLLERS SI OCCUPA SI GESTIRE, CONTROLLARE...UTENTI, TASK E CATEGORIA ANDANDO A CREARE, RECUPERARE O ELIMINARE SECONDO I LORO ID
     {
         private readonly ApplicationDbContext _context;
 

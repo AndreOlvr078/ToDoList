@@ -1,11 +1,12 @@
 ﻿using System.Runtime.ConstrainedExecution;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ToDoListAPI.Data;
 using ToDoListAPI.Models;
 
-namespace ToDoListAPI.Controllers
+namespace ToDoListAPI.Controllers  //LA CARTELLA CONTROLLERS SI OCCUPA SI GESTIRE, CONTROLLARE...UTENTI,TASK E CATEGORIA ANDANDO A CREARE, RECUPERARE O ELIMINARE SECONDO I LORO ID
 {
     [ApiController]
     [Route("api/[controller]")]   //Controller API per la gestione delle categorie.
