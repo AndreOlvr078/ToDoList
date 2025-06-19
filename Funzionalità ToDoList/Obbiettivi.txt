@@ -1,4 +1,5 @@
-Aggiungere una barra per creare nuovi utenti e categorie
-date di scadenza funzionanti
-migliorare visualizzazione dati
-far in modochele task completate vengano spostate nella pagina due 
+- date di scadenza funzionanti
+- completare la seconda pagina in cui si visualizzano le task completate
+- sistemare il pulsante descrizione: nella lista visualizzata ci devono essere solo il nome della task e la data, il resto va visualizzato   al click di quel pulsante
+- inserire gif caricamento all'apertura della pagina
+
