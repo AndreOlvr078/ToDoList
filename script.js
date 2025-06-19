@@ -133,8 +133,6 @@ function caricaTasks() {
 ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
             </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-              <div class="col-auto mx-2"><span><strong>Categoria:</strong> ${task.categoria}</span></div>
-              <div class="col-auto mx-2"><span><strong>Utente:</strong> ${task.utente}</span></div>
               <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${task.scadenza}</span></div>
               <div class="col-auto ms-auto d-flex gap-2">
                   <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
@@ -328,7 +326,12 @@ function notaTask(id) {
   fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
     .then(task => {
-      document.getElementById('modalDescrizioneTesto').textContent = task.descrizione;
+      // Mostra descrizione, utente e categoria nella modale
+      document.getElementById('modalDescrizioneTesto').innerHTML = `
+        <div><strong>Descrizione:</strong> ${task.descrizione}</div>
+        <div><strong>Utente:</strong> ${task.utente}</div>
+        <div><strong>Categoria:</strong> ${task.categoria}</div>
+      `;
       var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
       modal.show();
     })
