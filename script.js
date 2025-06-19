@@ -5,8 +5,18 @@ let taskIdDaCompletare = null;
 let checkboxDaRipristinare = null;
 let utenteSelezionato = null;
 
+
+function mostraSpinner() {
+  document.getElementById('spinner').style.display = 'flex';
+}
+
+function nascondiSpinner() {
+  document.getElementById('spinner').style.display = 'none';
+}
+
 // Selezione utente
 function caricaUtentiDropdown() {
+    mostraSpinner();
   fetch('https://localhost:7000/api/Utente')
     .then(res => res.json())
     .then(utenti => {
@@ -18,13 +28,18 @@ function caricaUtentiDropdown() {
         option.textContent = u.nome; // o altro campo che vuoi mostrare
         select.appendChild(option);
       });
+    })
+    .finally(() => {
+      nascondiSpinner();
     });
 }
 
 function apriModalUtente() {
+    mostraSpinner();
   caricaUtentiDropdown();
   const modal = new bootstrap.Modal(document.getElementById('scegliUtenteModal'));
   modal.show();
+  nascondiSpinner();
 }
 
 document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
@@ -40,6 +55,7 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
 });
 
 function caricaTasksPerUtente(UtenteId) {
+    mostraSpinner();
   fetch(`https://localhost:7000/api/Task/Utente/${UtenteId}`)
     .then(res => res.json())
     .then(tasks => {          // <-- qui devi mettere "tasks"
@@ -83,10 +99,14 @@ function caricaTasksPerUtente(UtenteId) {
     })
     .catch(err => {
       alert("Errore nel caricamento tasks per utente: " + err.message);
+    })
+    .finally(() => {
+      nascondiSpinner();
     });
 }
 
 function aggiungiCategoria(e) {
+    mostraSpinner();
   e.preventDefault();
   const nome = document.getElementById('nomeCategoria').value;
 
@@ -106,12 +126,16 @@ function aggiungiCategoria(e) {
       modal.hide();
       alert('Categoria aggiunta!');
     })
-    .catch(err => alert(err.message));
+    .catch(err => alert(err.message))
+    .finally(() => {
+      nascondiSpinner();
+    });
 }
 
 document.getElementById('formAggiungiCategoria').addEventListener('submit', aggiungiCategoria)
 
 function aggiungiUtente(e) {
+  mostraSpinner();
   e.preventDefault();
   const nome = document.getElementById('nomeUtente').value;
 
@@ -132,13 +156,17 @@ function aggiungiUtente(e) {
       modal.hide();
       alert('Utente aggiunto!');
     })
-    .catch(err => alert(err.message));
+    .catch(err => alert(err.message))
+    .finally(() => {
+      nascondiSpinner();
+    });
 }
 
 document.getElementById('formAggiungiUtente').addEventListener('submit', aggiungiUtente);
 
 // GET funzionante
 function caricaTasks() {
+  mostraSpinner();
   fetch('https://localhost:7000/api/Task')
     .then(res => res.json())
     .then(tasks => {
@@ -179,11 +207,15 @@ function caricaTasks() {
         `;
         lista.appendChild(box);
       });
+    })
+    .finally(() => {
+      nascondiSpinner();
     });
 }
 
 // POST/PUT
 function salvaTask(e) {
+  mostraSpinner();
   if (e) e.preventDefault();
 
   const titolo = document.getElementById('titolo').value;
@@ -225,7 +257,10 @@ function salvaTask(e) {
       document.getElementById('btnAggiungi').textContent = 'Aggiungi';
       caricaTasks();
     })
-    .catch(err => alert(err.message));
+    .catch(err => alert(err.message))
+    .finally(() => {
+      nascondiSpinner();
+    });
 }
 
 // Collega la funzione al click del pulsante
@@ -233,13 +268,16 @@ document.getElementById('taskForm').addEventListener('submit', salvaTask);
 
 // DELETE funzona
 function eliminaTask(id) {
+  mostraSpinner();
   taskIdDaEliminare = id;
   var modal = new bootstrap.Modal(document.getElementById('confermaEliminaModal'));
   modal.show();
+  nascondiSpinner();
 }
 
 // Funzione per aggiornare lo stato del task
 function toggleStato(id, nuovoStato, checkbox) {
+  mostraSpinner();
   if (nuovoStato) {
     // Se si spunta la checkbox, chiedi conferma
     taskIdDaCompletare = id;
@@ -250,9 +288,11 @@ function toggleStato(id, nuovoStato, checkbox) {
     // Se si deseleziona, aggiorna subito
     aggiornaStatoTask(id, false);
   }
+  nascondiSpinner();
 }
 
 function aggiornaStatoTask(id, nuovoStato) {
+  mostraSpinner();
   fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
     .then(task => {
@@ -280,8 +320,12 @@ function aggiornaStatoTask(id, nuovoStato) {
         caricaTasks();
       }
     })
-    .catch(err => alert(err.message));
+    .catch(err => alert(err.message))
+    .finally(() => {
+      nascondiSpinner();
+    });
 }
+
 document.getElementById('btnConfermaCompleta').addEventListener('click', function () {
   if (taskIdDaCompletare !== null) {
     aggiornaStatoTask(taskIdDaCompletare, true);
@@ -319,6 +363,7 @@ document.getElementById('btnConfermaElimina').addEventListener('click', function
 
 // MODIFICA - Carica i dati del task e apre il form per modificarlo
 function modificaTask(id) {
+  mostraSpinner();
   fetch(`https://localhost:7000/api/Task/${id}`, {
     method: 'GET'  //  Metodo corretto per ottenere i dati
   })
@@ -342,10 +387,14 @@ function modificaTask(id) {
     .catch(err => {
       console.error("Errore:", err);
       alert("Impossibile caricare il task.");
+    })
+    .finally(() => {
+      nascondiSpinner();
     });
 }
 
 function notaTask(id) {
+  mostraSpinner();
   fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
     .then(task => {
@@ -374,10 +423,14 @@ function notaTask(id) {
       document.getElementById('modalDescrizioneTesto').textContent = "Descrizione non trovata.";
       var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
       modal.show();
+    })
+    .finally(() => {
+      nascondiSpinner();
     });
 }
 
 function caricaCategorie() {
+  mostraSpinner();
   fetch('https://localhost:7000/api/Categorie')
     .then(res => res.json())
     .then(categorie => {
@@ -389,10 +442,14 @@ function caricaCategorie() {
         option.textContent = cat.descrizione; // o cat.descrizione
         select.appendChild(option);
       });
+    })
+    .finally(() => {
+      nascondiSpinner();
     });
 }
 
 function caricaUtentiForm() {
+  mostraSpinner();
   fetch('https://localhost:7000/api/Utente') // assicurati che questo endpoint esista
     .then(res => res.json())
     .then(utenti => {
@@ -407,6 +464,9 @@ function caricaUtentiForm() {
     })
     .catch(() => {
       alert("Errore nel caricamento degli utenti.");
+    })
+    .finally(() => {
+      nascondiSpinner();
     });
 }
 
@@ -414,10 +474,14 @@ function caricaUtentiForm() {
 
 // Quando la pagina è pronta, carica tasks e categorie
 document.addEventListener('DOMContentLoaded', () => {
+  mostraSpinner();
   caricaTasks();
   caricaCategorie();
   caricaUtentiForm();
-});
+})
+.finally(() => {
+      nascondiSpinner();
+    });
 
 // EVENTI
 document.getElementById('taskForm').addEventListener('submit', salvaTask);
