@@ -41,6 +41,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection(); // Forza l’uso di HTTPS per tutte le richieste.
+app.UseCors("AllowAll");
 app.UseAuthorization();  // Middleware per l’autorizzazione (anche se non configurata esplicitamente qui).
 app.MapControllers();     // Mappa le rotte ai controller definiti.
 app.Run();       // Avvia l’applicazione.
