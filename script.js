@@ -167,10 +167,10 @@ document.getElementById('formAggiungiUtente').addEventListener('submit', aggiung
 // GET funzionante
 function caricaTasks() {
   mostraSpinner();
-  fetch('https://localhost:7000/api/Task')
+  return fetch('https://localhost:7000/api/Task')
     .then(res => res.json())
     .then(tasks => {
-      console.log(tasks)
+      console.log(tasks);
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
       tasks.forEach(task => {
@@ -181,37 +181,41 @@ function caricaTasks() {
             <div class="row align-items-center flex-wrap">
               <div class="col-auto mx-2">
                 <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
-              ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
-            </div>
+                  ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
+              </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${task.scadenza}</span></div>
+              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${task.scadenza.split('T')[0]}</span></div>
               <div class="col-auto ms-auto d-flex gap-2">
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="notaTask(${task.id})">
-                          <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="modificaTask(${task.id})">
-                          <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="eliminaTask(${task.id})">
-                          <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                </div>
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;"
+                        onclick="notaTask(${task.id})">
+                  <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;"
+                        onclick="modificaTask(${task.id})">
+                  <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;"
+                        onclick="eliminaTask(${task.id})">
+                  <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
+              </div>
             </div>
           </div>
         `;
         lista.appendChild(box);
       });
     })
+    .catch(err => {
+      console.error("Errore nel caricamento delle task:", err);
+    })
     .finally(() => {
       nascondiSpinner();
     });
 }
+
 
 // POST/PUT
 function salvaTask(e) {
@@ -431,39 +435,43 @@ function notaTask(id) {
 
 function caricaCategorie() {
   mostraSpinner();
-  fetch('https://localhost:7000/api/Categorie')
+  return fetch('https://localhost:7000/api/Categorie')
     .then(res => res.json())
     .then(categorie => {
       const select = document.getElementById('categoria');
       select.innerHTML = '<option value="">Seleziona categoria...</option>';
       categorie.forEach(cat => {
         const option = document.createElement('option');
-        option.value = cat.id; // o cat.categoriaID, dipende dal tuo modello
-        option.textContent = cat.descrizione; // o cat.descrizione
+        option.value = cat.id;
+        option.textContent = cat.descrizione;
         select.appendChild(option);
       });
+    })
+    .catch(err => {
+      console.error("Errore nel caricamento categorie:", err);
     })
     .finally(() => {
       nascondiSpinner();
     });
 }
 
+
 function caricaUtentiForm() {
   mostraSpinner();
-  fetch('https://localhost:7000/api/Utente') // assicurati che questo endpoint esista
+  return fetch('https://localhost:7000/api/Utente')
     .then(res => res.json())
     .then(utenti => {
       const select = document.getElementById('utente');
       select.innerHTML = '<option value="">Seleziona utente...</option>';
       utenti.forEach(u => {
         const option = document.createElement('option');
-        option.value = u.id; // o u.utenteID, dipende dal tuo modello
-        option.textContent = u.nome; // o u.username, dipende dal tuo campo
+        option.value = u.id;
+        option.textContent = u.nome;
         select.appendChild(option);
       });
     })
-    .catch(() => {
-      alert("Errore nel caricamento degli utenti.");
+    .catch(err => {
+      console.error("Errore nel caricamento utenti:", err);
     })
     .finally(() => {
       nascondiSpinner();
@@ -471,18 +479,19 @@ function caricaUtentiForm() {
 }
 
 
-
 // Quando la pagina è pronta, carica tasks e categorie
 document.addEventListener('DOMContentLoaded', () => {
   mostraSpinner();
-  caricaTasks();
-  caricaCategorie();
-  caricaUtentiForm();
-})
-.finally(() => {
+  setTimeout(() => {
+    Promise.all([
+      caricaTasks(),
+      caricaCategorie(),
+      caricaUtentiForm()
+    ]).finally(() => {
       nascondiSpinner();
     });
-
+  }, 1000); // Spinner visibile per almeno 1 secondo
+});
 // EVENTI
 document.getElementById('taskForm').addEventListener('submit', salvaTask);
 
