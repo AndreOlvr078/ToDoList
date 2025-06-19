@@ -7,7 +7,7 @@ let checkboxDaRipristinare = null;
 
 // Selezione utente
 function caricaUtentiDropdown() {
-  fetch('https://localhost:7000/api/UtenteID')
+  fetch('https://localhost:7000/api/Utente')
     .then(res => res.json())
     .then(utenti => {
       const select = document.getElementById('utenteDropdown');
@@ -22,15 +22,15 @@ function caricaUtentiDropdown() {
 }
 
 function apriModalUtente() {
-  caricaUtenti();
+  caricaUtentiDropdown();
   const modal = new bootstrap.Modal(document.getElementById('scegliUtenteModal'));
   modal.show();
 }
 
 document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
-  const utenteId = document.getElementById('utenteDropdown').value;
-  if (utenteId) {
-    caricaTasksPerUtente(utenteId);
+  const UtenteId = document.getElementById('utenteDropdown').value;
+  if (UtenteId) {
+    caricaTasksPerUtente(UtenteId);
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
     modal.hide();
   } else {
@@ -38,19 +38,54 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
   }
 });
 
-function caricaTasksPerUtente(utenteId) {
-  fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
+function caricaTasksPerUtente(UtenteId) {
+  fetch(`https://localhost:7000/api/Task/Utente/${UtenteId}`)
     .then(res => res.json())
-    .then(tasks => {
-      // Qui aggiorna la lista come già fai in caricaTasks
+    .then(tasks => {          // <-- qui devi mettere "tasks"
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
       tasks.forEach(task => {
-        // ...crea e aggiungi i box delle task come già fai...
+        // crea e aggiungi i box come in caricaTasks
+        const box = document.createElement('div');
+        box.className = 'card mb-2 w-100';
+        box.innerHTML = `
+          <div class="card-body p-2">
+            <div class="row align-items-center flex-wrap">
+              <div class="col-auto mx-2">
+                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
+                ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
+              </div>
+              <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
+              <div class="col-auto mx-2"><span><strong>Categoria:</strong> ${task.categoria}</span></div>
+              <div class="col-auto mx-2"><span><strong>Utente:</strong> ${task.utente}</span></div>
+              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${task.scadenza}</span></div>
+              <div class="col-auto ms-auto d-flex gap-2">
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="notaTask(${task.id})">
+                          <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="modificaTask(${task.id})">
+                          <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="eliminaTask(${task.id})">
+                          <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                </div>
+            </div>
+          </div>
+        `;
+        lista.appendChild(box);
       });
+    })
+    .catch(err => {
+      alert("Errore nel caricamento tasks per utente: " + err.message);
     });
 }
-
 // GET funzionante
 function caricaTasks() {
   fetch('https://localhost:7000/api/Task')
