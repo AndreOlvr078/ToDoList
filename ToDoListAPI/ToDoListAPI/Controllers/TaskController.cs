@@ -1,10 +1,7 @@
 ﻿using System.Runtime.ConstrainedExecution;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-<<<<<<< Updated upstream
 using Microsoft.AspNetCore.Http.HttpResults;
-=======
->>>>>>> Stashed changes
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -26,11 +23,7 @@ namespace ToDoListAPI.Controllers
         }
 
         [HttpGet]
-<<<<<<< Updated upstream
         public IActionResult GetAllTasks() // Recupera la lista di task tramite la stored procedure "TabelleJoinate" e restituisce un DTO personalizzato(TaskJoinDto).
-=======
-        public IActionResult GetAll()  // Recupera la lista di task tramite la stored procedure "TabelleJoinate" e restituisce un DTO personalizzato(TaskJoinDto).
->>>>>>> Stashed changes
         {
             var tasks = _context.TaskJoinDto
                 .FromSqlRaw("EXEC TabelleJoinate")

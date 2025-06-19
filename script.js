@@ -56,7 +56,7 @@ function salvaTask(e) {
   const titolo = document.getElementById('titolo').value;
   const descrizione = document.getElementById('descrizione').value;  // Assicurati che esista questo input
   const scadenza = document.getElementById('scadenza').value;
-  const stato = document.getElementById('stato').value;              // Anche questo input deve esistere
+  const stato = document.getElementById('stato').checked;             // Anche questo input deve esistere
   const categoriaID = parseInt(document.getElementById('categoria').value);
   const utenteID = parseInt(document.getElementById('utente').value);
 
@@ -172,7 +172,7 @@ function caricaCategorie() {
       categorie.forEach(cat => {
         const option = document.createElement('option');
         option.value = cat.id; // o cat.categoriaID, dipende dal tuo modello
-        option.textContent = cat.nome; // o cat.descrizione
+        option.textContent = cat.descrizione; // o cat.descrizione
         select.appendChild(option);
       });
     });
