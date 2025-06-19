@@ -23,11 +23,7 @@ namespace ToDoListAPI.Controllers
         }
 
         [HttpGet]
-<<<<<<< Updated upstream
-        public IActionResult GetAllTasks()
-=======
-        public IActionResult GetAll()  // Recupera la lista di task tramite la stored procedure "TabelleJoinate" e restituisce un DTO personalizzato(TaskJoinDto).
->>>>>>> Stashed changes
+        public IActionResult GetAllTasks() // Recupera la lista di task tramite la stored procedure "TabelleJoinate" e restituisce un DTO personalizzato(TaskJoinDto).
         {
             var tasks = _context.TaskJoinDto
                 .FromSqlRaw("EXEC TabelleJoinate")
@@ -55,6 +51,15 @@ namespace ToDoListAPI.Controllers
                     new SqlParameter("@CategoriaId", CategoriaId))
                 .ToList();
 
+            return Ok(tasks);
+        }
+
+        [HttpGet("Stato")]
+        public IActionResult GetTasksByStato() // Recupera i task filtrati per stato (completati o non completati) tramite la stored procedure "OrdinaStato".
+        {
+            var tasks = _context.TaskJoinDto
+                .FromSqlRaw("EXEC OrdinaStatoNo")
+                .ToList();
             return Ok(tasks);
         }
 
@@ -120,6 +125,13 @@ namespace ToDoListAPI.Controllers
             _context.Database.ExecuteSqlRaw(sql, id);
 
             return Ok(new { message = "Task eliminato tramite stored procedure." });
+        }
+
+        [HttpDelete("EliminaCompletate")]
+        public IActionResult DeleteCompletedTasks() // Elimina tutti i task completati eseguendo la stored procedure "EliminaCompletate".
+        {
+            _context.Database.ExecuteSqlRaw("EXEC EliminaCompletate");
+            return Ok(new { message = "Task completati eliminati." });
         }
     }
 }

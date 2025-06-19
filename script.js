@@ -1,5 +1,7 @@
 let modalDiv = null;
 let taskDaModificare = null;
+let taskIdDaEliminare = null;
+
 
 // GET funzionante
 function caricaTasks() {
@@ -25,6 +27,11 @@ function caricaTasks() {
               <div class="col-auto ms-auto d-flex gap-2">
                   <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
                           style="width: 48px; height: 48px; padding: 0;"
+                          onclick="notaTask(${task.id})">
+                          <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
                           onclick="modificaTask(${task.id})">
                           <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
                   </button>
@@ -32,11 +39,6 @@ function caricaTasks() {
                           style="width: 48px; height: 48px; padding: 0;"
                           onclick="eliminaTask(${task.id})">
                           <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="notaTask(${task.id})">
-                          <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
                   </button>
                 </div>
             </div>
@@ -66,31 +68,31 @@ function salvaTask(e) {
     method = 'PUT';
   }
 
-  fetch(url, {
+  fetch(url =`https://localhost:7000/api/Task/${taskDaModificare}`, {
     method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       titolo,
       descrizione,
-      scadenza,
       stato,
+      scadenza,
       categoriaID,
       utenteID
     })
   })
-  .then(res => {
-    if (!res.ok) throw new Error('Errore nel salvataggio');
-    return res.json();
-  })
-  .then(() => {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
-    modal.hide();
-    document.getElementById('taskForm').reset();
-    taskDaModificare = null;
-    document.getElementById('btnAggiungi').textContent = 'Aggiungi';
-    caricaTasks();
-  })
-  .catch(err => alert(err.message));
+    .then(res => {
+      if (!res.ok) throw new Error('Errore nel salvataggio');
+      return res.json();
+    })
+    .then(() => {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+      modal.hide();
+      document.getElementById('taskForm').reset();
+      taskDaModificare = null;
+      document.getElementById('btnAggiungi').textContent = 'Aggiungi';
+      caricaTasks();
+    })
+    .catch(err => alert(err.message));
 }
 
 // Collega la funzione al click del pulsante
@@ -98,13 +100,25 @@ document.getElementById('btnAggiungi').addEventListener('click', salvaTask);
 
 // DELETE funzona
 function eliminaTask(id) {
-  if (confirm("Sei sicuro di voler eliminare questa task?")) {
-    fetch(`https://localhost:7000/api/Task/${id}`, {
+  taskIdDaEliminare = id;
+  var modal = new bootstrap.Modal(document.getElementById('confermaEliminaModal'));
+  modal.show();
+}
+
+// Conferma eliminazione
+document.getElementById('btnConfermaElimina').addEventListener('click', function () {
+  if (taskIdDaEliminare !== null) {
+    fetch(`https://localhost:7000/api/Task/${taskIdDaEliminare}`, {
       method: 'DELETE'
     })
-    .then(() => caricaTasks());
+      .then(() => {
+        taskIdDaEliminare = null;
+        var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
+        modal.hide();
+        caricaTasks();
+      });
   }
-}
+});
 
 // MODIFICA - Carica i dati del task e apre il form per modificarlo
 function modificaTask(id) {
@@ -118,9 +132,10 @@ function modificaTask(id) {
     .then(task => {
       document.getElementById('titolo').value = task.titolo;
       document.getElementById('categoria').value = task.categoriaID; //  assicurati che sia categoriaID e non descrizione
-      document.getElementById('scadenza').value = task.scadenza.split('T')[0]; // elimina orario se presente
+      if(task.scadenza !== null) 
+        document.getElementById('scadenza').value = task.scadenza.split('T')[0]; // elimina orario se presente
       document.getElementById('utente').value = task.utenteID;
-      
+
       taskDaModificare = id;
       document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
 
@@ -132,11 +147,44 @@ function modificaTask(id) {
       alert("Impossibile caricare il task.");
     });
 }
-function notaTask(id) { 
-    document.getElementById('modalDescrizioneTesto').textContent = descrizione;
-    var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
-    modal.show();
+
+function notaTask(id) {
+  fetch(`https://localhost:7000/api/Task/${id}`)
+    .then(res => res.json())
+    .then(task => {
+      document.getElementById('modalDescrizioneTesto').textContent = task.descrizione;
+      var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+      modal.show();
+    })
+    .catch(() => {
+      document.getElementById('modalDescrizioneTesto').textContent = "Descrizione non trovata.";
+      var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+      modal.show();
+    });
 }
+
+function caricaCategorie() {
+  fetch('https://localhost:7000/api/Categorie')
+    .then(res => res.json())
+    .then(categorie => {
+      const select = document.getElementById('categoria');
+      select.innerHTML = '<option value="">Seleziona categoria...</option>';
+      categorie.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.id; // o cat.categoriaID, dipende dal tuo modello
+        option.textContent = cat.nome; // o cat.descrizione
+        select.appendChild(option);
+      });
+    });
+}
+
+
+// Quando la pagina è pronta, carica tasks e categorie
+document.addEventListener('DOMContentLoaded', () => {
+  caricaTasks();
+  caricaCategorie();
+});
+
 // EVENTI
 document.getElementById('taskForm').addEventListener('submit', salvaTask);
 
