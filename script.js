@@ -57,7 +57,7 @@ function salvaTask(e) {
   const titolo = document.getElementById('titolo').value;
   const descrizione = document.getElementById('descrizione').value;  // Assicurati che esista questo input
   const scadenza = document.getElementById('scadenza').value;
-  const stato = document.getElementById('stato').checked;             // Anche questo input deve esistere
+            // Anche questo input deve esistere
   const categoriaID = parseInt(document.getElementById('categoria').value);
   const utenteID = parseInt(document.getElementById('utente').value);
 
@@ -75,7 +75,7 @@ function salvaTask(e) {
     body: JSON.stringify({
       titolo,
       descrizione,
-      stato,
+      stato: false,  // Imposta lo stato inizialmente a false
       scadenza,
       categoriaID,
       utenteID
@@ -97,7 +97,7 @@ function salvaTask(e) {
 }
 
 // Collega la funzione al click del pulsante
-document.getElementById('btnAggiungi').addEventListener('click', salvaTask);
+document.getElementById('taskForm').addEventListener('submit', salvaTask);
 
 // DELETE funzona
 function eliminaTask(id) {
