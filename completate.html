@@ -25,10 +25,83 @@
                     style="width: 48px; height: 48px; padding: 0;" onclick="apriModalUtente()">
                     <i class="bi bi-person" style="font-size: 2rem; font-weight: bold;"></i>
                 </button>
-            </nav>
-            <div class="container-fluid mt-4" id="lista-box">
-                
+    </nav>
+    <div class="container-fluid mt-4" id="lista-box">
+
+    </div>
+    <!--Modal scegli utente-->
+    <div class="modal fade" id="scegliUtenteModal" tabindex="-1" aria-labelledby="scegliUtenteLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="scegliUtenteLabel">Scegli utente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                </div>
+                <div class="modal-body">
+                    <select id="utenteDropdown" class="form-select">
+                        <option value="">Seleziona utente...</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="confermaUtenteBtn">Visualizza task</button>
+                </div>
             </div>
+        </div>
+    </div>
+    <!-- Modal per visualizzare le descrizioni -->
+    <div class="modal fade" id="descrizioneModal" tabindex="-1" aria-labelledby="descrizioneModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="descrizioneModalLabel">Descrizione Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                </div>
+                <div class="modal-body" id="modalDescrizioneTesto">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal per l'eliminazione -->
+    <div class="modal fade" id="confermaEliminaModal" tabindex="-1" aria-labelledby="confermaEliminaModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confermaEliminaModalLabel">Conferma Eliminazione</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                </div>
+                <div class="modal-body">
+                    Sei sicuro di voler eliminare questa task?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-primary" id="btnConfermaElimina">Elimina</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal per la conferma della check -->
+    <div class="modal fade" id="confermaCompletaModal" tabindex="-1" aria-labelledby="confermaCompletaModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confermaCompletaModalLabel">Conferma Completamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                </div>
+                <div class="modal-body">
+                    Sei sicuro di voler segnare questa task come completata?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-primary" id="btnConfermaCompleta">Sì, completa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
