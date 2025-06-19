@@ -68,7 +68,7 @@ function salvaTask(e) {
     method = 'PUT';
   }
 
-  fetch(url, {
+  fetch(url =`https://localhost:7000/api/Task/${taskDaModificare}`, {
     method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
