@@ -63,16 +63,16 @@ namespace ToDoListAPI.Controllers
         }
 
 
-        //[HttpGet("{id}")]
-        //public IActionResult GetById(int id)  //Recupera un task specifico per ID dalla tabella Task.
-        //{
-        //    var task = _context.Task.Find(id);
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)  //Recupera un task specifico per ID dalla tabella Task.
+        {
+            var task = _context.Task.Find(id);
 
-        //    if (task == null)
-        //        return NotFound();
+            if (task == null)
+                return NotFound();
 
-        //    return Ok(task);
-        //}
+            return Ok(task);
+        }
 
         [HttpPost]
         public IActionResult Create([FromBody] TaskCreateDto dto) // Crea un nuovo task eseguendo la stored procedure "AggiungiTask" con i dati forniti nel body della richiesta.

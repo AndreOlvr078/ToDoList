@@ -74,8 +74,8 @@ function salvaTask(e) {
     body: JSON.stringify({
       titolo,
       descrizione,
-      scadenza,
       stato,
+      scadenza,
       categoriaID,
       utenteID
     })
@@ -132,7 +132,8 @@ function modificaTask(id) {
     .then(task => {
       document.getElementById('titolo').value = task.titolo;
       document.getElementById('categoria').value = task.categoriaID; //  assicurati che sia categoriaID e non descrizione
-      document.getElementById('scadenza').value = task.scadenza.split('T')[0]; // elimina orario se presente
+      if(task.scadenza !== null) 
+        document.getElementById('scadenza').value = task.scadenza.split('T')[0]; // elimina orario se presente
       document.getElementById('utente').value = task.utenteID;
 
       taskDaModificare = id;
