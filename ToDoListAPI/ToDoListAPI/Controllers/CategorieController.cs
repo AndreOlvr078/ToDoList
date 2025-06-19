@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Runtime.ConstrainedExecution;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ToDoListAPI.Data;
@@ -7,24 +8,24 @@ using ToDoListAPI.Models;
 namespace ToDoListAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]")]   //Controller API per la gestione delle categorie.
     public class CategorieController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public CategorieController(ApplicationDbContext context)
+        public CategorieController(ApplicationDbContext context) // Espone le seguenti operazioni HTTP:
         {
-            _context = context;
+            _context = context; //Utilizza ApplicationDbContext per l'accesso al database tramite Entity Framework Core.
         }
 
-        [HttpGet]
+        [HttpGet]  //Recupera tutte le categorie.
         public IActionResult GetAll()
         {
             var categorie = _context.Categorie.ToList();
             return Ok(categorie);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}")] //Recupera una categoria specifica tramite ID.
         public IActionResult GetById(int id)
         {
             var categoria = _context.Categorie.Find(id);
@@ -35,7 +36,7 @@ namespace ToDoListAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] CategorieDto dto)
+        public IActionResult Create([FromBody] CategorieDto dto) //Crea una nuova categoria(con dati nel body).
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -51,8 +52,9 @@ namespace ToDoListAPI.Controllers
             return CreatedAtAction(nameof(GetAll), new { id = categoria.ID }, categoria);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] CategorieDto updated)
+        [HttpPut("{id}")]   
+
+        public IActionResult Update(int id, [FromBody] CategorieDto updated)   // Aggiorna una categoria esistente tramite ID.
         {
             var categoria = _context.Categorie.Find(id);
             if (categoria == null)
@@ -63,8 +65,8 @@ namespace ToDoListAPI.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        [HttpDelete("{id}")] 
+        public IActionResult Delete(int id) //Elimina una categoria esistente tramite ID
         {
             var categoria = _context.Categorie.Find(id);
             if (categoria == null)
@@ -76,3 +78,14 @@ namespace ToDoListAPI.Controllers
         }
     }
 }
+/*
+
+ * 
+
+
+ 
+ 
+ * 
+ * Utilizza ApplicationDbContext per l'accesso al database tramite Entity Framework Core.
+ * Implementa controlli di validità dei dati e risposte HTTP appropriate (200 OK, 201 Created, 204 NoContent, 400 BadRequest, 404 NotFound).
+ */

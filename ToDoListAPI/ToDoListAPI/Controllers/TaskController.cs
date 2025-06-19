@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Runtime.ConstrainedExecution;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using ToDoListAPI.Data;
 using ToDoListAPI.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ToDoListAPI.Controllers
 {
@@ -13,13 +16,17 @@ namespace ToDoListAPI.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public TaskController(ApplicationDbContext context)
+        public TaskController(ApplicationDbContext context) //Questo controller utilizza ApplicationDbContext per interagire con il database principalmente tramite stored procedure eseguite con ExecuteSqlRaw di Entity Framework Core.
         {
             _context = context;
         }
 
         [HttpGet]
+<<<<<<< Updated upstream
         public IActionResult GetAllTasks()
+=======
+        public IActionResult GetAll()  // Recupera la lista di task tramite la stored procedure "TabelleJoinate" e restituisce un DTO personalizzato(TaskJoinDto).
+>>>>>>> Stashed changes
         {
             var tasks = _context.TaskJoinDto
                 .FromSqlRaw("EXEC TabelleJoinate")
@@ -52,7 +59,7 @@ namespace ToDoListAPI.Controllers
 
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public IActionResult GetById(int id)  //Recupera un task specifico per ID dalla tabella Task.
         {
             var task = _context.Task.Find(id);
 
@@ -63,7 +70,7 @@ namespace ToDoListAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] TaskCreateDto dto)
+        public IActionResult Create([FromBody] TaskCreateDto dto) // Crea un nuovo task eseguendo la stored procedure "AggiungiTask" con i dati forniti nel body della richiesta.
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -84,7 +91,7 @@ namespace ToDoListAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] TaskCreateDto dto)
+        public IActionResult Update(int id, [FromBody] TaskCreateDto dto)  //Aggiorna un task esistente tramite la stored procedure "AggiornaTask" passando l'ID e i nuovi dati.
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -106,7 +113,7 @@ namespace ToDoListAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int id)   //Elimina un task eseguendo la stored procedure "EliminaTask" con l'ID specificato.
         {
             var sql = "EXEC EliminaTask @p0";
             _context.Database.ExecuteSqlRaw(sql, id);
