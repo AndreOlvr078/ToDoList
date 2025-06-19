@@ -33,6 +33,11 @@ function caricaTasks() {
                           onclick="eliminaTask(${task.id})">
                           <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
                   </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="notaTask(${task.id})">
+                          <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
                 </div>
             </div>
           </div>
@@ -104,7 +109,7 @@ function eliminaTask(id) {
 // MODIFICA - Carica i dati del task e apre il form per modificarlo
 function modificaTask(id) {
   fetch(`https://localhost:7000/api/Task/${id}`, {
-    method: 'GET'  // ✅ Metodo corretto per ottenere i dati
+    method: 'GET'  //  Metodo corretto per ottenere i dati
   })
     .then(res => {
       if (!res.ok) throw new Error("Errore nel recupero del task");
@@ -112,7 +117,7 @@ function modificaTask(id) {
     })
     .then(task => {
       document.getElementById('titolo').value = task.titolo;
-      document.getElementById('categoria').value = task.categoriaID; // ⚠️ assicurati che sia categoriaID e non descrizione
+      document.getElementById('categoria').value = task.categoriaID; //  assicurati che sia categoriaID e non descrizione
       document.getElementById('scadenza').value = task.scadenza.split('T')[0]; // elimina orario se presente
       document.getElementById('utente').value = task.utenteID;
       
@@ -126,6 +131,11 @@ function modificaTask(id) {
       console.error("Errore:", err);
       alert("Impossibile caricare il task.");
     });
+}
+function notaTask(id) { 
+    document.getElementById('modalDescrizioneTesto').textContent = descrizione;
+    var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+    modal.show();
 }
 // EVENTI
 document.getElementById('taskForm').addEventListener('submit', salvaTask);
