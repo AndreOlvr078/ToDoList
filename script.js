@@ -1,6 +1,8 @@
 let modalDiv = null;
 let taskDaModificare = null;
 let taskIdDaEliminare = null;
+let taskIdDaCompletare = null;
+let checkboxDaRipristinare = null;
 
 
 // Selezione utente
@@ -40,8 +42,8 @@ function caricaTasks() {
           <div class="card-body p-2">
             <div class="row align-items-center flex-wrap">
               <div class="col-auto mx-2">
-                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);" 
-                 ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked)">
+                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
+${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
             </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
               <div class="col-auto mx-2"><span><strong>Categoria:</strong> ${task.categoria}</span></div>
@@ -79,7 +81,7 @@ function salvaTask(e) {
   const titolo = document.getElementById('titolo').value;
   const descrizione = document.getElementById('descrizione').value;  // Assicurati che esista questo input
   const scadenza = document.getElementById('scadenza').value;
-            // Anche questo input deve esistere
+  // Anche questo input deve esistere
   const categoriaID = parseInt(document.getElementById('categoria').value);
   const utenteID = parseInt(document.getElementById('utente').value);
 
@@ -129,7 +131,20 @@ function eliminaTask(id) {
 }
 
 // Funzione per aggiornare lo stato del task
-function toggleStato(id, nuovoStato) {
+function toggleStato(id, nuovoStato, checkbox) {
+  if (nuovoStato) {
+    // Se si spunta la checkbox, chiedi conferma
+    taskIdDaCompletare = id;
+    checkboxDaRipristinare = checkbox;
+    var modal = new bootstrap.Modal(document.getElementById('confermaCompletaModal'));
+    modal.show();
+  } else {
+    // Se si deseleziona, aggiorna subito
+    aggiornaStatoTask(id, false);
+  }
+}
+
+function aggiornaStatoTask(id, nuovoStato) {
   fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
     .then(task => {
@@ -153,6 +168,24 @@ function toggleStato(id, nuovoStato) {
     .then(() => caricaTasks())
     .catch(err => alert(err.message));
 }
+document.getElementById('btnConfermaCompleta').addEventListener('click', function () {
+  if (taskIdDaCompletare !== null) {
+    aggiornaStatoTask(taskIdDaCompletare, true);
+    taskIdDaCompletare = null;
+    checkboxDaRipristinare = null;
+    var modal = bootstrap.Modal.getInstance(document.getElementById('confermaCompletaModal'));
+    modal.hide();
+    // Dopo aver completato, puoi anche reindirizzare a completate.html se vuoi:
+    // window.location.href = 'completate.html';
+  }
+});
+document.getElementById('confermaCompletaModal').addEventListener('hidden.bs.modal', function () {
+  if (checkboxDaRipristinare) {
+    checkboxDaRipristinare.checked = false;
+    checkboxDaRipristinare = null;
+  }
+  taskIdDaCompletare = null;
+});
 
 
 // Conferma eliminazione
