@@ -154,8 +154,8 @@ function aggiornaStatoTask(id, nuovoStato) {
         body: JSON.stringify({
           titolo: task.titolo,
           descrizione: task.descrizione,
-          scadenza: task.scadenza,
           stato: nuovoStato,
+          scadenza: task.scadenza,
           categoriaID: task.categoriaID,
           utenteID: task.utenteID
         })
