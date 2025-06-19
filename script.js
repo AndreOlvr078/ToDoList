@@ -32,10 +32,10 @@ function caricaTasks() {
   fetch('https://localhost:7000/api/Task')
     .then(res => res.json())
     .then(tasks => {
-      console.log(tasks)
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
-      tasks.forEach(task => {
+      // Mostra solo le task completate
+      tasks.filter(task => task.stato).forEach(task => {
         const box = document.createElement('div');
         box.className = 'card mb-2 w-100';
         box.innerHTML = `
@@ -43,8 +43,8 @@ function caricaTasks() {
             <div class="row align-items-center flex-wrap">
               <div class="col-auto mx-2">
                 <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
-${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
-            </div>
+                  checked disabled>
+              </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
               <div class="col-auto mx-2"><span><strong>Categoria:</strong> ${task.categoria}</span></div>
               <div class="col-auto mx-2"><span><strong>Utente:</strong> ${task.utente}</span></div>
