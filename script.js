@@ -3,6 +3,28 @@ let taskDaModificare = null;
 let taskIdDaEliminare = null;
 
 
+// Selezione utente
+function caricaUtenti() {
+  fetch('https://localhost:7000/api/Utenti')
+    .then(res => res.json())
+    .then(utenti => {
+      const select = document.getElementById('utenteDropdown');
+      select.innerHTML = '<option value="">Seleziona utente...</option>';
+      utenti.forEach(u => {
+        const option = document.createElement('option');
+        option.value = u.id;
+        option.textContent = u.nome; // o altro campo che vuoi mostrare
+        select.appendChild(option);
+      });
+    });
+}
+
+function apriModalUtente() {
+  caricaUtenti();
+  const modal = new bootstrap.Modal(document.getElementById('scegliUtenteModal'));
+  modal.show();
+}
+
 // GET funzionante
 function caricaTasks() {
   fetch('https://localhost:7000/api/Task')
