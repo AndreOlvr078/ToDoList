@@ -34,8 +34,8 @@ function caricaTasks() {
     .then(tasks => {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
-      // Mostra solo le task completate
-      tasks.filter(task => task.stato).forEach(task => {
+      // Mostra solo le task NON completate
+      tasks.filter(task => !task.stato).forEach(task => {
         const box = document.createElement('div');
         box.className = 'card mb-2 w-100';
         box.innerHTML = `
