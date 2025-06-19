@@ -132,11 +132,22 @@ function modificaTask(id) {
       alert("Impossibile caricare il task.");
     });
 }
-function notaTask(id) { 
-    document.getElementById('modalDescrizioneTesto').textContent = descrizione;
-    var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
-    modal.show();
+
+function notaTask(id) {
+    fetch(`https://localhost:7000/api/Task/${id}`)
+        .then(res => res.json())
+        .then(task => {
+            document.getElementById('modalDescrizioneTesto').textContent = task.descrizione;
+            var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+            modal.show();
+        })
+        .catch(() => {
+            document.getElementById('modalDescrizioneTesto').textContent = "Descrizione non trovata.";
+            var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+            modal.show();
+        });
 }
+
 // EVENTI
 document.getElementById('taskForm').addEventListener('submit', salvaTask);
 
