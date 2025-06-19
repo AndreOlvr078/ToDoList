@@ -6,7 +6,7 @@
         public string Titolo { get; set; }
         public string? Descrizione { get; set; } 
         public DateTime? Scadenza { get; set; }
-        public string Stato { get; set; }
+        public bool Stato { get; set; }
 
         public int? CategoriaID { get; set; }
         public Categorie? Categoria { get; set; }
