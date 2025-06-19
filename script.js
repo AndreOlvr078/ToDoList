@@ -19,7 +19,7 @@ function caricaTasks() {
             <div class="row align-items-center flex-wrap">
               <div class="col-auto mx-2">
                 <input type="checkbox" class="form-check-input" style="transform: scale(1.5);" 
-              ${task.stato ? 'checked' : ''} disabled>
+                 ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked)">
             </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
               <div class="col-auto mx-2"><span><strong>Categoria:</strong> ${task.categoria}</span></div>
@@ -105,6 +105,33 @@ function eliminaTask(id) {
   var modal = new bootstrap.Modal(document.getElementById('confermaEliminaModal'));
   modal.show();
 }
+
+// Funzione per aggiornare lo stato del task
+function toggleStato(id, nuovoStato) {
+  fetch(`https://localhost:7000/api/Task/${id}`)
+    .then(res => res.json())
+    .then(task => {
+      return fetch(`https://localhost:7000/api/Task/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          titolo: task.titolo,
+          descrizione: task.descrizione,
+          scadenza: task.scadenza,
+          stato: nuovoStato,
+          categoriaID: task.categoriaID,
+          utenteID: task.utenteID
+        })
+      });
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Errore nel salvataggio");
+      return res.json();
+    })
+    .then(() => caricaTasks())
+    .catch(err => alert(err.message));
+}
+
 
 // Conferma eliminazione
 document.getElementById('btnConfermaElimina').addEventListener('click', function () {
