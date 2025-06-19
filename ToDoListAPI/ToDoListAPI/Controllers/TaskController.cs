@@ -22,11 +22,7 @@ namespace ToDoListAPI.Controllers
         }
 
         [HttpGet]
-<<<<<<< Updated upstream
-        public IActionResult GetAllTasks()
-=======
-        public IActionResult GetAll()  // Recupera la lista di task tramite la stored procedure "TabelleJoinate" e restituisce un DTO personalizzato(TaskJoinDto).
->>>>>>> Stashed changes
+        public IActionResult GetAllTasks() // Recupera la lista di task tramite la stored procedure "TabelleJoinate" e restituisce un DTO personalizzato(TaskJoinDto).
         {
             var tasks = _context.TaskJoinDto
                 .FromSqlRaw("EXEC TabelleJoinate")
