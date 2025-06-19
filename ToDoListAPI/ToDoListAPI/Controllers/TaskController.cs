@@ -121,7 +121,7 @@ namespace ToDoListAPI.Controllers
         public IActionResult ContaCompletateUt(int UtenteId)
         {
             var risultato = _context.Set<CountResultDto>()
-                .FromSqlRaw("EXEC CountUtenteStatoSi @UtenteId", new SqlParameter("@UtenteId", UtenteId))
+                .FromSqlRaw("EXEC CountUtenteStatoSi< @UtenteId", new SqlParameter("@UtenteId", UtenteId))
                 .AsEnumerable()
                 .FirstOrDefault();
 
