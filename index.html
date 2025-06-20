@@ -122,26 +122,27 @@
         </div>
     </div>
 
-  <!-- Modal per eliminare utente -->
-<div class="modal fade" id="eliminaUtenteModal" tabindex="-1" aria-labelledby="eliminaUtenteLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="eliminaUtenteLabel">Elimina utente</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
-      </div>
-      <div class="modal-body">
-        <select id="eliminaUtenteDropdown" class="form-select">
-          <option value="">Seleziona utente da eliminare...</option>
-        </select>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-        <button type="button" class="btn btn-danger" id="confermaEliminaUtenteBtn">Elimina</button>
-      </div>
+    <!-- Modal per eliminare utente -->
+    <div class="modal fade" id="eliminaUtenteModal" tabindex="-1" aria-labelledby="eliminaUtenteLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminaUtenteLabel">Elimina utente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                </div>
+                <div class="modal-body">
+                    <select id="eliminaUtenteDropdown" class="form-select">
+                        <option value="">Seleziona utente da eliminare...</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-danger" id="confermaEliminaUtenteBtn">Elimina</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
 
 
@@ -165,16 +166,40 @@
                         data-bs-target="#aggiungiCategoriaModal">
                         <i class="bi bi-folder-plus" style="font-size: 2rem; font-weight: bold;"></i>
                     </button>
+                    <!-- Pulsante elimina categoria -->
                     <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;" data-bs-toggle="modal" data-bs-target="">
-                        <!-- da inserire il modal -->
+                        style="width: 48px; height: 48px; padding: 0;" onclick="apriModalEliminaCategoria()">
                         <i class="bi bi-folder-minus" style="font-size: 2rem; font-weight: bold;"></i>
                     </button>
+
                     <button type="button" class="btn btn-primary" id="confermaCategoriaBtn">Visualizza task</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal per eliminare categoria -->
+    <div class="modal fade" id="eliminaCategoriaModal" tabindex="-1" aria-labelledby="eliminaCategoriaLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminaCategoriaLabel">Elimina categoria</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                </div>
+                <div class="modal-body">
+                    <select id="eliminaCategoriaDropdown" class="form-select">
+                        <option value="">Seleziona categoria da eliminare...</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-danger" id="confermaEliminaCategoriaBtn">Elimina</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!--modal aggiungi-->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

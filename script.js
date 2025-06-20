@@ -121,20 +121,47 @@ function aggiungiCategoria(e) {
     .catch(err => alert(err.message));
 }
 
-function eliminaCategoria(id) {
+function apriModalEliminaCategoria() {
+  fetch('https://localhost:7000/api/Categorie')
+    .then(res => res.json())
+    .then(categorie => {
+      const select = document.getElementById('eliminaCategoriaDropdown');
+      select.innerHTML = '<option value="">Seleziona categoria da eliminare...</option>';
+      categorie.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.id;
+        option.textContent = cat.descrizione;
+        select.appendChild(option);
+      });
+
+      const modal = new bootstrap.Modal(document.getElementById('eliminaCategoriaModal'));
+      modal.show();
+    })
+    .catch(err => alert("Errore nel caricamento categorie: " + err.message));
+}
+
+document.getElementById('confermaEliminaCategoriaBtn').addEventListener('click', () => {
+  const categoriaId = document.getElementById('eliminaCategoriaDropdown').value;
+  if (!categoriaId) {
+    alert("Seleziona una categoria da eliminare.");
+    return;
+  }
+
   if (confirm("Sei sicuro di voler eliminare questa categoria?")) {
-    fetch(`https://localhost:7000/api/Categorie/${id}`, {
+    fetch(`https://localhost:7000/api/Categorie/${categoriaId}`, {
       method: 'DELETE'
     })
-    .then(res => {
-      if (!res.ok) throw new Error('Errore nell\'eliminazione categoria');
-      // Aggiorna la lista delle categorie dopo l'eliminazione
-      caricaCategorie && caricaCategorie();
-      alert('Categoria eliminata!');
-    })
-    .catch(err => alert(err.message));
+      .then(res => {
+        if (!res.ok) throw new Error('Errore nell\'eliminazione categoria');
+        alert("Categoria eliminata!");
+        caricaCategorie && caricaCategorie();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('eliminaCategoriaModal'));
+        modal.hide();
+      })
+      .catch(err => alert(err.message));
   }
-}
+});
+
 
 document.getElementById('formAggiungiCategoria').addEventListener('submit', aggiungiCategoria);
 
