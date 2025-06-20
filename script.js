@@ -7,7 +7,7 @@ let utenteSelezionato = null;
 
 
 function mostraSpinner() {
-  document.getElementById('loader').style.display = 'inline-block';
+  document.getElementById('loader').style.display = 'flex';
 }
 
 function nascondiSpinner() {
@@ -51,6 +51,7 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
 });
 
 function caricaTasksPerUtente(UtenteId) {
+    mostraSpinner();
   fetch(`https://localhost:7000/api/Task/Utente/${UtenteId}`)
     .then(res => res.json())
     .then(tasks => {
@@ -91,7 +92,10 @@ function caricaTasksPerUtente(UtenteId) {
         lista.appendChild(box);
       });
     })
-    .catch(err => alert("Errore nel caricamento tasks per utente: " + err.message));
+    .catch(err => alert("Errore nel caricamento tasks per utente: " + err.message))
+        .finally(() => {
+      nascondiSpinner();
+    });;
 }
 
 function aggiungiCategoria(e) {
