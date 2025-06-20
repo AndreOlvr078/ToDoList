@@ -100,12 +100,12 @@ function caricaTasksPerUtente(UtenteId) {
 
 function aggiungiCategoria(e) {
   e.preventDefault();
-  const nome = document.getElementById('nomeCategoria').value;
+  const descrizione = document.getElementById('nomeCategoria').value;
 
   fetch('https://localhost:7000/api/Categorie', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nome })
+    body: JSON.stringify({ descrizione })
   })
     .then(res => {
       if (!res.ok) throw new Error('Errore nell\'aggiunta categoria');
