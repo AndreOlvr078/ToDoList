@@ -12,6 +12,6 @@
         public Categorie? Categoria { get; set; }
 
         public int? UtenteID { get; set; }
-        public Utente Utente { get; set; } 
+        public Utente? Utente { get; set; } 
     }
 }

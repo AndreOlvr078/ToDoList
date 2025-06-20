@@ -66,15 +66,28 @@ namespace ToDoListAPI.Controllers  //LA CARTELLA CONTROLLERS SI OCCUPA SI GESTIR
             return NoContent();
         }
 
-        [HttpDelete("{id}")] 
-        public IActionResult Delete(int id) //Elimina una categoria esistente tramite ID
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
         {
             var categoria = _context.Categorie.Find(id);
             if (categoria == null)
                 return NotFound();
 
+            // Trova le task che usano questa categoria
+            var tasksConQuestaCategoria = _context.Task
+                .Where(t => t.CategoriaID == id)
+                .ToList();
+
+            // Imposta CategoriaID a null per ciascuna task
+            foreach (var task in tasksConQuestaCategoria)
+            {
+                task.CategoriaID = null;
+            }
+
+            // Ora puoi rimuovere la categoria
             _context.Categorie.Remove(categoria);
             _context.SaveChanges();
+
             return NoContent();
         }
     }
