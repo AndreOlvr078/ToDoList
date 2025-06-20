@@ -66,8 +66,6 @@ if (UtenteId) {
   caricaTasksPerUtente(UtenteId);
   const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
   modal.hide();
-} else {
-  alert('Seleziona un utente!');
 }
 
 
@@ -103,6 +101,10 @@ function caricaTasksPerUtente(UtenteId) {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
       tasks.forEach(task => {
+        const scadenza = new Date(task.scadenza);
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+        const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+
         const box = document.createElement('div');
         box.className = 'card mb-2 w-100';
         box.innerHTML = `
@@ -113,7 +115,7 @@ function caricaTasksPerUtente(UtenteId) {
                 ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
               </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${task.scadenza}</span></div>
+              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
               <div class="col-auto ms-auto d-flex gap-2">
                 <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
                         style="width: 48px; height: 48px; padding: 0;"
@@ -144,6 +146,7 @@ function caricaTasksPerUtente(UtenteId) {
     });
 }
 
+
 document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
   const utenteId = document.getElementById('utenteDropdown').value;
   if (utenteId) {
@@ -163,6 +166,10 @@ function caricaTasksPerCategoria(CategoriaId) {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
       tasks.forEach(task => {
+        const scadenza = new Date(task.scadenza);
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+        const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+
         const box = document.createElement('div');
         box.className = 'card mb-2 w-100';
         box.innerHTML = `
@@ -173,7 +180,7 @@ function caricaTasksPerCategoria(CategoriaId) {
                 ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
               </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${task.scadenza}</span></div>
+              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
               <div class="col-auto ms-auto d-flex gap-2">
                 <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
                         style="width: 48px; height: 48px; padding: 0;"
@@ -648,6 +655,10 @@ function caricaTasksCompletate() {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
       tasks.filter(task => task.stato).forEach(task => {
+        const scadenza = new Date(task.scadenza);
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+        const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+
         const box = document.createElement('div');
         box.className = 'card mb-2 w-100';
         box.innerHTML = `
@@ -657,7 +668,7 @@ function caricaTasksCompletate() {
                 <input type="checkbox" class="form-check-input" style="transform: scale(1.5);">
               </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${task.scadenza}</span></div>
+              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
               <div class="col-auto ms-auto d-flex gap-2">
                   <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
                           style="width: 48px; height: 48px; padding: 0;"
