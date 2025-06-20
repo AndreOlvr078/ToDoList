@@ -50,8 +50,32 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
   }
 });
 
+// Funzione per aggiornare il badge con il numero di task non fatte per utente selezionato
+function aggiornaNumeroSezione() {
+  let utenteId = utenteSelezionato || null;
+  let url = utenteId
+    ? `https://localhost:7000/api/Task/Utente/${utenteId}`
+    : 'https://localhost:7000/api/Task/StatoNo';
+  fetch(url)
+    .then(res => res.json())
+    .then(tasks => {
+      let count = 0;
+      if (Array.isArray(tasks)) {
+        count = utenteId
+          ? tasks.filter(t => !t.stato).length
+          : tasks.length;
+      }
+      const badge = document.getElementById('numero-sezione');
+      if (badge) badge.textContent = count;
+    })
+    .catch(() => {
+      const badge = document.getElementById('numero-sezione');
+      if (badge) badge.textContent = '0';
+    });
+}
+
 function caricaTasksPerUtente(UtenteId) {
-    mostraSpinner();
+  mostraSpinner();
   fetch(`https://localhost:7000/api/Task/Utente/${UtenteId}`)
     .then(res => res.json())
     .then(tasks => {
@@ -91,11 +115,12 @@ function caricaTasksPerUtente(UtenteId) {
         `;
         lista.appendChild(box);
       });
+      mostraNumeroTaskNonFattePerUtente(UtenteId);
     })
     .catch(err => alert("Errore nel caricamento tasks per utente: " + err.message))
-        .finally(() => {
+    .finally(() => {
       nascondiSpinner();
-    });;
+    });
 }
 
 function aggiungiCategoria(e) {
@@ -274,6 +299,7 @@ function caricaTasks() {
         `;
         lista.appendChild(box);
       });
+      aggiornaNumeroSezione();
     })
     .catch(err => console.error("Errore nel caricamento delle task:", err));
 }
@@ -343,6 +369,8 @@ function toggleStato(id, nuovoStato, checkbox) {
   }
 }
 
+
+// Aggiorna badge anche dopo modifica stato o eliminazione
 function aggiornaStatoTask(id, nuovoStato) {
   fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
@@ -357,6 +385,7 @@ function aggiornaStatoTask(id, nuovoStato) {
     .then(() => {
       if (utenteSelezionato) caricaTasksPerUtente(utenteSelezionato);
       else caricaTasks();
+      aggiornaNumeroSezione();
     })
     .catch(err => alert(err.message));
 }
@@ -394,6 +423,7 @@ document.getElementById('btnConfermaElimina').addEventListener('click', function
         } else {
           caricaTasks();
         }
+        aggiornaNumeroSezione();
       });
   }
 });
@@ -499,6 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
     caricaCategorie(),
     caricaUtentiForm()
   ]);
+  aggiornaNumeroSezione();
 });
 
 function caricaTasksCompletate() {
@@ -535,5 +566,21 @@ function caricaTasksCompletate() {
         `;
         lista.appendChild(box);
       });
+    });
+}
+
+function mostraNumeroTaskNonFattePerUtente(utenteId) {
+  if (!utenteId) {
+    document.getElementById('numero-sezione').textContent = '0';
+    return;
+  }
+  fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
+    .then(res => res.json())
+    .then(tasks => {
+      const nonFatte = tasks.filter(t => !t.stato).length;
+      document.getElementById('numero-sezione').textContent = nonFatte;
+    })
+    .catch(() => {
+      document.getElementById('numero-sezione').textContent = '0';
     });
 }
