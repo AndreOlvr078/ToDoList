@@ -135,7 +135,7 @@ function aggiungiUtente(e) {
 document.getElementById('formAggiungiUtente').addEventListener('submit', aggiungiUtente);
 
 function caricaTasks() {
-  return fetch('https://localhost:7000/api/Task')
+  return fetch('https://localhost:7000/api/Task/StatoNo')
     .then(res => res.json())
     .then(tasks => {
       const lista = document.getElementById('lista-box');
