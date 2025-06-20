@@ -1,5 +1,5 @@
 - date di scadenza funzionanti con il time 
 - completare la seconda pagina in cui si visualizzano le task completate
-- inserire gif caricamento all'apertura della pagina
+- count task da completare e completate
 
 
