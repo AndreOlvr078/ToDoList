@@ -38,7 +38,6 @@ function apriModalUtente() {
   modal.show();
 }
 
-document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
   const UtenteId = document.getElementById('utenteDropdown').value;
   if (UtenteId) {
     utenteSelezionato = UtenteId;
@@ -47,11 +46,21 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
     modal.hide();
   } else {
     alert('Seleziona un utente!');
-  }
-});
+  }  
+  
+  document.getElementById('confermaCategoriaBtn').addEventListener('click', function () {
+    const categoriaId = document.getElementById('categoriaDropdown').value;
+    if (categoriaId) {
+      caricaTasksPerCategoria(categoriaId);
+      const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
+      modal.hide();
+    } else {
+      alert('Seleziona una categoria!');
+    }
+  });
 
 function caricaTasksPerUtente(UtenteId) {
-    mostraSpinner();
+  mostraSpinner();
   fetch(`https://localhost:7000/api/Task/Utente/${UtenteId}`)
     .then(res => res.json())
     .then(tasks => {
@@ -93,10 +102,60 @@ function caricaTasksPerUtente(UtenteId) {
       });
     })
     .catch(err => alert("Errore nel caricamento tasks per utente: " + err.message))
-        .finally(() => {
+    .finally(() => {
       nascondiSpinner();
     });;
 }
+
+function caricaTasksPerCategoria(categoriaId) {
+  mostraSpinner();
+  fetch(`https://localhost:7000/api/Task/Categoria/${categoriaId}`)
+    .then(res => res.json())
+    .then(tasks => {
+      const lista = document.getElementById('lista-box');
+      lista.innerHTML = '';
+      tasks.forEach(task => {
+        const box = document.createElement('div');
+        box.className = 'card mb-2 w-100';
+        box.innerHTML = `
+          <div class="card-body p-2">
+            <div class="row align-items-center flex-wrap">
+              <div class="col-auto mx-2">
+                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
+                ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
+              </div>
+              <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
+              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${task.scadenza}</span></div>
+              <div class="col-auto ms-auto d-flex gap-2">
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;"
+                        onclick="notaTask(${task.id})">
+                  <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;"
+                        onclick="modificaTask(${task.id})">
+                  <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;"
+                        onclick="eliminaTask(${task.id})">
+                  <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        lista.appendChild(box);
+      });
+    })
+    .catch(err => alert("Errore nel caricamento tasks per categoria: " + err.message))
+    .finally(() => {
+      nascondiSpinner();
+    });
+}
+
+
 
 function aggiungiCategoria(e) {
   e.preventDefault();
@@ -289,7 +348,7 @@ function salvaTask(e) {
 
   // Validazione data futura
   const oggi = new Date();
-  oggi.setHours(0,0,0,0);
+  oggi.setHours(0, 0, 0, 0);
   const dataScadenza = new Date(scadenza);
   if (dataScadenza < oggi) {
     alert('La data di scadenza deve essere oggi o una data futura.');
@@ -398,7 +457,7 @@ document.getElementById('btnConfermaElimina').addEventListener('click', function
   }
 });
 
-function modificaTask(id) {   
+function modificaTask(id) {
   fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
     .then(task => {
