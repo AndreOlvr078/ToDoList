@@ -65,14 +65,27 @@ namespace ToDoListAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id) //Elimina un utente tramite ID.
+        public IActionResult Delete(int id)
         {
             var utente = _context.Utente.Find(id);
             if (utente == null)
                 return NotFound();
 
+            // Trova tutte le task collegate all'utente
+            var tasksConUtente = _context.Task
+                .Where(t => t.UtenteID == id)
+                .ToList();
+
+            // Imposta UtenteID a null per ogni task
+            foreach (var task in tasksConUtente)
+            {
+                task.UtenteID = null;
+            }
+
+            // Ora elimina l'utente
             _context.Utente.Remove(utente);
             _context.SaveChanges();
+
             return NoContent();
         }
     }
