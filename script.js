@@ -14,7 +14,23 @@ function nascondiSpinner() {
   document.getElementById('loader').style.display = 'none';
 }
 
-
+function caricaCategorieDropdown() {
+  fetch('https://localhost:7000/api/Categorie')
+    .then(res => res.json())
+    .then(categorie => {
+      const select = document.getElementById('categoriaDropdown');
+      select.innerHTML = '<option value="">Seleziona categoria...</option>';
+      categorie.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.id;
+        option.textContent = cat.descrizione;
+        select.appendChild(option);
+      });
+    })
+    .catch(err => {
+      alert("Errore nel caricamento categorie: " + err.message);
+    });
+}
 
 // Selezione utente
 function caricaUtentiDropdown() {
@@ -35,6 +51,12 @@ function caricaUtentiDropdown() {
 function apriModalUtente() {
   caricaUtentiDropdown();
   const modal = new bootstrap.Modal(document.getElementById('scegliUtenteModal'));
+  modal.show();
+}
+
+function apriModalCategoria() {
+  caricaCategorieDropdown(); 
+  const modal = new bootstrap.Modal(document.getElementById('scegliCategoriaModal'));
   modal.show();
 }
 
@@ -75,7 +97,7 @@ function aggiornaNumeroSezione() {
 
 function caricaTasksPerUtente(UtenteId) {
   mostraSpinner();
-  fetch(`https://localhost:7000/api/Task/Utente/${UtenteId}`)
+  fetch(`https://localhost:7000/api/Task/UtenteStatoNo/${UtenteId}`)
     .then(res => res.json())
     .then(tasks => {
       const lista = document.getElementById('lista-box');
@@ -133,9 +155,9 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
   }
 });
 
-function caricaTasksPerCategoria(id) {
+function caricaTasksPerCategoria(CategoriaId) {
   mostraSpinner();
-  fetch(`https://localhost:7000/api/Task/Categorie/${id}`)
+  fetch(`https://localhost:7000/api/Task/Categoria/${CategoriaId}`)
     .then(res => res.json())
     .then(tasks => {
       const lista = document.getElementById('lista-box');
@@ -182,9 +204,9 @@ function caricaTasksPerCategoria(id) {
 }
 
 document.getElementById('confermaCategoriaBtn').addEventListener('click', function () {
-  const categoriaId = document.getElementById('categoriaDropdown').value;
-  if (categoriaId) {
-    caricaTasksPerCategoria(categoriaId);
+  const CategoriaID = document.getElementById('categoriaDropdown').value;
+  if (CategoriaID) {
+    caricaTasksPerCategoria(CategoriaID);
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
     modal.hide();
   } else {
