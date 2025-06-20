@@ -202,6 +202,15 @@ function salvaTask(e) {
   const categoriaID = parseInt(document.getElementById('categoria').value);
   const utenteID = parseInt(document.getElementById('utente').value);
 
+  // Validazione data futura
+  const oggi = new Date();
+  oggi.setHours(0,0,0,0);
+  const dataScadenza = new Date(scadenza);
+  if (dataScadenza < oggi) {
+    alert('La data di scadenza deve essere oggi o una data futura.');
+    return;
+  }
+
   let url = 'https://localhost:7000/api/Task';
   let method = 'POST';
 
@@ -304,7 +313,7 @@ document.getElementById('btnConfermaElimina').addEventListener('click', function
   }
 });
 
-function modificaTask(id) {
+function modificaTask(id) {   
   fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
     .then(task => {
@@ -389,6 +398,17 @@ function caricaUtentiForm() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Imposta il min della data di scadenza a oggi
+  const scadenzaInput = document.getElementById('scadenza');
+  if (scadenzaInput) {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const minDate = `${yyyy}-${mm}-${dd}`;
+    scadenzaInput.setAttribute('min', minDate);
+  }
+
   Promise.all([
     caricaTasks(),
     caricaCategorie(),
