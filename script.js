@@ -357,6 +357,18 @@ function caricaTasks() {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
       tasks.forEach(task => {
+        // Trasforma la stringa scadenza in oggetto Date
+        const scadenza = new Date(task.scadenza);
+
+        // Opzioni per formattare data e ora in italiano con giorno, mese, anno, ora e minuti
+        const options = { 
+          year: 'numeric', month: '2-digit', day: '2-digit', 
+          hour: '2-digit', minute: '2-digit' 
+        };
+
+        // Formatta la data/ora
+        const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+
         const box = document.createElement('div');
         box.className = 'card mb-2 w-100';
         box.innerHTML = `
@@ -367,7 +379,7 @@ function caricaTasks() {
                   ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
               </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${task.scadenza.split('T')[0]}</span></div>
+              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
               <div class="col-auto ms-auto d-flex gap-2">
                 <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
                         style="width: 48px; height: 48px; padding: 0;"
@@ -395,14 +407,22 @@ function caricaTasks() {
     .catch(err => console.error("Errore nel caricamento delle task:", err));
 }
 
+
 function salvaTask(e) {
   if (e) e.preventDefault();
 
   const titolo = document.getElementById('titolo').value;
   const descrizione = document.getElementById('descrizione').value;
-  const scadenza = document.getElementById('scadenza').value;
+  const data = document.getElementById('scadenza').value;      // yyyy-mm-dd
+  const ora = document.getElementById('scadenzaOra').value;   // hh:mm
   const categoriaID = parseInt(document.getElementById('categoria').value);
   const utenteID = parseInt(document.getElementById('utente').value);
+
+  let scadenza = null;
+  if (data) {
+    // Se c'è l'ora, mettila, altrimenti metti mezzanotte
+    scadenza = ora ? `${data}T${ora}:00` : `${data}T00:00:00`;
+  }
 
   // Validazione data futura
   const oggi = new Date();
@@ -415,32 +435,30 @@ function salvaTask(e) {
 
   let url = 'https://localhost:7000/api/Task';
   let method = 'POST';
-
   if (taskDaModificare) {
     url = `https://localhost:7000/api/Task/${taskDaModificare}`;
     method = 'PUT';
   }
-
+console.log("Scadenza inviata:", scadenza);
   fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ titolo, descrizione, stato: false, scadenza, categoriaID, utenteID })
   })
-    .then(res => {
-      if (!res.ok) throw new Error('Errore nel salvataggio');
-      return res.json();
-    })
-    .then(() => {
-      const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
-      modal.hide();
-      document.getElementById('taskForm').reset();
-      taskDaModificare = null;
-      document.getElementById('btnAggiungi').textContent = 'Aggiungi';
-      caricaTasks();
-    })
-    .catch(err => alert(err.message));
+  .then(res => {
+    if (!res.ok) throw new Error('Errore nel salvataggio');
+    return res.json();
+  })
+  .then(() => {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+    modal.hide();
+    document.getElementById('taskForm').reset();
+    taskDaModificare = null;
+    document.getElementById('btnAggiungi').textContent = 'Aggiungi';
+    caricaTasks();
+  })
+  .catch(err => alert(err.message));
 }
-
 document.getElementById('taskForm').addEventListener('submit', salvaTask);
 
 function eliminaTask(id) {

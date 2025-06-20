@@ -7,7 +7,7 @@
         public string Descrizione { get; set; }
         public DateTime? Scadenza { get; set; }
         public bool Stato { get; set; }
-        public string Categoria { get; set; }
-        public string Utente { get; set; }
+        public string? Categoria { get; set; }
+        public string? Utente { get; set; }
     }
 }

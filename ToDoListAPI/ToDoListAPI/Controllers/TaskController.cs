@@ -164,10 +164,17 @@ namespace ToDoListAPI.Controllers
 
 
         [HttpPost]
-        public IActionResult Create([FromBody] TaskCreateDto dto) // Crea un nuovo task eseguendo la stored procedure "AggiungiTask" con i dati forniti nel body della richiesta.
+        public IActionResult Create([FromBody] TaskCreateDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            if (!DateTime.TryParse(dto.Scadenza, out DateTime dataScadenza))
+            {
+                return BadRequest("Formato scadenza non valido");
+            }
+
+            Console.WriteLine($"✅ Scadenza ricevuta corretta: {dataScadenza}");
 
             var sql = "EXEC AggiungiTask @p0, @p1, @p2, @p3, @p4, @p5";
 
@@ -175,7 +182,7 @@ namespace ToDoListAPI.Controllers
                 sql,
                 dto.Titolo,
                 dto.Descrizione,
-                dto.Scadenza,
+                dataScadenza,
                 dto.Stato,
                 dto.CategoriaID,
                 dto.UtenteID
@@ -183,7 +190,6 @@ namespace ToDoListAPI.Controllers
 
             return Ok(new { message = "Task inserito." });
         }
-
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] TaskCreateDto dto)  //Aggiorna un task esistente tramite la stored procedure "AggiornaTask" passando l'ID e i nuovi dati.
         {
