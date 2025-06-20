@@ -128,6 +128,17 @@ namespace ToDoListAPI.Controllers
             return Ok(risultato);
         }
 
+        [HttpGet("Count")]
+        public IActionResult Conta()
+        {
+            var risultato = _context.Set<CountResultDto>()
+                .FromSqlRaw("EXEC CountTot")
+                .AsEnumerable()
+                .FirstOrDefault();
+
+            return Ok(risultato);
+        }
+
         [HttpGet("CountUtDaFare/{UtenteId}")]
         public IActionResult ContaDaFareUt(int UtenteId)
         {
