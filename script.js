@@ -279,7 +279,12 @@ document.getElementById('btnConfermaElimina').addEventListener('click', function
         taskIdDaEliminare = null;
         var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
         modal.hide();
-        caricaTasks();
+        // Ricarica la lista giusta in base alla pagina
+        if (window.location.pathname.endsWith('completate.html')) {
+          caricaTasksCompletate();
+        } else {
+          caricaTasks();
+        }
       });
   }
 });
