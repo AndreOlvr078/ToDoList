@@ -1,12 +1,138 @@
-/* Cambia la freccina del select in bianco */
+/* Reset e base */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9faff;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar {
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
+}
+
+.navbar-brand {
+  font-size: 1.8rem;
+  letter-spacing: 1.5px;
+}
+
+/* Contenitore lista */
+#lista-box {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Card task */
+.card {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.05);
+  transition: box-shadow 0.3s ease;
+  background-color: white;
+}
+
+.card:hover {
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.15);
+}
+
+/* Card body */
+.card-body {
+  padding: 1rem 1.5rem;
+}
+
+/* Righe e colonne */
+.row.align-items-center {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Checkbox */
+.form-check-input {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.form-check-input:hover {
+  transform: scale(1.7);
+}
+
+/* Testi allineati e spazi */
+.col-auto span {
+  font-size: 1rem;
+  color: #3a3a3a;
+  user-select: none;
+}
+
+/* Pulsanti tondi */
+.btn.btn-light.rounded-circle {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  transition: background-color 0.25s ease;
+}
+
+.btn.btn-light.rounded-circle:hover {
+  background-color: #dce9ff;
+}
+
+/* Icone */
+.btn i.bi {
+  font-size: 1.8rem;
+  color: #007bff;
+  pointer-events: none;
+}
+
+/* Modal titoli */
+.modal-title {
+  font-weight: 600;
+  color: #222;
+}
+
+/* Pulsanti modali */
+.modal-footer .btn-primary {
+  background-color: #007bff;
+  border: none;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.modal-footer .btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* Select menu */
+select.form-select {
+  border-radius: 6px;
+  border: 1.5px solid #ced4da;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  color: #212529;
+  background-color: #1a1a1a; /* sfondo scuro per far risaltare freccina bianca */
+}
+
+/* Focus select */
+select.form-select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px #cce5ff;
+  outline: none;
+}
+
+/* Classe per freccina bianca personalizzata */
 .custom-arrow-white {
-    /* Per Chrome, Safari, Edge */
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,<svg width='16' height='16' fill='white' xmlns='http://www.w3.org/2000/svg'><path d='M4 6l4 4 4-4'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1.2em;
-    padding-right: 2.5em;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,<svg width='16' height='16' fill='white' xmlns='http://www.w3.org/2000/svg'><path d='M4 6l4 4 4-4'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.2em;
+  padding-right: 2.5em;
+  background-color: #1a1a1a; /* uniforme con select */
+  color: white; /* testo bianco */
+  border: 1.5px solid #444; /* bordo più scuro */
+}
+
+/* Per evitare che la freccina nativa appaia */
+.custom-arrow-white::-ms-expand {
+  display: none;
 }
