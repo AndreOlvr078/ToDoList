@@ -10,25 +10,20 @@ body {
 }
 
 .loader {
-    width: 48px;
-    height: 48px;
-    border: 5px solid #008cff;
-    border-bottom-color: #ffffff;
-    border-radius: 50%;
-    display: none;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
-    }
+  width: 48px;
+  height: 48px;
+  border: 5px solid #008cff;
+  border-bottom-color: #ffffff;
+  border-radius: 50%;
+  display: none;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
 
-    @keyframes rotation {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-    } 
-
+@keyframes rotation {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
 
 .navbar-brand {
   font-size: 1.8rem;
@@ -97,7 +92,7 @@ body {
 /* Icone */
 .btn i.bi {
   font-size: 1.8rem;
-  color: #007bff;
+  color: #007bff !important;
   pointer-events: none;
 }
 
@@ -126,8 +121,8 @@ select.form-select {
   padding: 0.375rem 0.75rem;
   font-size: 1rem;
   transition: border-color 0.3s ease;
-  color: #e0e0e0;              /* testo bianco tenue, meno duro */
-  background-color: #008cff;  
+  color: #e0e0e0;
+  background-color: #007bff;
 }
 
 /* Focus select */
@@ -144,58 +139,16 @@ select.form-select:focus {
   -moz-appearance: none;
   background-image: url("data:image/svg+xml;charset=UTF-8,<svg width='16' height='16' fill='white' xmlns='http://www.w3.org/2000/svg'><path d='M4 6l4 4 4-4'/></svg>");
   background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1.2em;
-  padding-right: 3.5em;
-   padding-left: 0.75em;  /* spazio dal bordo sinistro per il testo */
-  background-color: #008cff;   /* uniforme con select */
-  color: white;                /* testo bianco */
-  border: 1.5px solid #ffffff;    /* bordo più scuro */
-}
-
-/* Per evitare che la freccina nativa appaia */
-.custom-arrow-white::-ms-expand {
-  display: none;
-}
-select.form-select {
-  border-radius: 6px;
-  border: 1.5px solid #ced4da;
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-  color: #e0e0e0;              /* testo bianco tenue, meno duro */
-  background-color: #2a2a2a;   /* nero meno intenso rispetto a #1a1a1a */
-}
-
-/* Focus */
-select.form-select:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 6px #cce5ff;
-  outline: none;
-}
-
-/* Freccia bianca personalizzata */
-.custom-arrow-white {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,<svg width='16' height='16' fill='white' xmlns='http://www.w3.org/2000/svg'><path d='M4 6l4 4 4-4'/></svg>");
-  background-repeat: no-repeat;
   background-position: right 0.25rem center;
   background-size: 1.2em;
   padding-right: 3.5em;
-   padding-left: 0.75em;  /* spazio dal bordo sinistro per il testo */
-  background-color: #2a2a2a;   /* uniforme con select */
-  color: white;                /* testo bianco */
-  border: 1.5px solid #444;    /* bordo più scuro */
+  padding-left: 0.75em;
+  background-color: #007bff;
+  color: white;
+  border: 1.5px solid #444;
 }
 
 /* Rimuove freccia default su IE */
 .custom-arrow-white::-ms-expand {
   display: none;
-}
-
-/* Icone blu (se presenti) */
-.btn i.bi {
-  color: #007bff !important;
 }
