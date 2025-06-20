@@ -38,26 +38,16 @@ function apriModalUtente() {
   modal.show();
 }
 
-  const UtenteId = document.getElementById('utenteDropdown').value;
-  if (UtenteId) {
-    utenteSelezionato = UtenteId;
-    caricaTasksPerUtente(UtenteId);
-    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
-    modal.hide();
-  } else {
-    alert('Seleziona un utente!');
-  }  
-  
-  document.getElementById('confermaCategoriaBtn').addEventListener('click', function () {
-    const categoriaId = document.getElementById('categoriaDropdown').value;
-    if (categoriaId) {
-      caricaTasksPerCategoria(categoriaId);
-      const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
-      modal.hide();
-    } else {
-      alert('Seleziona una categoria!');
-    }
-  });
+const UtenteId = document.getElementById('utenteDropdown').value;
+if (UtenteId) {
+  utenteSelezionato = UtenteId;
+  caricaTasksPerUtente(UtenteId);
+  const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
+  modal.hide();
+} else {
+  alert('Seleziona un utente!');
+}
+
 
 // Funzione per aggiornare il badge con il numero di task non fatte per utente selezionato
 function aggiornaNumeroSezione() {
@@ -132,6 +122,17 @@ function caricaTasksPerUtente(UtenteId) {
     });
 }
 
+document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
+  const utenteId = document.getElementById('utenteDropdown').value;
+  if (utenteId) {
+    caricaTasksPerUtente(utenteId);
+    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
+    modal.hide();
+  } else {
+    alert('Seleziona un utente!');
+  }
+});
+
 function caricaTasksPerCategoria(categoriaId) {
   mostraSpinner();
   fetch(`https://localhost:7000/api/Task/Categoria/${categoriaId}`)
@@ -180,7 +181,16 @@ function caricaTasksPerCategoria(categoriaId) {
     });
 }
 
-
+document.getElementById('confermaCategoriaBtn').addEventListener('click', function () {
+  const categoriaId = document.getElementById('categoriaDropdown').value;
+  if (categoriaId) {
+    caricaTasksPerCategoria(categoriaId);
+    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
+    modal.hide();
+  } else {
+    alert('Seleziona una categoria!');
+  }
+});
 
 function aggiungiCategoria(e) {
   e.preventDefault();
