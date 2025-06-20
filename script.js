@@ -121,6 +121,21 @@ function aggiungiCategoria(e) {
     .catch(err => alert(err.message));
 }
 
+function eliminaCategoria(id) {
+  if (confirm("Sei sicuro di voler eliminare questa categoria?")) {
+    fetch(`https://localhost:7000/api/Categorie/${id}`, {
+      method: 'DELETE'
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Errore nell\'eliminazione categoria');
+      // Aggiorna la lista delle categorie dopo l'eliminazione
+      caricaCategorie && caricaCategorie();
+      alert('Categoria eliminata!');
+    })
+    .catch(err => alert(err.message));
+  }
+}
+
 document.getElementById('formAggiungiCategoria').addEventListener('submit', aggiungiCategoria);
 
 function aggiungiUtente(e) {
@@ -146,6 +161,49 @@ function aggiungiUtente(e) {
     })
     .catch(err => alert(err.message));
 }
+
+function apriModalEliminaUtente() {
+  fetch('https://localhost:7000/api/Utente')
+    .then(res => res.json())
+    .then(utenti => {
+      const select = document.getElementById('eliminaUtenteDropdown');
+      select.innerHTML = '<option value="">Seleziona utente da eliminare...</option>';
+      utenti.forEach(u => {
+        const option = document.createElement('option');
+        option.value = u.id;
+        option.textContent = u.nome;
+        select.appendChild(option);
+      });
+
+      const modal = new bootstrap.Modal(document.getElementById('eliminaUtenteModal'));
+      modal.show();
+    })
+    .catch(err => alert("Errore nel caricamento utenti: " + err.message));
+}
+
+document.getElementById('confermaEliminaUtenteBtn').addEventListener('click', () => {
+  const utenteId = document.getElementById('eliminaUtenteDropdown').value;
+  if (!utenteId) {
+    alert("Seleziona un utente da eliminare.");
+    return;
+  }
+
+  if (confirm("Sei sicuro di voler eliminare questo utente?")) {
+    fetch(`https://localhost:7000/api/Utente/${utenteId}`, {
+      method: 'DELETE'
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Errore nell\'eliminazione utente');
+        alert("Utente eliminato!");
+        caricaUtentiForm && caricaUtentiForm();
+        caricaUtentiDropdown && caricaUtentiDropdown();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('eliminaUtenteModal'));
+        modal.hide();
+      })
+      .catch(err => alert(err.message));
+  }
+});
+
 
 document.getElementById('formAggiungiUtente').addEventListener('submit', aggiungiUtente);
 

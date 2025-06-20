@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 
 <head>
@@ -24,7 +24,8 @@
 
                 <!--Visualizza per categorie-->
                 <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                    style="width: 48px; height: 48px; padding: 0;" data-bs-toggle="modal" data-bs-target="#scegliCategoriaModal">
+                    style="width: 48px; height: 48px; padding: 0;" data-bs-toggle="modal"
+                    data-bs-target="#scegliCategoriaModal">
                     <i class="bi bi-folder" style="font-size: 2rem; font-weight: bold;"></i>
                 </button>
 
@@ -105,19 +106,48 @@
                         data-bs-target="#aggiungiUtenteModal">
                         <i class="bi bi-person-plus-fill" style="font-size: 2rem; font-weight: bold;"></i>
                     </button>
+                    <!--Elimina un utente-->
+                    <!-- Bottone elimina utente (simbolo persona con meno) -->
                     <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;" data-bs-toggle="modal" data-bs-target="">
-                        <!-- da inserire il modal -->
-                        <i class="bi bi-person-dash-fill" style="font-size: 2rem; font-weight: bold;"></i>
+                        style="width: 48px; height: 48px; padding: 0;" onclick="apriModalEliminaUtente()">
+                        <i class="bi bi-person-dash-fill" style="font-size: 1.5rem;"></i>
                     </button>
+
+
+                    <!-- da inserire il modal -->
+
                     <button type="button" class="btn btn-primary" id="confermaUtenteBtn">Visualizza task</button>
                 </div>
             </div>
         </div>
     </div>
 
+  <!-- Modal per eliminare utente -->
+<div class="modal fade" id="eliminaUtenteModal" tabindex="-1" aria-labelledby="eliminaUtenteLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eliminaUtenteLabel">Elimina utente</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+      </div>
+      <div class="modal-body">
+        <select id="eliminaUtenteDropdown" class="form-select">
+          <option value="">Seleziona utente da eliminare...</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn btn-danger" id="confermaEliminaUtenteBtn">Elimina</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
     <!--Modal scegli categorie-->
-    <div class="modal fade" id="scegliCategoriaModal" tabindex="-1" aria-labelledby="scegliCategoriaLabel" aria-hidden="true">
+    <div class="modal fade" id="scegliCategoriaModal" tabindex="-1" aria-labelledby="scegliCategoriaLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
