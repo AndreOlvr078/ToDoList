@@ -21,6 +21,13 @@
                     style="width: 48px; height: 48px; padding: 0;" onclick="apriModalUtente()">
                     <i class="bi bi-person" style="font-size: 2rem; font-weight: bold;"></i>
                 </button>
+
+                <!--Visualizza per categorie-->
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                    style="width: 48px; height: 48px; padding: 0;" data-bs-toggle="modal" data-bs-target="#scegliCategoriaModal">
+                    <i class="bi bi-folder" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
+
                 <!-- +/Aggiungi-->
                 <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
                     style="width: 48px; height: 48px; padding: 0;" data-bs-toggle="modal"
@@ -93,12 +100,53 @@
                     </select>
                 </div>
                 <div class="modal-footer">
+                    <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;" data-bs-toggle="modal"
+                        data-bs-target="#aggiungiUtenteModal">
+                        <i class="bi bi-person-plus-fill" style="font-size: 2rem; font-weight: bold;"></i>
+                    </button>
+                    <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;" data-bs-toggle="modal" data-bs-target="">
+                        <!-- da inserire il modal -->
+                        <i class="bi bi-person-dash-fill" style="font-size: 2rem; font-weight: bold;"></i>
+                    </button>
                     <button type="button" class="btn btn-primary" id="confermaUtenteBtn">Visualizza task</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!--Modal scegli categorie-->
+    <div class="modal fade" id="scegliCategoriaModal" tabindex="-1" aria-labelledby="scegliCategoriaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="scegliCategoriaLabel">Scegli la categoria</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+                </div>
+                <div class="modal-body">
+                    <select id="categoriaDropdown" class="form-select">
+                        <option value="">Seleziona categoria...</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;" data-bs-toggle="modal"
+                        data-bs-target="#aggiungiCategoriaModal">
+                        <i class="bi bi-folder-plus" style="font-size: 2rem; font-weight: bold;"></i>
+                    </button>
+                    <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;" data-bs-toggle="modal" data-bs-target="">
+                        <!-- da inserire il modal -->
+                        <i class="bi bi-folder-minus" style="font-size: 2rem; font-weight: bold;"></i>
+                    </button>
+                    <button type="button" class="btn btn-primary" id="confermaCategoriaBtn">Visualizza task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--modal aggiungi-->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -130,12 +178,6 @@
                                     required>
                                     <option selected>Seleziona una categoria</option>
                                 </select>
-                                <button
-                                    class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                                    style="width: 48px; height: 48px; padding: 0;" data-bs-toggle="modal"
-                                    data-bs-target="#aggiungiCategoriaModal">
-                                    <i class="bi bi-folder-plus" style="font-size: 2rem; font-weight: bold;"></i>
-                                </button>
                             </div>
                         </div>
                         <div class="mb-3" style="display: flex; justify-content: center; align-items: center;">
@@ -146,12 +188,6 @@
                                     required>
                                     <option selected>Seleziona un utente</option>
                                 </select>
-                                <button
-                                    class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                                    style="width: 48px; height: 48px; padding: 0;" data-bs-toggle="modal"
-                                    data-bs-target="#aggiungiUtenteModal">
-                                    <i class="bi bi-person-add" style="font-size: 2rem; font-weight: bold;"></i>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -159,7 +195,7 @@
                         <button type="button" class="btn btn-primary me-auto" data-bs-dismiss="modal">Chiudi</button>
                         <button type="submit" class="btn btn-primary" id="btnAggiungi">Aggiungi</button>
                     </div>
-                </form> 
+                </form>
             </div>
         </div>
     </div>
