@@ -574,7 +574,7 @@ function mostraNumeroTaskNonFattePerUtente(utenteId) {
     document.getElementById('numero-sezione').textContent = '0';
     return;
   }
-  fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
+  fetch(`https://localhost:7000/api/Task/UtenteStatoNo/${utenteId}`)
     .then(res => res.json())
     .then(tasks => {
       const nonFatte = tasks.filter(t => !t.stato).length;
