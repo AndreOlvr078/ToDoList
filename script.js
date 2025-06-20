@@ -132,9 +132,9 @@ function caricaTasksPerUtente(UtenteId) {
     });
 }
 
-function caricaTasksPerCategoria(categoriaId) {
+function caricaTasksPerCategoria(id) {
   mostraSpinner();
-  fetch(`https://localhost:7000/api/Task/Categoria/${categoriaId}`)
+  fetch(`https://localhost:7000/api/Task/Categorie/${id}`)
     .then(res => res.json())
     .then(tasks => {
       const lista = document.getElementById('lista-box');
