@@ -5,6 +5,17 @@ let taskIdDaCompletare = null;
 let checkboxDaRipristinare = null;
 let utenteSelezionato = null;
 
+
+function mostraSpinner() {
+  document.getElementById('loader').style.display = 'inline-block';
+}
+
+function nascondiSpinner() {
+  document.getElementById('loader').style.display = 'none';
+}
+
+
+
 // Selezione utente
 function caricaUtentiDropdown() {
   fetch('https://localhost:7000/api/Utente')
