@@ -104,7 +104,7 @@ body {
 /* Modal titoli */
 .modal-title {
   font-weight: 600;
-  color: #222;
+  color: #008cff;
 }
 
 /* Pulsanti modali */
@@ -127,7 +127,7 @@ select.form-select {
   font-size: 1rem;
   transition: border-color 0.3s ease;
   color: #e0e0e0;              /* testo bianco tenue, meno duro */
-  background-color: #2a2a2a;   /* nero meno intenso rispetto a #1a1a1a */
+  background-color: #008cff;  
 }
 
 /* Focus select */
@@ -148,9 +148,9 @@ select.form-select:focus {
   background-size: 1.2em;
   padding-right: 3.5em;
    padding-left: 0.75em;  /* spazio dal bordo sinistro per il testo */
-  background-color: #2a2a2a;   /* uniforme con select */
+  background-color: #008cff;   /* uniforme con select */
   color: white;                /* testo bianco */
-  border: 1.5px solid #444;    /* bordo più scuro */
+  border: 1.5px solid #ffffff;    /* bordo più scuro */
 }
 
 /* Per evitare che la freccina nativa appaia */
