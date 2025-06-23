@@ -222,8 +222,6 @@ function caricaSottoTask(taskId) {
 }
 
 function resetUtenteVisualizzato() {
-  utenteSelezionato = null;
-  document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
   // Carica le task appropriate in base alla pagina corrente
   if (window.location.pathname.endsWith('completate.html')) {
     caricaTasksCompletate();
@@ -972,6 +970,7 @@ document.addEventListener('DOMContentLoaded', () => {
   gestioneEliminazioneTask();
 
   // Inizializza badge categoria
+  document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
   document.getElementById('categoria-in-uso').textContent = 'Nessuna categoria selezionata';
 
   Promise.all([
@@ -1071,7 +1070,6 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
   }
   if (CategoriaID) {
     categoriaSelezionata = CategoriaID;
-    utenteSelezionato = null; // Reset utente quando si seleziona una categoria specifica
     document.getElementById('categoria-in-uso').textContent = nomeCategoria;
 
     // Carica le task appropriate in base alla pagina corrente
