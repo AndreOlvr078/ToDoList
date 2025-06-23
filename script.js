@@ -748,14 +748,25 @@ document.getElementById('btnConfermaElimina').addEventListener('click', function
       .then(() => {
         taskIdDaEliminare = null;
         var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
-        modal.hide();
-        // Ricarica la lista giusta in base alla pagina
+        modal.hide();        // Ricarica la lista giusta in base alla pagina e ai filtri attivi
         if (window.location.pathname.endsWith('completate.html')) {
-          caricaTasksCompletate();
-        } else if (utenteSelezionato) {
-          caricaTasksPerUtente(utenteSelezionato);
+          // Pagina completate - considera sia categoria che utente
+          if (categoriaSelezionata) {
+            caricaTasksCompletatePerCategoria(categoriaSelezionata);
+          } else if (utenteSelezionato) {
+            caricaTasksCompletatePerUtente(utenteSelezionato);
+          } else {
+            caricaTasksCompletate();
+          }
         } else {
-          caricaTasks();
+          // Pagina principale - considera sia categoria che utente
+          if (categoriaSelezionata) {
+            caricaTasksPerCategoria(categoriaSelezionata);
+          } else if (utenteSelezionato) {
+            caricaTasksPerUtente(utenteSelezionato);
+          } else {
+            caricaTasks();
+          }
         }
         aggiornaNumeroSezione();
         aggiornaNumeroSezioneCompletate();
@@ -779,33 +790,11 @@ function modificaTask(id) {
           // Estrai solo ore e minuti (formato HH:MM)
           const ora = dataOra[1].substring(0, 5);
           document.getElementById('scadenzaOra').value = ora;
-        }
-      } else {
+        }      } else {
         document.getElementById('scadenza').value = '';
         document.getElementById('scadenzaOra').value = '';
       }
-document.getElementById('btnConfermaElimina').addEventListener('click', function () {
-  if (taskIdDaEliminare !== null) {
-    fetch(`https://localhost:7000/api/Task/${taskIdDaEliminare}`, {
-      method: 'DELETE'
-    })
-      .then(() => {
-        taskIdDaEliminare = null;
-        var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
-        modal.hide();
-        // Ricarica la lista giusta in base alla pagina
-        if (window.location.pathname.endsWith('completate.html')) {
-          caricaTasksCompletate();
-        } else if (utenteSelezionato) {
-          caricaTasksPerUtente(utenteSelezionato);
-        } else {
-          caricaTasks();
-        }
-        aggiornaNumeroSezione();
-        aggiornaNumeroSezioneCompletate();
-      });
-  }
-});
+
 function modificaTask(id) {
   fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
