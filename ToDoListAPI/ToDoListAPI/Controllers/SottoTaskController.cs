@@ -29,7 +29,7 @@ namespace ToDoListAPI.Controllers
         public IActionResult GetByTask(int taskId)
         {
             var sottoTasks = _context.SottoTask
-                .FromSqlRaw("EXEC ElencoSottoTaskPerTask @p0", taskId)
+                .FromSqlRaw("EXEC ElencoSottoTaskP  erTask @p0", taskId)
                 .ToList();
 
             return Ok(sottoTasks);
