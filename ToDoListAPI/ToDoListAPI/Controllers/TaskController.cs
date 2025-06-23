@@ -73,7 +73,7 @@ namespace ToDoListAPI.Controllers
             var tasks = _context.TaskJoinDto
                 .FromSqlRaw("EXEC OrdinaUtenteCategoria @UtenteID, @Categoria",
                     new SqlParameter("@UtenteID", utenteId),
-                    new SqlParameter("@Categoria", categoriaId))
+                    new SqlParameter("@Categoria", categoriaId))    
                 .ToList();
 
             return Ok(tasks);
