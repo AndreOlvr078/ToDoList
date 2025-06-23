@@ -177,39 +177,38 @@ function caricaTasksPerUtente(UtenteId) {
 }
 
 function caricaSottoTask(taskId) {
+  const container = document.getElementById(`dropdown-sottotask-${taskId}`);
+  if (!container) return;
+
+  // Se la dropdown è già visibile, la nascondo e ritorno
+  if (container.style.display === 'block') {
+    container.style.display = 'none';
+    container.innerHTML = '';
+    return;
+  }
+
+  // Altrimenti la mostro e la popolo
   fetch(`https://localhost:7000/api/SottoTask/Task/${taskId}`)
     .then(res => res.json())
     .then(sottoTasks => {
-      const container = document.getElementById(`dropdown-sottotask-${taskId}`);
-      if (!container) return;
-
       container.innerHTML = '';
-
       if (!sottoTasks || sottoTasks.length === 0) {
         container.innerHTML = '<div class="text-muted small ms-3">Nessun sotto-task</div>';
-        return;
+      } else {
+        let items = sottoTasks.map(st =>
+          `<li><span class="dropdown-item">${st.titolo}</span></li>`
+        ).join('');
+        container.innerHTML = `
+          <ul class="dropdown-menu show" style="position:static;display:block;">
+            ${items}
+          </ul>
+        `;
       }
-
-      const dropdown = document.createElement('div');
-      dropdown.className = 'dropdown show ms-3';
-
-      let items = sottoTasks.map(st =>
-        `<li><span class="dropdown-item">${st.titolo}</span></li>`
-      ).join('');
-
-      dropdown.innerHTML = `
-        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="true">
-          Sotto-task
-        </button>
-        <ul class="dropdown-menu show" style="position:static;">
-          ${items}
-        </ul>
-      `;
-      container.appendChild(dropdown);
+      container.style.display = 'block';
     })
     .catch(() => {
-      const container = document.getElementById(`dropdown-sottotask-${taskId}`);
-      if (container) container.innerHTML = '<div class="text-danger small ms-3">Errore caricamento sotto-task</div>';
+      container.innerHTML = '<div class="text-danger small ms-3">Errore caricamento sotto-task</div>';
+      container.style.display = 'block';
     });
 }
 
@@ -406,6 +405,12 @@ function caricaTasks() {
                         onclick="eliminaTask(${task.id})">
                   <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
                 </button>
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="caricaSottoTask(${task.id})">
+                  <i class="bi bi-caret-down-fill"></i>
+                </button>
+                  <div id="dropdown-sottotask-${task.id}"></div>
               </div>
             </div>
           </div>
@@ -535,11 +540,11 @@ function gestioneEliminazioneTask() {
           taskIdDaEliminare = null;
           var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
           modal.hide();
-          
+
           console.log('Controllo pagina corrente:', window.location.pathname);
           console.log('categoriaSelezionata:', categoriaSelezionata);
           console.log('utenteSelezionato:', utenteSelezionato);
-          
+
           // Ricarica la lista giusta in base alla pagina e ai filtri attivi
           if (window.location.pathname.endsWith('completate.html')) {
             console.log('Siamo nella pagina completate');
@@ -678,7 +683,7 @@ function caricaUtentiForm() {
 
 function caricaTasksCompletate() {
   let url = 'https://localhost:7000/api/Task';
-  
+
   // Se è selezionata una categoria specifica
   if (categoriaSelezionata) {
     url = `https://localhost:7000/api/Task/Categoria/${categoriaSelezionata}`;
@@ -694,10 +699,10 @@ function caricaTasksCompletate() {
     .then(tasks => {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
-      
+
       // Filtra solo le task completate
       const tasksCompletate = tasks.filter(task => task.stato);
-      
+
       if (tasksCompletate.length === 0) {
         // Mostra messaggio se non ci sono task completate
         const msg = document.createElement('div');
@@ -983,8 +988,8 @@ document.getElementById('confermaCompletaModal').addEventListener('hidden.bs.mod
 document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
   const utenteId = document.getElementById('utenteDropdown').value;
   const utenteSelect = document.getElementById('utenteDropdown');
-  const nomeUtente = utenteSelect.options[utenteSelect.selectedIndex].textContent; 
-  
+  const nomeUtente = utenteSelect.options[utenteSelect.selectedIndex].textContent;
+
   if (utenteId === "tutti") {
     utenteSelezionato = null;
     categoriaSelezionata = null; // Reset anche categoria quando si seleziona "Tutti"
@@ -1025,7 +1030,7 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
   const CategoriaID = document.getElementById('categoriaDropdown').value;
   const categoriaSelect = document.getElementById('categoriaDropdown');
   const nomeCategoria = categoriaSelect.options[categoriaSelect.selectedIndex].textContent;
-  
+
   if (CategoriaID === "tutti") {
     // Reset tutte le selezioni quando si sceglie "Tutti" per le categorie
     categoriaSelezionata = null;
