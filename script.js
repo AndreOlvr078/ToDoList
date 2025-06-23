@@ -150,6 +150,16 @@ function caricaTasksPerUtente(UtenteId) {
 document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
   const utenteId = document.getElementById('utenteDropdown').value;
   if (utenteId) {
+    // Trova il nome dell'utente selezionato
+    const utenteSelect = document.getElementById('utenteDropdown');
+    const nomeUtente = utenteSelect.options[utenteSelect.selectedIndex].textContent;
+    
+    // Salva l'utente selezionato
+    utenteSelezionato = utenteId;
+    
+    // Aggiorna il nome visualizzato
+    document.getElementById('utente-in-uso').textContent = nomeUtente;
+    
     caricaTasksPerUtente(utenteId);
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
     modal.hide();
@@ -157,6 +167,12 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
     alert('Seleziona un utente!');
   }
 });
+
+function resetUtenteVisualizzato() {
+  utenteSelezionato = null;
+  document.getElementById('utente-in-uso').textContent = '';
+  caricaTasks();
+}
 
 function caricaTasksPerCategoria(CategoriaId) {
   mostraSpinner();
@@ -639,6 +655,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const minDate = `${yyyy}-${mm}-${dd}`;
     scadenzaInput.setAttribute('min', minDate);
   }
+
+  // Inizializza con nessun utente selezionato
+  document.getElementById('utente-in-uso').textContent = 'Tutti';
 
   Promise.all([
     caricaTasks(),
