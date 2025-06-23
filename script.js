@@ -20,7 +20,7 @@ function caricaCategorieDropdown() {
     .then(res => res.json())
     .then(categorie => {
       const select = document.getElementById('categoriaDropdown');
-      select.innerHTML = '<option value="">Seleziona categoria...</option><option value="tutte">Tutte</option>';
+      select.innerHTML = '<option value="">Seleziona categoria...</option><option value="tutti">Tutti</option>';
       categorie.forEach(cat => {
         const option = document.createElement('option');
         option.value = cat.id;
@@ -291,15 +291,23 @@ function caricaTasksPerCategoria(CategoriaId) {
 
 document.getElementById('confermaCategoriaBtn').addEventListener('click', function () {
   const CategoriaID = document.getElementById('categoriaDropdown').value;
-  if (CategoriaID === "tutte") {
-    // Mostra tutte le task (come per utenti)
-    caricaTasks();
+  const categoriaSelect = document.getElementById('categoriaDropdown');
+  const nomeCategoria = categoriaSelect.options[categoriaSelect.selectedIndex].textContent;
+  
+  if (CategoriaID === "tutti") {
+    // Reset tutte le selezioni quando si sceglie "Tutti" per le categorie
+    categoriaSelezionata = null;
+    utenteSelezionato = null;
+    document.getElementById('utente-in-uso').textContent = "Tutti";
+    caricaTasks(); // Mostra tutte le task
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
     modal.hide();
     return;
   }
   if (CategoriaID) {
     categoriaSelezionata = CategoriaID;
+    utenteSelezionato = null; // Reset utente quando si seleziona una categoria specifica
+    document.getElementById('utente-in-uso').textContent = nomeCategoria;
     caricaTasksPerCategoria(CategoriaID);
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
     modal.hide();

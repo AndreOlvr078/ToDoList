@@ -4,5 +4,3 @@
 - Creare un sistema di scadenza funzionante
 - Aggiungere in Frontend la visualizzazione delle sottotask 
 - Nella scelta utente aver la possibiloità di tornare alla schermata con tutti gli utenti
-- sistemare la descrizione e ora nella task durante la modifica, bisogna visualizare la desczrizione e ora della task che si vuole modificare 
-- mettere opzione tutti nelle categorie
