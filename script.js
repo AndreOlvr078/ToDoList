@@ -93,6 +93,28 @@ function aggiornaNumeroSezione() {
     });
 }
 
+// Funzione per aggiornare il badge con il numero di task completate per utente selezionato
+function aggiornaNumeroSezioneCompletate() {
+  let utenteId = utenteSelezionato || null;
+  let url = utenteId
+    ? `https://localhost:7000/api/Task/Utente/${utenteId}`
+    : 'https://localhost:7000/api/Task';
+  fetch(url)
+    .then(res => res.json())
+    .then(tasks => {
+      let count = 0;
+      if (Array.isArray(tasks)) {
+        count = tasks.filter(t => t.stato).length;
+      }
+      const badge = document.getElementById('numero-sezione-si');
+      if (badge) badge.textContent = count;
+    })
+    .catch(() => {
+      const badge = document.getElementById('numero-sezione-si');
+      if (badge) badge.textContent = '0';
+    });
+}
+
 function caricaTasksPerUtente(UtenteId) {
   mostraSpinner();
   fetch(`https://localhost:7000/api/Task/UtenteStatoNo/${UtenteId}`)
@@ -135,10 +157,10 @@ function caricaTasksPerUtente(UtenteId) {
               </div>
             </div>
           </div>
-        `;
-        lista.appendChild(box);
+        `;        lista.appendChild(box);
       });
       mostraNumeroTaskNonFattePerUtente(UtenteId);
+      mostraNumeroTaskCompletatePerUtente(UtenteId);
     })
     .catch(err => alert("Errore nel caricamento tasks per utente: " + err.message))
     .finally(() => {
@@ -160,7 +182,13 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
     // Aggiorna il nome visualizzato
     document.getElementById('utente-in-uso').textContent = nomeUtente;
     
-    caricaTasksPerUtente(utenteId);
+    // Carica le task appropriate in base alla pagina corrente
+    if (window.location.pathname.endsWith('completate.html')) {
+      caricaTasksCompletate();
+    } else {
+      caricaTasksPerUtente(utenteId);
+    }
+    
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
     modal.hide();
   } else {
@@ -171,7 +199,12 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
 function resetUtenteVisualizzato() {
   utenteSelezionato = null;
   document.getElementById('utente-in-uso').textContent = '';
-  caricaTasks();
+  // Carica le task appropriate in base alla pagina corrente
+  if (window.location.pathname.endsWith('completate.html')) {
+    caricaTasksCompletate();
+  } else {
+    caricaTasks();
+  }
 }
 
   // Inizializza con nessun utente selezionato
@@ -427,9 +460,9 @@ function caricaTasks() {
             </div>
           </div>
         `;
-        lista.appendChild(box);
-      });
+        lista.appendChild(box);      });
       aggiornaNumeroSezione();
+      aggiornaNumeroSezioneCompletate();
     })
     .catch(err => console.error("Errore nel caricamento delle task:", err));
 }
@@ -518,10 +551,10 @@ function aggiornaStatoTask(id, nuovoStato) {
       });
     })
     .then(res => res.json())
-    .then(() => {
-      if (utenteSelezionato) caricaTasksPerUtente(utenteSelezionato);
+    .then(() => {      if (utenteSelezionato) caricaTasksPerUtente(utenteSelezionato);
       else caricaTasks();
       aggiornaNumeroSezione();
+      aggiornaNumeroSezioneCompletate();
     })
     .catch(err => alert(err.message));
 }
@@ -557,9 +590,9 @@ document.getElementById('btnConfermaElimina').addEventListener('click', function
         if (window.location.pathname.endsWith('completate.html')) {
           caricaTasksCompletate();
         } else {
-          caricaTasks();
-        }
+          caricaTasks();        }
         aggiornaNumeroSezione();
+        aggiornaNumeroSezioneCompletate();
       });
   }
 });
@@ -659,17 +692,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const minDate = `${yyyy}-${mm}-${dd}`;
     scadenzaInput.setAttribute('min', minDate);
   }
-
   Promise.all([
     caricaTasks(),
     caricaCategorie(),
     caricaUtentiForm()
   ]);
   aggiornaNumeroSezione();
+  aggiornaNumeroSezioneCompletate();
 });
 
 function caricaTasksCompletate() {
-  fetch('https://localhost:7000/api/Task')
+  let url = 'https://localhost:7000/api/Task';
+  if (utenteSelezionato) {
+    url = `https://localhost:7000/api/Task/Utente/${utenteSelezionato}`;
+  }
+  
+  fetch(url)
     .then(res => res.json())
     .then(tasks => {
       const lista = document.getElementById('lista-box');
@@ -685,7 +723,8 @@ function caricaTasksCompletate() {
           <div class="card-body p-2">
             <div class="row align-items-center flex-wrap">
               <div class="col-auto mx-2">
-                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);">
+                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);" checked 
+                  onchange="toggleStato(${task.id}, this.checked, this)">
               </div>
               <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
               <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
@@ -706,6 +745,7 @@ function caricaTasksCompletate() {
         `;
         lista.appendChild(box);
       });
+      aggiornaNumeroSezioneCompletate();
     });
 }
 
@@ -722,5 +762,21 @@ function mostraNumeroTaskNonFattePerUtente(utenteId) {
     })
     .catch(() => {
       document.getElementById('numero-sezione').textContent = '0';
+    });
+}
+
+function mostraNumeroTaskCompletatePerUtente(utenteId) {
+  if (!utenteId) {
+    document.getElementById('numero-sezione-si').textContent = '0';
+    return;
+  }
+  fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
+    .then(res => res.json())
+    .then(tasks => {
+      const completate = tasks.filter(t => t.stato).length;
+      document.getElementById('numero-sezione-si').textContent = completate;
+    })
+    .catch(() => {
+      document.getElementById('numero-sezione-si').textContent = '0';
     });
 }
