@@ -67,6 +67,18 @@ namespace ToDoListAPI.Controllers
             return Ok(tasks);
         }
 
+
+        [HttpGet("CategoriaStatoSi/{CategoriaID}")]
+        public IActionResult GetTasksCategoriaSi(int CategoriaID)
+        {
+            var tasks = _context.TaskJoinDto
+                .FromSqlRaw("EXEC OrdinataskCategoriaSi @CategoriaID",
+                    new SqlParameter("@CategoriaID", CategoriaID))
+                .ToList();
+
+            return Ok(tasks);
+        }
+
         [HttpGet("UtenteCategoria/{utenteId}/{categoriaId}")]
         public IActionResult GetTasksByUserAndCategory(int utenteId, int categoriaId)
         {
