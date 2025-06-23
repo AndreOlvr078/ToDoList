@@ -310,10 +310,9 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
   if (CategoriaID) {
     categoriaSelezionata = CategoriaID;
     utenteSelezionato = null; // Reset utente quando si seleziona una categoria specifica
-    document.getElementById('utente-in-uso').textContent = nomeCategoria;
-
-    // Carica le task appropriate in base alla pagina corrente
+    document.getElementById('utente-in-uso').textContent = nomeCategoria;    // Carica le task appropriate in base alla pagina corrente
     if (window.location.pathname.endsWith('completate.html')) {
+      console.log('Caricando task completate per categoria:', CategoriaID);
       caricaTasksCompletatePerCategoria(CategoriaID);
     } else {
       caricaTasksPerCategoria(CategoriaID);
@@ -970,14 +969,20 @@ function caricaTasksCompletatePerUtente(utenteId) {
 }
 
 function caricaTasksCompletatePerCategoria(categoriaId) {
+  console.log('Chiamata caricaTasksCompletatePerCategoria con ID:', categoriaId);
   fetch(`https://localhost:7000/api/Task/Categoria/${categoriaId}`)
-    .then(res => res.json())
+    .then(res => {
+      console.log('Risposta API:', res.status);
+      return res.json();
+    })
     .then(tasks => {
+      console.log('Task ricevute:', tasks);
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
 
       // Filtra solo le task completate
       const tasksCompletate = tasks.filter(task => task.stato);
+      console.log('Task completate filtrate:', tasksCompletate);
 
       if (tasksCompletate.length === 0) {
         const msg = document.createElement('div');
