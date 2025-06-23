@@ -215,7 +215,7 @@ function caricaSottoTask(taskId) {
 function resetUtenteVisualizzato() {
   utenteSelezionato = null;
   categoriaSelezionata = null; // Reset anche categoria
-  document.getElementById('utente-in-uso').textContent = '';
+  document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
   // Carica le task appropriate in base alla pagina corrente
   if (window.location.pathname.endsWith('completate.html')) {
     caricaTasksCompletate();
