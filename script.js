@@ -171,13 +171,7 @@ function caricaTasksPerUtente(UtenteId) {
                   </button>
                   <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
                           style="width: 48px; height: 48px; padding: 0;"
-                          onclick="caricaSottoTask(${task.Id})">
-                    <i class="bi bi-caret-down-fill"></i>
-                  </button>
-                  <div id="dropdown-sottotask-${task.id}"></div>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="caricaSottoTask(${task.Id})">
+                          onclick="caricaSottoTask(${task.id})">
                     <i class="bi bi-caret-down-fill"></i>
                   </button>
                   <div id="dropdown-sottotask-${task.id}"></div>
@@ -201,7 +195,6 @@ function caricaSottoTask(taskId) {
       const container = document.getElementById(`dropdown-sottotask-${taskId}`);
       if (!container) return;
 
-      // Rimuovi eventuale dropdown già presente
       container.innerHTML = '';
 
       if (!sottoTasks || sottoTasks.length === 0) {
@@ -209,7 +202,6 @@ function caricaSottoTask(taskId) {
         return;
       }
 
-      // Crea la dropdown Bootstrap
       const dropdown = document.createElement('div');
       dropdown.className = 'dropdown show ms-3';
 
