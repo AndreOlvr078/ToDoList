@@ -5,7 +5,6 @@ let taskIdDaCompletare = null;
 let checkboxDaRipristinare = null;
 let utenteSelezionato = null;
 
-<<<<<<< Updated upstream
 
 function mostraSpinner() {
   document.getElementById('loader').style.display = 'flex';
@@ -33,8 +32,6 @@ function caricaCategorieDropdown() {
     });
 }
 
-=======
->>>>>>> Stashed changes
 // Selezione utente
 function caricaUtentiDropdown() {
   fetch('https://localhost:7000/api/Utente')
@@ -97,12 +94,8 @@ function aggiornaNumeroSezione() {
 }
 
 function caricaTasksPerUtente(UtenteId) {
-<<<<<<< Updated upstream
   mostraSpinner();
   fetch(`https://localhost:7000/api/Task/UtenteStatoNo/${UtenteId}`)
-=======
-  fetch(`https://localhost:7000/api/Task/Utente/${UtenteId}`)
->>>>>>> Stashed changes
     .then(res => res.json())
     .then(tasks => {
       const lista = document.getElementById('lista-box');
@@ -227,14 +220,10 @@ function caricaTasksPerCategoria(CategoriaId) {
         lista.appendChild(box);
       });
     })
-<<<<<<< Updated upstream
     .catch(err => alert("Errore nel caricamento tasks per categoria: " + err.message))
     .finally(() => {
       nascondiSpinner();
     });
-=======
-    .catch(err => alert("Errore nel caricamento tasks per utente: " + err.message));
->>>>>>> Stashed changes
 }
 
 document.getElementById('confermaCategoriaBtn').addEventListener('click', function () {
@@ -452,7 +441,6 @@ function salvaTask(e) {
   const categoriaID = parseInt(document.getElementById('categoria').value);
   const utenteID = parseInt(document.getElementById('utente').value);
 
-<<<<<<< Updated upstream
   let scadenza = null;
   if (data) {
     // Se c'è l'ora, mettila, altrimenti metti mezzanotte
@@ -468,8 +456,6 @@ function salvaTask(e) {
     return;
   }
 
-=======
->>>>>>> Stashed changes
   let url = 'https://localhost:7000/api/Task';
   let method = 'POST';
   if (taskDaModificare) {
@@ -659,6 +645,17 @@ function caricaUtentiForm() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Imposta il min della data di scadenza a oggi
+  const scadenzaInput = document.getElementById('scadenza');
+  if (scadenzaInput) {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const minDate = `${yyyy}-${mm}-${dd}`;
+    scadenzaInput.setAttribute('min', minDate);
+  }
+
   Promise.all([
     caricaTasks(),
     caricaCategorie(),
