@@ -639,15 +639,28 @@ function salvaTask(e) {
         });
     }
   });
-
   function modificaTask(id) {
     fetch(`https://localhost:7000/api/Task/${id}`)
       .then(res => res.json())
       .then(task => {
         document.getElementById('titolo').value = task.titolo;
+        document.getElementById('descrizione').value = task.descrizione;
         document.getElementById('categoria').value = task.categoriaID;
-        document.getElementById('scadenza').value = task.scadenza?.split('T')[0] ?? '';
         document.getElementById('utente').value = task.utenteID;
+        
+        // Gestione della data e ora di scadenza
+        if (task.scadenza) {
+          const dataOra = task.scadenza.split('T');
+          document.getElementById('scadenza').value = dataOra[0];
+          if (dataOra[1]) {
+            // Estrai solo ore e minuti (formato HH:MM)
+            const ora = dataOra[1].substring(0, 5);
+            document.getElementById('scadenzaOra').value = ora;
+          }
+        } else {
+          document.getElementById('scadenza').value = '';
+          document.getElementById('scadenzaOra').value = '';
+        }
 
         taskDaModificare = id;
         document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
