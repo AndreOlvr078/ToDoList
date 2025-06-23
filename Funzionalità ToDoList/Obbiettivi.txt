@@ -1,4 +1,4 @@
 - pagina completate aggiungere la possibilità di ripristinare una task
 - nelle completate sistemare eliminazione
 - Creare un sistema di scadenza funzionante
-- Aggiungere in Frontend la visualizzazione delle sottotask 
+-migliortara in Frontend la visualizzazione delle sottotask 
