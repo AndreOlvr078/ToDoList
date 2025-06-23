@@ -174,6 +174,10 @@ function resetUtenteVisualizzato() {
   caricaTasks();
 }
 
+  // Inizializza con nessun utente selezionato
+  document.getElementById('utente-in-uso').textContent = 'Tutti';
+
+
 function caricaTasksPerCategoria(CategoriaId) {
   mostraSpinner();
   fetch(`https://localhost:7000/api/Task/Categoria/${CategoriaId}`)
