@@ -1,138 +1,21 @@
-/* Reset e base */
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f9faff;
-  margin: 0;
-  padding: 0;
-}
-.navbar {
-  box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
-}
-
-.loader {
-  width: 48px;
-  height: 48px;
-  border: 5px solid #008cff;
-  border-bottom-color: #ffffff;
-  border-radius: 50%;
-  display: none;
-  box-sizing: border-box;
-  animation: rotation 1s linear infinite;
-}
-
-@keyframes rotation {
-  0% { transform: rotate(0deg);}
-  100% { transform: rotate(360deg);}
-}
-
-.navbar-brand {
-  font-size: 1.8rem;
-  letter-spacing: 1.5px;
-}
-
-/* Contenitore lista */
-#lista-box {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-
-/* Card task */
-.card {
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 0.05);
-  transition: box-shadow 0.3s ease;
-  background-color: white;
-}
-
-.card:hover {
-  box-shadow: 0 8px 20px rgb(0 0 0 / 0.15);
-}
-
-/* Card body */
-.card-body {
-  padding: 1rem 1.5rem;
-}
-
-/* Righe e colonne */
-.row.align-items-center {
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-/* Checkbox */
-.form-check-input {
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.form-check-input:hover {
-  transform: scale(1.7);
-}
-
-/* Testi allineati e spazi */
-.col-auto span {
-  font-size: 1rem;
-  color: #3a3a3a;
-  user-select: none;
-}
-
-/* Pulsanti tondi */
-.btn.btn-light.rounded-circle {
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  transition: background-color 0.25s ease;
-}
-
-.btn.btn-light.rounded-circle:hover {
-  background-color: #dce9ff;
-}
-
-/* Icone */
-.btn i.bi {
-  font-size: 1.8rem;
-  color: #007bff !important;
-  pointer-events: none;
-}
-
-/* Modal titoli */
-.modal-title {
-  font-weight: 600;
-  color: #008cff;
-}
-
-/* Pulsanti modali */
-.modal-footer .btn-primary {
-  background-color: #007bff;
-  border: none;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
-}
-
-.modal-footer .btn-primary:hover {
-  background-color: #0056b3;
-}
-
-/* Select menu */
 select.form-select {
+  color: #007bff !important;      /* testo blu sempre */
+  background-color: #2a2a2a;      /* sfondo scuro */
   border-radius: 6px;
   border: 1.5px solid #ced4da;
   padding: 0.375rem 0.75rem;
   font-size: 1rem;
   transition: border-color 0.3s ease;
-  color: #e0e0e0;
-  background-color: #007bff;
 }
 
-/* Focus select */
+/* Focus */
 select.form-select:focus {
   border-color: #007bff;
   box-shadow: 0 0 6px #cce5ff;
   outline: none;
 }
 
-/* Classe per freccina bianca personalizzata */
+/* Freccia bianca personalizzata */
 .custom-arrow-white {
   appearance: none;
   -webkit-appearance: none;
@@ -143,7 +26,7 @@ select.form-select:focus {
   background-size: 1.2em;
   padding-right: 3.5em;
   padding-left: 0.75em;
-  background-color: #007bff;
+  background-color: #2a2a2a;
   color: white;
   border: 1.5px solid #444;
 }
@@ -151,4 +34,9 @@ select.form-select:focus {
 /* Rimuove freccia default su IE */
 .custom-arrow-white::-ms-expand {
   display: none;
+}
+
+/* Icone blu (se presenti) */
+.btn i.bi {
+  color: #007bff !important;
 }
