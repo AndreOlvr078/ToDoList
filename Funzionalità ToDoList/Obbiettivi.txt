@@ -6,4 +6,3 @@
 - Nella scelta utente aver la possibiloità di tornare alla schermata con tutti gli utenti
 - sistemare la descrizione e ora nella task durante la modifica, bisogna visualizare la desczrizione e ora della task che si vuole modificare 
 - sistemre categorie, quando si filtra per categorie il counter rimane a quelle totali di tutto 
-- sistemare modifica, quando si aggiorna una task con nuovi dati e si era nella lista filtrata di un utente essa torna a visualizzare tutte le task ma con il counter e il nome dell'utente di pri
