@@ -192,13 +192,13 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
     return;
   }
 
-  if (utenteId) {
+  if (utenteId && utenteId !== "") {
     utenteSelezionato = utenteId;
     document.getElementById('utente-in-uso').textContent = nomeUtente;
     caricaTasksPerUtente(utenteId);
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
     modal.hide();
-  } else {
+  } else if (utenteId === "") {
     alert('Seleziona un utente!');
   }
 });
