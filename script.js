@@ -132,38 +132,36 @@ function caricaTasksPerUtente(UtenteId) {
 
           const box = document.createElement('div');
           box.className = 'card mb-2 w-100';
+          box.setAttribute('data-task-id', task.id);
           box.innerHTML = `
-            <div class="card-body p-2">
-              <div class="row align-items-center flex-wrap">
-                <div class="col-auto mx-2">
-                  <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
-                  ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
-                </div>
-                <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-                <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
-                <div class="col-auto ms-auto d-flex gap-2">
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="notaTask(${task.id})">
-                    <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="modificaTask(${task.id})">
-                    <i class="bi bi-pencil-square" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="eliminaTask(${task.id})">
-                    <i class="bi bi-trash3" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="caricaSottoTask(${task.id})">
-                    <i class="bi bi-caret-down-fill"></i>
-                  </button>
-                  <div id="dropdown-sottotask-${task.id}"></div>
-                </div>
+            <div class="card-body d-flex align-items-center p-2">
+              <div class="d-flex align-items-center flex-wrap gap-3">
+                <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.5);"
+                ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
+                <span><strong>Titolo:</strong> ${task.titolo}</span>
+                <span class="ms-3"><strong>Scadenza:</strong> ${scadenzaFormattata}</span>
+              </div>
+              <div class="d-flex ms-auto gap-2">
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;"
+                        onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
+                  <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;"
+                        onclick="notaTask(${task.id})">
+                  <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;"
+                        onclick="modificaTask(${task.id})">
+                  <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;"
+                        onclick="eliminaTask(${task.id})">
+                  <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
               </div>
             </div>
           `;
@@ -177,40 +175,49 @@ function caricaTasksPerUtente(UtenteId) {
 }
 
 function caricaSottoTask(taskId) {
-  const container = document.getElementById(`dropdown-sottotask-${taskId}`);
-  if (!container) return;
+  // Trova la card della task selezionata
+  const card = document.querySelector(`.card[data-task-id='${taskId}']`);
+  if (!card) return;
 
-  // Se la dropdown è già visibile, la nascondo e ritorno
-  if (container.style.display === 'block') {
-    container.style.display = 'none';
-    container.innerHTML = '';
+  // Se la sottotask-container esiste già subito dopo la card, la rimuovo (toggle)
+  const nextElem = card.nextElementSibling;
+  if (nextElem && nextElem.classList.contains('sottotask-container')) {
+    nextElem.remove();
     return;
   }
 
-  // Altrimenti la mostro e la popolo
+  // Altrimenti, creo e inserisco la sottotask-container subito dopo la card
   fetch(`https://localhost:7000/api/SottoTask/Task/${taskId}`)
     .then(res => res.json())
     .then(sottoTasks => {
-      container.innerHTML = '';
+      // Rimuovi eventuali altre sottotask-container aperte
+      document.querySelectorAll('.sottotask-container').forEach(el => el.remove());
+
+      const container = document.createElement('div');
+      container.className = 'sottotask-container';
+      container.style.width = '100%';
       if (!sottoTasks || sottoTasks.length === 0) {
         container.innerHTML = '<div class="text-muted small ms-3">Nessun sotto-task</div>';
       } else {
-let items = sottoTasks.map(st =>
-  `<li class="py-1 px-2 border-bottom">${st.titolo}</li>`
-).join('');
-container.innerHTML = `
-  <div class="w-100 mt-2 p-2 bg-white border rounded shadow-sm">
-    <ul class="list-unstyled mb-0">
-      ${items}
-    </ul>
-  </div>
-`;
+        let items = sottoTasks.map(st =>
+          `<li>${st.titolo}</li>`
+        ).join('');
+        container.innerHTML = `
+          <ul class="mb-0">
+            ${items}
+          </ul>
+        `;
       }
-      container.style.display = 'block';
+      // Inserisci subito dopo la card
+      card.parentNode.insertBefore(container, card.nextSibling);
     })
     .catch(() => {
+      // Rimuovi eventuali altre sottotask-container aperte
+      document.querySelectorAll('.sottotask-container').forEach(el => el.remove());
+      const container = document.createElement('div');
+      container.className = 'sottotask-container';
       container.innerHTML = '<div class="text-danger small ms-3">Errore caricamento sotto-task</div>';
-      container.style.display = 'block';
+      card.parentNode.insertBefore(container, card.nextSibling);
     });
 }
 
@@ -238,32 +245,36 @@ function caricaTasksPerCategoria(CategoriaId) {
 
         const box = document.createElement('div');
         box.className = 'card mb-2 w-100';
+        box.setAttribute('data-task-id', task.id);
         box.innerHTML = `
-          <div class="card-body p-2">
-            <div class="row align-items-center flex-wrap">
-              <div class="col-auto mx-2">
-                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
-                ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
-              </div>
-              <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
-              <div class="col-auto ms-auto d-flex gap-2">
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="notaTask(${task.id})">
-                  <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-                </button>
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="modificaTask(${task.id})">
-                  <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
-                </button>
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="eliminaTask(${task.id})">
-                  <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-                </button>
-              </div>
+          <div class="card-body d-flex align-items-center p-2">
+            <div class="d-flex align-items-center flex-wrap gap-3">
+              <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.5);"
+              ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
+              <span><strong>Titolo:</strong> ${task.titolo}</span>
+              <span class="ms-3"><strong>Scadenza:</strong> ${scadenzaFormattata}</span>
+            </div>
+            <div class="d-flex ms-auto gap-2">
+              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                      style="width: 48px; height: 48px; padding: 0;"
+                      onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
+                <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
+              </button>
+              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                      style="width: 48px; height: 48px; padding: 0;"
+                      onclick="notaTask(${task.id})">
+                <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+              </button>
+              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                      style="width: 48px; height: 48px; padding: 0;"
+                      onclick="modificaTask(${task.id})">
+                <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
+              </button>
+              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                      style="width: 48px; height: 48px; padding: 0;"
+                      onclick="eliminaTask(${task.id})">
+                <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+              </button>
             </div>
           </div>
         `;
@@ -381,38 +392,36 @@ function caricaTasks() {
 
         const box = document.createElement('div');
         box.className = 'card mb-2 w-100';
+        box.setAttribute('data-task-id', task.id);
         box.innerHTML = `
-          <div class="card-body p-2">
-            <div class="row align-items-center flex-wrap">
-              <div class="col-auto mx-2">
-                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
-                  ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
-              </div>
-              <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
-              <div class="col-auto ms-auto d-flex gap-2">
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="notaTask(${task.id})">
-                  <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-                </button>
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="modificaTask(${task.id})">
-                  <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
-                </button>
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="eliminaTask(${task.id})">
-                  <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-                </button>
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="caricaSottoTask(${task.id})">
-                  <i class="bi bi-caret-down-fill"></i>
-                </button>
-                  <div id="dropdown-sottotask-${task.id}"></div>
-              </div>
+          <div class="card-body d-flex align-items-center p-2">
+            <div class="d-flex align-items-center flex-wrap gap-3">
+              <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.5);"
+                ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
+              <span><strong>Titolo:</strong> ${task.titolo}</span>
+              <span class="ms-3"><strong>Scadenza:</strong> ${scadenzaFormattata}</span>
+            </div>
+            <div class="d-flex ms-auto gap-2">
+              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                      style="width: 48px; height: 48px; padding: 0;"
+                      onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
+                <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
+              </button>
+              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                      style="width: 48px; height: 48px; padding: 0;"
+                      onclick="notaTask(${task.id})">
+                <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+              </button>
+              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                      style="width: 48px; height: 48px; padding: 0;"
+                      onclick="modificaTask(${task.id})">
+                <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
+              </button>
+              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                      style="width: 48px; height: 48px; padding: 0;"
+                      onclick="eliminaTask(${task.id})">
+                <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+              </button>
             </div>
           </div>
         `;
@@ -718,27 +727,31 @@ function caricaTasksCompletate() {
 
           const box = document.createElement('div');
           box.className = 'card mb-2 w-100';
+          box.setAttribute('data-task-id', task.id);
           box.innerHTML = `
-            <div class="card-body p-2">
-              <div class="row align-items-center flex-wrap">
-                <div class="col-auto mx-2">
-                  <input type="checkbox" class="form-check-input" style="transform: scale(1.5);" checked 
-                    onchange="toggleStato(${task.id}, this.checked, this)">
-                </div>
-                <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-                <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
-                <div class="col-auto ms-auto d-flex gap-2">
-                    <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                            style="width: 48px; height: 48px; padding: 0;"
-                            onclick="notaTask(${task.id})">
-                            <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-                    </button>
-                    <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                            style="width: 48px; height: 48px; padding: 0;"
-                            onclick="eliminaTask(${task.id})">
-                            <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-                    </button>
-                  </div>
+            <div class="card-body d-flex align-items-center p-2">
+              <div class="d-flex align-items-center flex-wrap gap-3">
+                <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.5);" checked 
+                  onchange="toggleStato(${task.id}, this.checked, this)">
+                <span><strong>Titolo:</strong> ${task.titolo}</span>
+                <span class="ms-3"><strong>Scadenza:</strong> ${scadenzaFormattata}</span>
+              </div>
+              <div class="d-flex ms-auto gap-2">
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;"
+                        onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
+                  <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;"
+                        onclick="notaTask(${task.id})">
+                  <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 48px; height: 48px; padding: 0;"
+                        onclick="eliminaTask(${task.id})">
+                  <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
               </div>
             </div>
           `;
@@ -841,27 +854,31 @@ function caricaTasksCompletatePerUtente(utenteId) {
 
           const box = document.createElement('div');
           box.className = 'card mb-2 w-100';
+          box.setAttribute('data-task-id', task.id);
           box.innerHTML = `
-              <div class="card-body p-2">
-                <div class="row align-items-center flex-wrap">
-                  <div class="col-auto mx-2">
-                    <input type="checkbox" class="form-check-input" style="transform: scale(1.5);" checked
-                    onchange="toggleStato(${task.id}, this.checked, this)">
-                  </div>
-                  <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-                  <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
-                  <div class="col-auto ms-auto d-flex gap-2">
-                    <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                            style="width: 48px; height: 48px; padding: 0;"
-                            onclick="notaTask(${task.id})">
-                      <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-                    </button>
-                    <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                            style="width: 48px; height: 48px; padding: 0;"
-                            onclick="eliminaTask(${task.id})">
-                      <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-                    </button>
-                  </div>
+              <div class="card-body d-flex align-items-center p-2">
+                <div class="d-flex align-items-center flex-wrap gap-3">
+                  <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.5);" checked
+                  onchange="toggleStato(${task.id}, this.checked, this)">
+                  <span><strong>Titolo:</strong> ${task.titolo}</span>
+                  <span class="ms-3"><strong>Scadenza:</strong> ${scadenzaFormattata}</span>
+                </div>
+                <div class="d-flex ms-auto gap-2">
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
+                    <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="notaTask(${task.id})">
+                    <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="eliminaTask(${task.id})">
+                    <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
                 </div>
               </div>
             `;
@@ -899,27 +916,31 @@ function caricaTasksCompletatePerCategoria(categoriaId) {
 
           const box = document.createElement('div');
           box.className = 'card mb-2 w-100';
+          box.setAttribute('data-task-id', task.id);
           box.innerHTML = `
-              <div class="card-body p-2">
-                <div class="row align-items-center flex-wrap">
-                  <div class="col-auto mx-2">
-                    <input type="checkbox" class="form-check-input" style="transform: scale(1.5);" checked
-                    onchange="toggleStato(${task.id}, this.checked, this)">
-                  </div>
-                  <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-                  <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
-                  <div class="col-auto ms-auto d-flex gap-2">
-                    <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                            style="width: 48px; height: 48px; padding: 0;"
-                            onclick="notaTask(${task.id})">
-                      <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-                    </button>
-                    <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                            style="width: 48px; height: 48px; padding: 0;"
-                            onclick="eliminaTask(${task.id})">
-                      <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-                    </button>
-                  </div>
+              <div class="card-body d-flex align-items-center p-2">
+                <div class="d-flex align-items-center flex-wrap gap-3">
+                  <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.5);" checked
+                  onchange="toggleStato(${task.id}, this.checked, this)">
+                  <span><strong>Titolo:</strong> ${task.titolo}</span>
+                  <span class="ms-3"><strong>Scadenza:</strong> ${scadenzaFormattata}</span>
+                </div>
+                <div class="d-flex ms-auto gap-2">
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
+                    <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="notaTask(${task.id})">
+                    <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="eliminaTask(${task.id})">
+                    <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
                 </div>
               </div>
             `;
