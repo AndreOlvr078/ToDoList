@@ -171,30 +171,29 @@ function caricaTasksPerUtente(UtenteId) {
 
 document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
   const utenteId = document.getElementById('utenteDropdown').value;
+  const utenteSelect = document.getElementById('utenteDropdown');
+  const nomeUtente = utenteSelect.options[utenteSelect.selectedIndex].textContent;
+
+  if (utenteId === "tutti") {
+    utenteSelezionato = null;
+    document.getElementById('utente-in-uso').textContent = "Tutti";
+    caricaTasks(); // Mostra tutte le task
+    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
+    modal.hide();
+    return;
+  }
+
   if (utenteId) {
-    // Trova il nome dell'utente selezionato
-    const utenteSelect = document.getElementById('utenteDropdown');
-    const nomeUtente = utenteSelect.options[utenteSelect.selectedIndex].textContent;
-
-    // Salva l'utente selezionato
     utenteSelezionato = utenteId;
-
-    // Aggiorna il nome visualizzato
     document.getElementById('utente-in-uso').textContent = nomeUtente;
-
-    // Carica le task appropriate in base alla pagina corrente
-    if (window.location.pathname.endsWith('completate.html')) {
-      caricaTasksCompletate();
-    } else {
-      caricaTasksPerUtente(utenteId);
-    }
-
+    caricaTasksPerUtente(utenteId);
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
     modal.hide();
   } else {
     alert('Seleziona un utente!');
   }
 });
+
 
 function resetUtenteVisualizzato() {
   utenteSelezionato = null;
