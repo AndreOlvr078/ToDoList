@@ -175,7 +175,7 @@ function resetUtenteVisualizzato() {
 }
 
   // Inizializza con nessun utente selezionato
-  document.getElementById('utente-in-uso').textContent = 'Tutti';
+  document.getElementById('utente-in-uso').textContent = 'Nessuno utente selezionato';
 
 
 function caricaTasksPerCategoria(CategoriaId) {
