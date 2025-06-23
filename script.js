@@ -20,7 +20,7 @@ function caricaCategorieDropdown() {
     .then(res => res.json())
     .then(categorie => {
       const select = document.getElementById('categoriaDropdown');
-      select.innerHTML = '<option value="">Seleziona categoria...</option>';
+      select.innerHTML = '<option value="">Seleziona categoria...</option><option value="tutte">Tutte</option>';
       categorie.forEach(cat => {
         const option = document.createElement('option');
         option.value = cat.id;
@@ -291,6 +291,13 @@ function caricaTasksPerCategoria(CategoriaId) {
 
 document.getElementById('confermaCategoriaBtn').addEventListener('click', function () {
   const CategoriaID = document.getElementById('categoriaDropdown').value;
+  if (CategoriaID === "tutte") {
+    // Mostra tutte le task (come per utenti)
+    caricaTasks();
+    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
+    modal.hide();
+    return;
+  }
   if (CategoriaID) {
     categoriaSelezionata = CategoriaID;
     caricaTasksPerCategoria(CategoriaID);
