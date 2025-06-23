@@ -524,215 +524,219 @@ function salvaTask(e) {
       document.getElementById('taskForm').reset();
       taskDaModificare = null;
       document.getElementById('btnAggiungi').textContent = 'Aggiungi';
-      caricaTasks();
+      if (utenteSelezionato) {
+        caricaTasksPerUtente(utenteSelezionato);
+      } else {
+        caricaTasks();
+      }
     })
-    .catch(err => alert(err.message));
-}
-document.getElementById('taskForm').addEventListener('submit', salvaTask);
+  }
 
-function eliminaTask(id) {
-  taskIdDaEliminare = id;
-  var modal = new bootstrap.Modal(document.getElementById('confermaEliminaModal'));
-  modal.show();
-}
+  document.getElementById('taskForm').addEventListener('submit', salvaTask);
 
-function toggleStato(id, nuovoStato, checkbox) {
-  if (nuovoStato) {
-    taskIdDaCompletare = id;
-    checkboxDaRipristinare = checkbox;
-    var modal = new bootstrap.Modal(document.getElementById('confermaCompletaModal'));
+  function eliminaTask(id) {
+    taskIdDaEliminare = id;
+    var modal = new bootstrap.Modal(document.getElementById('confermaEliminaModal'));
     modal.show();
-  } else {
-    aggiornaStatoTask(id, false);
   }
-}
 
-
-// Aggiorna badge anche dopo modifica stato o eliminazione
-function aggiornaStatoTask(id, nuovoStato) {
-  fetch(`https://localhost:7000/api/Task/${id}`)
-    .then(res => res.json())
-    .then(task => {
-      return fetch(`https://localhost:7000/api/Task/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...task, stato: nuovoStato })
-      });
-    })
-    .then(res => res.json())
-    .then(() => {
-      if (utenteSelezionato) caricaTasksPerUtente(utenteSelezionato);
-      else caricaTasks();
-      aggiornaNumeroSezione();
-      aggiornaNumeroSezioneCompletate();
-    })
-    .catch(err => alert(err.message));
-}
-
-document.getElementById('btnConfermaCompleta').addEventListener('click', function () {
-  if (taskIdDaCompletare !== null) {
-    aggiornaStatoTask(taskIdDaCompletare, true);
-    taskIdDaCompletare = null;
-    checkboxDaRipristinare = null;
-    var modal = bootstrap.Modal.getInstance(document.getElementById('confermaCompletaModal'));
-    modal.hide();
+  function toggleStato(id, nuovoStato, checkbox) {
+    if (nuovoStato) {
+      taskIdDaCompletare = id;
+      checkboxDaRipristinare = checkbox;
+      var modal = new bootstrap.Modal(document.getElementById('confermaCompletaModal'));
+      modal.show();
+    } else {
+      aggiornaStatoTask(id, false);
+    }
   }
-});
 
-document.getElementById('confermaCompletaModal').addEventListener('hidden.bs.modal', function () {
-  if (checkboxDaRipristinare) {
-    checkboxDaRipristinare.checked = false;
-    checkboxDaRipristinare = null;
-  }
-  taskIdDaCompletare = null;
-});
 
-document.getElementById('btnConfermaElimina').addEventListener('click', function () {
-  if (taskIdDaEliminare !== null) {
-    fetch(`https://localhost:7000/api/Task/${taskIdDaEliminare}`, {
-      method: 'DELETE'
-    })
+  // Aggiorna badge anche dopo modifica stato o eliminazione
+  function aggiornaStatoTask(id, nuovoStato) {
+    fetch(`https://localhost:7000/api/Task/${id}`)
+      .then(res => res.json())
+      .then(task => {
+        return fetch(`https://localhost:7000/api/Task/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...task, stato: nuovoStato })
+        });
+      })
+      .then(res => res.json())
       .then(() => {
-        taskIdDaEliminare = null;
-        var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
-        modal.hide();
-        // Ricarica la lista giusta in base alla pagina
-        if (window.location.pathname.endsWith('completate.html')) {
-          caricaTasksCompletate();
-        } else if (utenteSelezionato) {
-          caricaTasksPerUtente(utenteSelezionato);
-        } else {
-          caricaTasks();
-        }
+        if (utenteSelezionato) caricaTasksPerUtente(utenteSelezionato);
+        else caricaTasks();
         aggiornaNumeroSezione();
         aggiornaNumeroSezioneCompletate();
+      })
+      .catch(err => alert(err.message));
+  }
+
+  document.getElementById('btnConfermaCompleta').addEventListener('click', function () {
+    if (taskIdDaCompletare !== null) {
+      aggiornaStatoTask(taskIdDaCompletare, true);
+      taskIdDaCompletare = null;
+      checkboxDaRipristinare = null;
+      var modal = bootstrap.Modal.getInstance(document.getElementById('confermaCompletaModal'));
+      modal.hide();
+    }
+  });
+
+  document.getElementById('confermaCompletaModal').addEventListener('hidden.bs.modal', function () {
+    if (checkboxDaRipristinare) {
+      checkboxDaRipristinare.checked = false;
+      checkboxDaRipristinare = null;
+    }
+    taskIdDaCompletare = null;
+  });
+
+  document.getElementById('btnConfermaElimina').addEventListener('click', function () {
+    if (taskIdDaEliminare !== null) {
+      fetch(`https://localhost:7000/api/Task/${taskIdDaEliminare}`, {
+        method: 'DELETE'
+      })
+        .then(() => {
+          taskIdDaEliminare = null;
+          var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
+          modal.hide();
+          // Ricarica la lista giusta in base alla pagina
+          if (window.location.pathname.endsWith('completate.html')) {
+            caricaTasksCompletate();
+          } else if (utenteSelezionato) {
+            caricaTasksPerUtente(utenteSelezionato);
+          } else {
+            caricaTasks();
+          }
+          aggiornaNumeroSezione();
+          aggiornaNumeroSezioneCompletate();
+        });
+    }
+  });
+
+  function modificaTask(id) {
+    fetch(`https://localhost:7000/api/Task/${id}`)
+      .then(res => res.json())
+      .then(task => {
+        document.getElementById('titolo').value = task.titolo;
+        document.getElementById('categoria').value = task.categoriaID;
+        document.getElementById('scadenza').value = task.scadenza?.split('T')[0] ?? '';
+        document.getElementById('utente').value = task.utenteID;
+
+        taskDaModificare = id;
+        document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
+
+        const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+        modal.show();
+      })
+      .catch(err => {
+        alert("Impossibile caricare il task.");
+        console.error("Errore:", err);
       });
   }
-});
 
-function modificaTask(id) {
-  fetch(`https://localhost:7000/api/Task/${id}`)
-    .then(res => res.json())
-    .then(task => {
-      document.getElementById('titolo').value = task.titolo;
-      document.getElementById('categoria').value = task.categoriaID;
-      document.getElementById('scadenza').value = task.scadenza?.split('T')[0] ?? '';
-      document.getElementById('utente').value = task.utenteID;
-
-      taskDaModificare = id;
-      document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
-
-      const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
-      modal.show();
-    })
-    .catch(err => {
-      alert("Impossibile caricare il task.");
-      console.error("Errore:", err);
-    });
-}
-
-function notaTask(id) {
-  fetch(`https://localhost:7000/api/Task/${id}`)
-    .then(res => res.json())
-    .then(task => {
-      Promise.all([
-        fetch(`https://localhost:7000/api/Utente/${task.utenteID}`).then(r => r.json()),
-        fetch(`https://localhost:7000/api/Categorie/${task.categoriaID}`).then(r => r.json())
-      ])
-        .then(([utente, categoria]) => {
-          document.getElementById('modalDescrizioneTesto').innerHTML = `
+  function notaTask(id) {
+    fetch(`https://localhost:7000/api/Task/${id}`)
+      .then(res => res.json())
+      .then(task => {
+        Promise.all([
+          fetch(`https://localhost:7000/api/Utente/${task.utenteID}`).then(r => r.json()),
+          fetch(`https://localhost:7000/api/Categorie/${task.categoriaID}`).then(r => r.json())
+        ])
+          .then(([utente, categoria]) => {
+            document.getElementById('modalDescrizioneTesto').innerHTML = `
             <div><strong>Titolo:</strong> ${task.titolo}</div>
             <div><strong>Descrizione:</strong> ${task.descrizione}</div>
             <div><strong>Utente:</strong> ${utente.nome}</div>
             <div><strong>Categoria:</strong> ${categoria.descrizione}</div>
           `;
-          var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
-          modal.show();
-        })
-        .catch(() => {
-          document.getElementById('modalDescrizioneTesto').textContent = "Errore nel caricamento di utente o categoria.";
-          var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
-          modal.show();
+            var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+            modal.show();
+          })
+          .catch(() => {
+            document.getElementById('modalDescrizioneTesto').textContent = "Errore nel caricamento di utente o categoria.";
+            var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+            modal.show();
+          });
+      })
+      .catch(() => {
+        document.getElementById('modalDescrizioneTesto').textContent = "Descrizione non trovata.";
+        var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+        modal.show();
+      });
+  }
+
+  function caricaCategorie() {
+    return fetch('https://localhost:7000/api/Categorie')
+      .then(res => res.json())
+      .then(categorie => {
+        const select = document.getElementById('categoria');
+        select.innerHTML = '<option value="">Seleziona categoria...</option>';
+        categorie.forEach(cat => {
+          const option = document.createElement('option');
+          option.value = cat.id;
+          option.textContent = cat.descrizione;
+          select.appendChild(option);
         });
-    })
-    .catch(() => {
-      document.getElementById('modalDescrizioneTesto').textContent = "Descrizione non trovata.";
-      var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
-      modal.show();
-    });
-}
-
-function caricaCategorie() {
-  return fetch('https://localhost:7000/api/Categorie')
-    .then(res => res.json())
-    .then(categorie => {
-      const select = document.getElementById('categoria');
-      select.innerHTML = '<option value="">Seleziona categoria...</option>';
-      categorie.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat.id;
-        option.textContent = cat.descrizione;
-        select.appendChild(option);
-      });
-    })
-    .catch(err => console.error("Errore nel caricamento categorie:", err));
-}
-
-function caricaUtentiForm() {
-  return fetch('https://localhost:7000/api/Utente')
-    .then(res => res.json())
-    .then(utenti => {
-      const select = document.getElementById('utente');
-      select.innerHTML = '<option value="">Seleziona utente...</option>';
-      utenti.forEach(u => {
-        const option = document.createElement('option');
-        option.value = u.id;
-        option.textContent = u.nome;
-        select.appendChild(option);
-      });
-    })
-    .catch(err => console.error("Errore nel caricamento utenti:", err));
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Imposta il min della data di scadenza a oggi
-  const scadenzaInput = document.getElementById('scadenza');
-  if (scadenzaInput) {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const minDate = `${yyyy}-${mm}-${dd}`;
-    scadenzaInput.setAttribute('min', minDate);
-  }
-  Promise.all([
-    caricaTasks(),
-    caricaCategorie(),
-    caricaUtentiForm()
-  ]);
-  aggiornaNumeroSezione();
-  aggiornaNumeroSezioneCompletate();
-});
-
-function caricaTasksCompletate() {
-  let url = 'https://localhost:7000/api/Task';
-  if (utenteSelezionato) {
-    url = `https://localhost:7000/api/Task/Utente/${utenteSelezionato}`;
+      })
+      .catch(err => console.error("Errore nel caricamento categorie:", err));
   }
 
-  fetch(url)
-    .then(res => res.json())
-    .then(tasks => {
-      const lista = document.getElementById('lista-box');
-      lista.innerHTML = '';
-      tasks.filter(task => task.stato).forEach(task => {
-        const scadenza = new Date(task.scadenza);
-        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-        const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+  function caricaUtentiForm() {
+    return fetch('https://localhost:7000/api/Utente')
+      .then(res => res.json())
+      .then(utenti => {
+        const select = document.getElementById('utente');
+        select.innerHTML = '<option value="">Seleziona utente...</option>';
+        utenti.forEach(u => {
+          const option = document.createElement('option');
+          option.value = u.id;
+          option.textContent = u.nome;
+          select.appendChild(option);
+        });
+      })
+      .catch(err => console.error("Errore nel caricamento utenti:", err));
+  }
 
-        const box = document.createElement('div');
-        box.className = 'card mb-2 w-100';
-        box.innerHTML = `
+  document.addEventListener('DOMContentLoaded', () => {
+    // Imposta il min della data di scadenza a oggi
+    const scadenzaInput = document.getElementById('scadenza');
+    if (scadenzaInput) {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const minDate = `${yyyy}-${mm}-${dd}`;
+      scadenzaInput.setAttribute('min', minDate);
+    }
+    Promise.all([
+      caricaTasks(),
+      caricaCategorie(),
+      caricaUtentiForm()
+    ]);
+    aggiornaNumeroSezione();
+    aggiornaNumeroSezioneCompletate();
+  });
+
+  function caricaTasksCompletate() {
+    let url = 'https://localhost:7000/api/Task';
+    if (utenteSelezionato) {
+      url = `https://localhost:7000/api/Task/Utente/${utenteSelezionato}`;
+    }
+
+    fetch(url)
+      .then(res => res.json())
+      .then(tasks => {
+        const lista = document.getElementById('lista-box');
+        lista.innerHTML = '';
+        tasks.filter(task => task.stato).forEach(task => {
+          const scadenza = new Date(task.scadenza);
+          const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+          const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+
+          const box = document.createElement('div');
+          box.className = 'card mb-2 w-100';
+          box.innerHTML = `
           <div class="card-body p-2">
             <div class="row align-items-center flex-wrap">
               <div class="col-auto mx-2">
@@ -756,40 +760,40 @@ function caricaTasksCompletate() {
             </div>
           </div>
         `;
-        lista.appendChild(box);
+          lista.appendChild(box);
+        });
+        aggiornaNumeroSezioneCompletate();
       });
-      aggiornaNumeroSezioneCompletate();
-    });
-}
-
-function mostraNumeroTaskNonFattePerUtente(utenteId) {
-  if (!utenteId) {
-    document.getElementById('numero-sezione').textContent = '0';
-    return;
   }
-  fetch(`https://localhost:7000/api/Task/UtenteStatoNo/${utenteId}`)
-    .then(res => res.json())
-    .then(tasks => {
-      const nonFatte = tasks.filter(t => !t.stato).length;
-      document.getElementById('numero-sezione').textContent = nonFatte;
-    })
-    .catch(() => {
+
+  function mostraNumeroTaskNonFattePerUtente(utenteId) {
+    if (!utenteId) {
       document.getElementById('numero-sezione').textContent = '0';
-    });
-}
-
-function mostraNumeroTaskCompletatePerUtente(utenteId) {
-  if (!utenteId) {
-    document.getElementById('numero-sezione-si').textContent = '0';
-    return;
+      return;
+    }
+    fetch(`https://localhost:7000/api/Task/UtenteStatoNo/${utenteId}`)
+      .then(res => res.json())
+      .then(tasks => {
+        const nonFatte = tasks.filter(t => !t.stato).length;
+        document.getElementById('numero-sezione').textContent = nonFatte;
+      })
+      .catch(() => {
+        document.getElementById('numero-sezione').textContent = '0';
+      });
   }
-  fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
-    .then(res => res.json())
-    .then(tasks => {
-      const completate = tasks.filter(t => t.stato).length;
-      document.getElementById('numero-sezione-si').textContent = completate;
-    })
-    .catch(() => {
+
+  function mostraNumeroTaskCompletatePerUtente(utenteId) {
+    if (!utenteId) {
       document.getElementById('numero-sezione-si').textContent = '0';
-    });
-}
+      return;
+    }
+    fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
+      .then(res => res.json())
+      .then(tasks => {
+        const completate = tasks.filter(t => t.stato).length;
+        document.getElementById('numero-sezione-si').textContent = completate;
+      })
+      .catch(() => {
+        document.getElementById('numero-sezione-si').textContent = '0';
+      });
+  }
