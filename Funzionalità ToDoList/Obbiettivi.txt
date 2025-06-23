@@ -1,2 +1,3 @@
 - Creare un sistema di scadenza funzionante
 - aggiungere la possibilita di mettere le sottotask
+-aggiungere nel frontend il fatto che se premo unaa categoria e un utente escvano solo le cose lewgate ai due
