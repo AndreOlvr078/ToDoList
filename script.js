@@ -70,6 +70,7 @@ function aggiornaNumeroSezione() {
     return;
   }
 
+
   // Altrimenti usa la logica per utenti
   let utenteId = utenteSelezionato || null;
   let url = utenteId
@@ -100,6 +101,7 @@ function aggiornaNumeroSezioneCompletate() {
     mostraNumeroTaskCompletatePerCategoria(categoriaSelezionata);
     return;
   }
+
 
   // Altrimenti usa la logica per utenti
   let utenteId = utenteSelezionato || null;
@@ -167,6 +169,18 @@ function caricaTasksPerUtente(UtenteId) {
                           onclick="eliminaTask(${task.id})">
                     <i class="bi bi-trash3" style="font-size: 2rem; font-weight: bold;"></i>
                   </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="caricaSottoTask(${task.Id})">
+                    <i class="bi bi-caret-down-fill"></i>
+                  </button>
+                  <div id="dropdown-sottotask-${task.id}"></div>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="caricaSottoTask(${task.Id})">
+                    <i class="bi bi-caret-down-fill"></i>
+                  </button>
+                  <div id="dropdown-sottotask-${task.id}"></div>
                 </div>
               </div>
             </div>
@@ -180,6 +194,44 @@ function caricaTasksPerUtente(UtenteId) {
     .catch(err => alert("Errore nel caricamento tasks per utente: " + err.message));
 }
 
+function caricaSottoTask(taskId) {
+  fetch(`https://localhost:7000/api/SottoTask/Task/${taskId}`)
+    .then(res => res.json())
+    .then(sottoTasks => {
+      const container = document.getElementById(`dropdown-sottotask-${taskId}`);
+      if (!container) return;
+
+      // Rimuovi eventuale dropdown già presente
+      container.innerHTML = '';
+
+      if (!sottoTasks || sottoTasks.length === 0) {
+        container.innerHTML = '<div class="text-muted small ms-3">Nessun sotto-task</div>';
+        return;
+      }
+
+      // Crea la dropdown Bootstrap
+      const dropdown = document.createElement('div');
+      dropdown.className = 'dropdown show ms-3';
+
+      let items = sottoTasks.map(st =>
+        `<li><span class="dropdown-item">${st.titolo}</span></li>`
+      ).join('');
+
+      dropdown.innerHTML = `
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="true">
+          Sotto-task
+        </button>
+        <ul class="dropdown-menu show" style="position:static;">
+          ${items}
+        </ul>
+      `;
+      container.appendChild(dropdown);
+    })
+    .catch(() => {
+      const container = document.getElementById(`dropdown-sottotask-${taskId}`);
+      if (container) container.innerHTML = '<div class="text-danger small ms-3">Errore caricamento sotto-task</div>';
+    });
+}
 
 document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
   const utenteId = document.getElementById('utenteDropdown').value;
@@ -574,7 +626,9 @@ function salvaTask(e) {
       }
     })
 }
+}
 
+document.getElementById('taskForm').addEventListener('submit', salvaTask);
 document.getElementById('taskForm').addEventListener('submit', salvaTask);
 
 function eliminaTask(id) {
@@ -582,7 +636,22 @@ function eliminaTask(id) {
   var modal = new bootstrap.Modal(document.getElementById('confermaEliminaModal'));
   modal.show();
 }
+function eliminaTask(id) {
+  taskIdDaEliminare = id;
+  var modal = new bootstrap.Modal(document.getElementById('confermaEliminaModal'));
+  modal.show();
+}
 
+function toggleStato(id, nuovoStato, checkbox) {
+  if (nuovoStato) {
+    taskIdDaCompletare = id;
+    checkboxDaRipristinare = checkbox;
+    var modal = new bootstrap.Modal(document.getElementById('confermaCompletaModal'));
+    modal.show();
+  } else {
+    aggiornaStatoTask(id, false);
+  }
+}
 function toggleStato(id, nuovoStato, checkbox) {
   if (nuovoStato) {
     taskIdDaCompletare = id;
@@ -615,6 +684,26 @@ function aggiornaStatoTask(id, nuovoStato) {
     })
     .catch(err => alert(err.message));
 }
+// Aggiorna badge anche dopo modifica stato o eliminazione
+function aggiornaStatoTask(id, nuovoStato) {
+  fetch(`https://localhost:7000/api/Task/${id}`)
+    .then(res => res.json())
+    .then(task => {
+      return fetch(`https://localhost:7000/api/Task/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...task, stato: nuovoStato })
+      });
+    })
+    .then(res => res.json())
+    .then(() => {
+      if (utenteSelezionato) caricaTasksPerUtente(utenteSelezionato);
+      else caricaTasks();
+      aggiornaNumeroSezione();
+      aggiornaNumeroSezioneCompletate();
+    })
+    .catch(err => alert(err.message));
+}
 
 document.getElementById('btnConfermaCompleta').addEventListener('click', function () {
   if (taskIdDaCompletare !== null) {
@@ -625,7 +714,23 @@ document.getElementById('btnConfermaCompleta').addEventListener('click', functio
     modal.hide();
   }
 });
+document.getElementById('btnConfermaCompleta').addEventListener('click', function () {
+  if (taskIdDaCompletare !== null) {
+    aggiornaStatoTask(taskIdDaCompletare, true);
+    taskIdDaCompletare = null;
+    checkboxDaRipristinare = null;
+    var modal = bootstrap.Modal.getInstance(document.getElementById('confermaCompletaModal'));
+    modal.hide();
+  }
+});
 
+document.getElementById('confermaCompletaModal').addEventListener('hidden.bs.modal', function () {
+  if (checkboxDaRipristinare) {
+    checkboxDaRipristinare.checked = false;
+    checkboxDaRipristinare = null;
+  }
+  taskIdDaCompletare = null;
+});
 document.getElementById('confermaCompletaModal').addEventListener('hidden.bs.modal', function () {
   if (checkboxDaRipristinare) {
     checkboxDaRipristinare.checked = false;
@@ -678,10 +783,64 @@ function modificaTask(id) {
         document.getElementById('scadenza').value = '';
         document.getElementById('scadenzaOra').value = '';
       }
+document.getElementById('btnConfermaElimina').addEventListener('click', function () {
+  if (taskIdDaEliminare !== null) {
+    fetch(`https://localhost:7000/api/Task/${taskIdDaEliminare}`, {
+      method: 'DELETE'
+    })
+      .then(() => {
+        taskIdDaEliminare = null;
+        var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
+        modal.hide();
+        // Ricarica la lista giusta in base alla pagina
+        if (window.location.pathname.endsWith('completate.html')) {
+          caricaTasksCompletate();
+        } else if (utenteSelezionato) {
+          caricaTasksPerUtente(utenteSelezionato);
+        } else {
+          caricaTasks();
+        }
+        aggiornaNumeroSezione();
+        aggiornaNumeroSezioneCompletate();
+      });
+  }
+});
+function modificaTask(id) {
+  fetch(`https://localhost:7000/api/Task/${id}`)
+    .then(res => res.json())
+    .then(task => {
+      document.getElementById('titolo').value = task.titolo;
+      document.getElementById('descrizione').value = task.descrizione;
+      document.getElementById('categoria').value = task.categoriaID;
+      document.getElementById('utente').value = task.utenteID;
+
+      // Gestione della data e ora di scadenza
+      if (task.scadenza) {
+        const dataOra = task.scadenza.split('T');
+        document.getElementById('scadenza').value = dataOra[0];
+        if (dataOra[1]) {
+          // Estrai solo ore e minuti (formato HH:MM)
+          const ora = dataOra[1].substring(0, 5);
+          document.getElementById('scadenzaOra').value = ora;
+        }
+      } else {
+        document.getElementById('scadenza').value = '';
+        document.getElementById('scadenzaOra').value = '';
+      }
 
       taskDaModificare = id;
       document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
+      taskDaModificare = id;
+      document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
 
+      const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+      modal.show();
+    })
+    .catch(err => {
+      alert("Impossibile caricare il task.");
+      console.error("Errore:", err);
+    });
+}
       const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
       modal.show();
     })
@@ -701,11 +860,36 @@ function notaTask(id) {
       ])
         .then(([utente, categoria]) => {
           document.getElementById('modalDescrizioneTesto').innerHTML = `
+function notaTask(id) {
+  fetch(`https://localhost:7000/api/Task/${id}`)
+    .then(res => res.json())
+    .then(task => {
+      Promise.all([
+        fetch(`https://localhost:7000/api/Utente/${task.utenteID}`).then(r => r.json()),
+        fetch(`https://localhost:7000/api/Categorie/${task.categoriaID}`).then(r => r.json())
+      ])
+        .then(([utente, categoria]) => {
+          document.getElementById('modalDescrizioneTesto').innerHTML = `
             <div><strong>Titolo:</strong> ${task.titolo}</div>
             <div><strong>Descrizione:</strong> ${task.descrizione}</div>
             <div><strong>Utente:</strong> ${utente.nome}</div>
             <div><strong>Categoria:</strong> ${categoria.descrizione}</div>
           `;
+          var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+          modal.show();
+        })
+        .catch(() => {
+          document.getElementById('modalDescrizioneTesto').textContent = "Errore nel caricamento di utente o categoria.";
+          var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+          modal.show();
+        });
+    })
+    .catch(() => {
+      document.getElementById('modalDescrizioneTesto').textContent = "Descrizione non trovata.";
+      var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
+      modal.show();
+    });
+}
           var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
           modal.show();
         })
@@ -737,6 +921,21 @@ function caricaCategorie() {
     })
     .catch(err => console.error("Errore nel caricamento categorie:", err));
 }
+function caricaCategorie() {
+  return fetch('https://localhost:7000/api/Categorie')
+    .then(res => res.json())
+    .then(categorie => {
+      const select = document.getElementById('categoria');
+      select.innerHTML = '<option value="">Seleziona categoria...</option>';
+      categorie.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.id;
+        option.textContent = cat.descrizione;
+        select.appendChild(option);
+      });
+    })
+    .catch(err => console.error("Errore nel caricamento categorie:", err));
+}
 
 function caricaUtentiForm() {
   return fetch('https://localhost:7000/api/Utente')
@@ -753,7 +952,41 @@ function caricaUtentiForm() {
     })
     .catch(err => console.error("Errore nel caricamento utenti:", err));
 }
+function caricaUtentiForm() {
+  return fetch('https://localhost:7000/api/Utente')
+    .then(res => res.json())
+    .then(utenti => {
+      const select = document.getElementById('utente');
+      select.innerHTML = '<option value="">Seleziona utente...</option>';
+      utenti.forEach(u => {
+        const option = document.createElement('option');
+        option.value = u.id;
+        option.textContent = u.nome;
+        select.appendChild(option);
+      });
+    })
+    .catch(err => console.error("Errore nel caricamento utenti:", err));
+}
 
+document.addEventListener('DOMContentLoaded', () => {
+  // Imposta il min della data di scadenza a oggi
+  const scadenzaInput = document.getElementById('scadenza');
+  if (scadenzaInput) {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const minDate = `${yyyy}-${mm}-${dd}`;
+    scadenzaInput.setAttribute('min', minDate);
+  }
+  Promise.all([
+    caricaTasks(),
+    caricaCategorie(),
+    caricaUtentiForm()
+  ]);
+  aggiornaNumeroSezione();
+  aggiornaNumeroSezioneCompletate();
+});
 document.addEventListener('DOMContentLoaded', () => {
   // Imposta il min della data di scadenza a oggi
   const scadenzaInput = document.getElementById('scadenza');
@@ -861,6 +1094,21 @@ function mostraNumeroTaskNonFattePerUtente(utenteId) {
       document.getElementById('numero-sezione').textContent = '0';
     });
 }
+function mostraNumeroTaskNonFattePerUtente(utenteId) {
+  if (!utenteId) {
+    document.getElementById('numero-sezione').textContent = '0';
+    return;
+  }
+  fetch(`https://localhost:7000/api/Task/UtenteStatoNo/${utenteId}`)
+    .then(res => res.json())
+    .then(tasks => {
+      const nonFatte = tasks.filter(t => !t.stato).length;
+      document.getElementById('numero-sezione').textContent = nonFatte;
+    })
+    .catch(() => {
+      document.getElementById('numero-sezione').textContent = '0';
+    });
+}
 
 function mostraNumeroTaskCompletatePerUtente(utenteId) {
   if (!utenteId) {
@@ -877,7 +1125,37 @@ function mostraNumeroTaskCompletatePerUtente(utenteId) {
       document.getElementById('numero-sezione-si').textContent = '0';
     });
 }
+function mostraNumeroTaskCompletatePerUtente(utenteId) {
+  if (!utenteId) {
+    document.getElementById('numero-sezione-si').textContent = '0';
+    return;
+  }
+  fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
+    .then(res => res.json())
+    .then(tasks => {
+      const completate = tasks.filter(t => t.stato).length;
+      document.getElementById('numero-sezione-si').textContent = completate;
+    })
+    .catch(() => {
+      document.getElementById('numero-sezione-si').textContent = '0';
+    });
+}
 
+function mostraNumeroTaskNonFattePerCategoria(categoriaId) {
+  if (!categoriaId) {
+    document.getElementById('numero-sezione').textContent = '0';
+    return;
+  }
+  fetch(`https://localhost:7000/api/Task/Categoria/${categoriaId}`)
+    .then(res => res.json())
+    .then(tasks => {
+      const nonFatte = tasks.filter(t => !t.stato).length;
+      document.getElementById('numero-sezione').textContent = nonFatte;
+    })
+    .catch(() => {
+      document.getElementById('numero-sezione').textContent = '0';
+    });
+}
 function mostraNumeroTaskNonFattePerCategoria(categoriaId) {
   if (!categoriaId) {
     document.getElementById('numero-sezione').textContent = '0';
