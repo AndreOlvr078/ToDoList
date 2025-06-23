@@ -19,7 +19,7 @@ function caricaCategorieDropdown() {
     .then(res => res.json())
     .then(categorie => {
       const select = document.getElementById('categoriaDropdown');
-      select.innerHTML = '<option value="">Seleziona categoria...</option>';
+      select.innerHTML = '<option value="">Seleziona categoria...</option><option value="">Tutti</option>';
       categorie.forEach(cat => {
         const option = document.createElement('option');
         option.value = cat.id;
