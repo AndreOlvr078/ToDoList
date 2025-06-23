@@ -6,7 +6,6 @@ let checkboxDaRipristinare = null;
 let utenteSelezionato = null;
 let categoriaSelezionata = null;
 
-
 function caricaCategorieDropdown() {
   fetch('https://localhost:7000/api/Categorie')
     .then(res => res.json())
@@ -53,15 +52,6 @@ function apriModalCategoria() {
   modal.show();
 }
 
-const UtenteId = document.getElementById('utenteDropdown').value;
-if (UtenteId) {
-  utenteSelezionato = UtenteId;
-  caricaTasksPerUtente(UtenteId);
-  const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
-  modal.hide();
-}
-
-
 // Funzione per aggiornare il badge con il numero di task non fatte per utente/categoria selezionato
 function aggiornaNumeroSezione() {
   // Se è selezionata una categoria, usa la funzione per categorie
@@ -69,7 +59,6 @@ function aggiornaNumeroSezione() {
     mostraNumeroTaskNonFattePerCategoria(categoriaSelezionata);
     return;
   }
-
 
   // Altrimenti usa la logica per utenti
   let utenteId = utenteSelezionato || null;
@@ -101,7 +90,6 @@ function aggiornaNumeroSezioneCompletate() {
     mostraNumeroTaskCompletatePerCategoria(categoriaSelezionata);
     return;
   }
-
 
   // Altrimenti usa la logica per utenti
   let utenteId = utenteSelezionato || null;
@@ -225,45 +213,6 @@ function caricaSottoTask(taskId) {
     });
 }
 
-document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
-  const utenteId = document.getElementById('utenteDropdown').value;
-  const utenteSelect = document.getElementById('utenteDropdown');
-  const nomeUtente = utenteSelect.options[utenteSelect.selectedIndex].textContent; if (utenteId === "tutti") {
-    utenteSelezionato = null;
-    categoriaSelezionata = null; // Reset anche categoria quando si seleziona "Tutti"
-    document.getElementById('utente-in-uso').textContent = "Tutti";
-
-    // Carica le task appropriate in base alla pagina corrente
-    if (window.location.pathname.endsWith('completate.html')) {
-      caricaTasksCompletate();
-    } else {
-      caricaTasks();
-    }
-
-    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
-    modal.hide();
-    return;
-  }
-  if (utenteId && utenteId !== "") {
-    utenteSelezionato = utenteId;
-    categoriaSelezionata = null; // Reset categoria quando si seleziona un utente specifico
-    document.getElementById('utente-in-uso').textContent = nomeUtente;
-
-    // Carica le task appropriate in base alla pagina corrente
-    if (window.location.pathname.endsWith('completate.html')) {
-      caricaTasksCompletatePerUtente(utenteId);
-    } else {
-      caricaTasksPerUtente(utenteId);
-    }
-
-    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
-    modal.hide();
-  } else if (utenteId === "") {
-    alert('Seleziona un utente!');
-  }
-});
-
-
 function resetUtenteVisualizzato() {
   utenteSelezionato = null;
   categoriaSelezionata = null; // Reset anche categoria
@@ -275,10 +224,6 @@ function resetUtenteVisualizzato() {
     caricaTasks();
   }
 }
-
-// Inizializza con nessun utente selezionato
-document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
-
 
 function caricaTasksPerCategoria(CategoriaId) {
   fetch(`https://localhost:7000/api/Task/Categoria/${CategoriaId}`)
@@ -330,46 +275,6 @@ function caricaTasksPerCategoria(CategoriaId) {
     .catch(err => alert("Errore nel caricamento tasks per categoria: " + err.message));
 }
 
-document.getElementById('confermaCategoriaBtn').addEventListener('click', function () {
-  const CategoriaID = document.getElementById('categoriaDropdown').value;
-  const categoriaSelect = document.getElementById('categoriaDropdown');
-  const nomeCategoria = categoriaSelect.options[categoriaSelect.selectedIndex].textContent;
-  if (CategoriaID === "tutti") {
-    // Reset tutte le selezioni quando si sceglie "Tutti" per le categorie
-    categoriaSelezionata = null;
-    utenteSelezionato = null;
-    document.getElementById('utente-in-uso').textContent = "Tutti";
-
-    // Carica le task appropriate in base alla pagina corrente
-    if (window.location.pathname.endsWith('completate.html')) {
-      caricaTasksCompletate();
-    } else {
-      caricaTasks();
-    }
-
-    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
-    modal.hide();
-    return;
-  }
-  if (CategoriaID) {
-    categoriaSelezionata = CategoriaID;
-    utenteSelezionato = null; // Reset utente quando si seleziona una categoria specifica
-    document.getElementById('utente-in-uso').textContent = nomeCategoria;
-
-    // Carica le task appropriate in base alla pagina corrente
-    if (window.location.pathname.endsWith('completate.html')) {
-      caricaTasksCompletatePerCategoria(CategoriaID);
-    } else {
-      caricaTasksPerCategoria(CategoriaID);
-    }
-
-    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
-    modal.hide();
-  } else {
-    alert('Seleziona una categoria!');
-  }
-});
-
 function aggiungiCategoria(e) {
   e.preventDefault();
   const descrizione = document.getElementById('nomeCategoria').value;
@@ -411,31 +316,6 @@ function apriModalEliminaCategoria() {
     })
     .catch(err => alert("Errore nel caricamento categorie: " + err.message));
 }
-
-document.getElementById('confermaEliminaCategoriaBtn').addEventListener('click', () => {
-  const categoriaId = document.getElementById('eliminaCategoriaDropdown').value;
-  if (!categoriaId) {
-    alert("Seleziona una categoria da eliminare.");
-    return;
-  }
-
-  if (confirm("Sei sicuro di voler eliminare questa categoria?")) {
-    fetch(`https://localhost:7000/api/Categorie/${categoriaId}`, {
-      method: 'DELETE'
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Errore nell\'eliminazione categoria');
-        alert("Categoria eliminata!");
-        caricaCategorie && caricaCategorie();
-        const modal = bootstrap.Modal.getInstance(document.getElementById('eliminaCategoriaModal'));
-        modal.hide();
-      })
-      .catch(err => alert(err.message));
-  }
-});
-
-
-document.getElementById('formAggiungiCategoria').addEventListener('submit', aggiungiCategoria);
 
 function aggiungiUtente(e) {
   e.preventDefault();
@@ -479,32 +359,6 @@ function apriModalEliminaUtente() {
     })
     .catch(err => alert("Errore nel caricamento utenti: " + err.message));
 }
-
-document.getElementById('confermaEliminaUtenteBtn').addEventListener('click', () => {
-  const utenteId = document.getElementById('eliminaUtenteDropdown').value;
-  if (!utenteId) {
-    alert("Seleziona un utente da eliminare.");
-    return;
-  }
-
-  if (confirm("Sei sicuro di voler eliminare questo utente?")) {
-    fetch(`https://localhost:7000/api/Utente/${utenteId}`, {
-      method: 'DELETE'
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Errore nell\'eliminazione utente');
-        alert("Utente eliminato!");
-        caricaUtentiForm && caricaUtentiForm();
-        caricaUtentiDropdown && caricaUtentiDropdown();
-        const modal = bootstrap.Modal.getInstance(document.getElementById('eliminaUtenteModal'));
-        modal.hide();
-      })
-      .catch(err => alert(err.message));
-  }
-});
-
-
-document.getElementById('formAggiungiUtente').addEventListener('submit', aggiungiUtente);
 
 function caricaTasks() {
   return fetch('https://localhost:7000/api/Task/StatoNo')
@@ -564,7 +418,6 @@ function caricaTasks() {
     .catch(err => console.error("Errore nel caricamento delle task:", err));
 }
 
-
 function salvaTask(e) {
   if (e) e.preventDefault();
 
@@ -620,16 +473,8 @@ function salvaTask(e) {
     })
 }
 
-
-document.getElementById('taskForm').addEventListener('submit', salvaTask);
-document.getElementById('taskForm').addEventListener('submit', salvaTask);
-
 function eliminaTask(id) {
-  taskIdDaEliminare = id;
-  var modal = new bootstrap.Modal(document.getElementById('confermaEliminaModal'));
-  modal.show();
-}
-function eliminaTask(id) {
+  console.log('eliminaTask chiamata con id:', id);
   taskIdDaEliminare = id;
   var modal = new bootstrap.Modal(document.getElementById('confermaEliminaModal'));
   modal.show();
@@ -645,17 +490,6 @@ function toggleStato(id, nuovoStato, checkbox) {
     aggiornaStatoTask(id, false);
   }
 }
-function toggleStato(id, nuovoStato, checkbox) {
-  if (nuovoStato) {
-    taskIdDaCompletare = id;
-    checkboxDaRipristinare = checkbox;
-    var modal = new bootstrap.Modal(document.getElementById('confermaCompletaModal'));
-    modal.show();
-  } else {
-    aggiornaStatoTask(id, false);
-  }
-}
-
 
 // Aggiorna badge anche dopo modifica stato o eliminazione
 function aggiornaStatoTask(id, nuovoStato) {
@@ -677,65 +511,17 @@ function aggiornaStatoTask(id, nuovoStato) {
     })
     .catch(err => alert(err.message));
 }
-// Aggiorna badge anche dopo modifica stato o eliminazione
-function aggiornaStatoTask(id, nuovoStato) {
-  fetch(`https://localhost:7000/api/Task/${id}`)
-    .then(res => res.json())
-    .then(task => {
-      return fetch(`https://localhost:7000/api/Task/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...task, stato: nuovoStato })
-      });
-    })
-    .then(res => res.json())
-    .then(() => {
-      if (utenteSelezionato) caricaTasksPerUtente(utenteSelezionato);
-      else caricaTasks();
-      aggiornaNumeroSezione();
-      aggiornaNumeroSezioneCompletate();
-    })
-    .catch(err => alert(err.message));
-}
-
-document.getElementById('btnConfermaCompleta').addEventListener('click', function () {
-  if (taskIdDaCompletare !== null) {
-    aggiornaStatoTask(taskIdDaCompletare, true);
-    taskIdDaCompletare = null;
-    checkboxDaRipristinare = null;
-    var modal = bootstrap.Modal.getInstance(document.getElementById('confermaCompletaModal'));
-    modal.hide();
-  }
-});
-document.getElementById('btnConfermaCompleta').addEventListener('click', function () {
-  if (taskIdDaCompletare !== null) {
-    aggiornaStatoTask(taskIdDaCompletare, true);
-    taskIdDaCompletare = null;
-    checkboxDaRipristinare = null;
-    var modal = bootstrap.Modal.getInstance(document.getElementById('confermaCompletaModal'));
-    modal.hide();
-  }
-});
-
-document.getElementById('confermaCompletaModal').addEventListener('hidden.bs.modal', function () {
-  if (checkboxDaRipristinare) {
-    checkboxDaRipristinare.checked = false;
-    checkboxDaRipristinare = null;
-  }
-  taskIdDaCompletare = null;
-});
-document.getElementById('confermaCompletaModal').addEventListener('hidden.bs.modal', function () {
-  if (checkboxDaRipristinare) {
-    checkboxDaRipristinare.checked = false;
-    checkboxDaRipristinare = null;
-  }
-  taskIdDaCompletare = null;
-});
 
 // Funzione per gestire l'eliminazione task
 function gestioneEliminazioneTask() {
-  document.getElementById('btnConfermaElimina').addEventListener('click', function () {
-    console.log('Tentativo di eliminazione, taskId:', taskIdDaEliminare);
+  const btnElimina = document.getElementById('btnConfermaElimina');
+  if (!btnElimina) {
+    console.log('Bottone btnConfermaElimina non trovato');
+    return;
+  }
+
+  btnElimina.addEventListener('click', function () {
+    console.log('Click su btnConfermaElimina, taskId:', taskIdDaEliminare);
     if (taskIdDaEliminare !== null) {
       console.log('Chiamata API DELETE per task:', taskIdDaEliminare);
       fetch(`https://localhost:7000/api/Task/${taskIdDaEliminare}`, {
@@ -792,38 +578,6 @@ function gestioneEliminazioneTask() {
   });
 }
 
-// Inizializza l'event listener quando il DOM è pronto
-document.addEventListener('DOMContentLoaded', function() {
-  const btnElimina = document.getElementById('btnConfermaElimina');
-  if (btnElimina) {
-    console.log('Bottone btnConfermaElimina trovato, aggiungendo event listener');
-    gestioneEliminazioneTask();
-  } else {
-    console.log('Bottone btnConfermaElimina NON trovato nel DOM');
-  }
-});
-function modificaTask(id) {
-  fetch(`https://localhost:7000/api/Task/${id}`)
-    .then(res => res.json())
-    .then(task => {
-      document.getElementById('titolo').value = task.titolo;
-      document.getElementById('descrizione').value = task.descrizione;
-      document.getElementById('categoria').value = task.categoriaID;
-      document.getElementById('utente').value = task.utenteID;
-
-      // Gestione della data e ora di scadenza
-      if (task.scadenza) {
-        const dataOra = task.scadenza.split('T');
-        document.getElementById('scadenza').value = dataOra[0];
-        if (dataOra[1]) {
-          // Estrai solo ore e minuti (formato HH:MM)
-          const ora = dataOra[1].substring(0, 5);
-          document.getElementById('scadenzaOra').value = ora;
-        }      } else {
-        document.getElementById('scadenza').value = '';
-        document.getElementById('scadenzaOra').value = '';
-      }
-
 function modificaTask(id) {
   fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
@@ -849,8 +603,6 @@ function modificaTask(id) {
 
       taskDaModificare = id;
       document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
-      taskDaModificare = id;
-      document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
 
       const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
       modal.show();
@@ -860,14 +612,7 @@ function modificaTask(id) {
       console.error("Errore:", err);
     });
 }
-      const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
-      modal.show();
-    })
-    .catch(err => {
-      alert("Impossibile caricare il task.");
-      console.error("Errore:", err);
-    });
-}
+
 function notaTask(id) {
   fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
@@ -914,21 +659,6 @@ function caricaCategorie() {
     })
     .catch(err => console.error("Errore nel caricamento categorie:", err));
 }
-function caricaCategorie() {
-  return fetch('https://localhost:7000/api/Categorie')
-    .then(res => res.json())
-    .then(categorie => {
-      const select = document.getElementById('categoria');
-      select.innerHTML = '<option value="">Seleziona categoria...</option>';
-      categorie.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat.id;
-        option.textContent = cat.descrizione;
-        select.appendChild(option);
-      });
-    })
-    .catch(err => console.error("Errore nel caricamento categorie:", err));
-}
 
 function caricaUtentiForm() {
   return fetch('https://localhost:7000/api/Utente')
@@ -945,60 +675,6 @@ function caricaUtentiForm() {
     })
     .catch(err => console.error("Errore nel caricamento utenti:", err));
 }
-function caricaUtentiForm() {
-  return fetch('https://localhost:7000/api/Utente')
-    .then(res => res.json())
-    .then(utenti => {
-      const select = document.getElementById('utente');
-      select.innerHTML = '<option value="">Seleziona utente...</option>';
-      utenti.forEach(u => {
-        const option = document.createElement('option');
-        option.value = u.id;
-        option.textContent = u.nome;
-        select.appendChild(option);
-      });
-    })
-    .catch(err => console.error("Errore nel caricamento utenti:", err));
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Imposta il min della data di scadenza a oggi
-  const scadenzaInput = document.getElementById('scadenza');
-  if (scadenzaInput) {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const minDate = `${yyyy}-${mm}-${dd}`;
-    scadenzaInput.setAttribute('min', minDate);
-  }
-  Promise.all([
-    caricaTasks(),
-    caricaCategorie(),
-    caricaUtentiForm()
-  ]);
-  aggiornaNumeroSezione();
-  aggiornaNumeroSezioneCompletate();
-});
-document.addEventListener('DOMContentLoaded', () => {
-  // Imposta il min della data di scadenza a oggi
-  const scadenzaInput = document.getElementById('scadenza');
-  if (scadenzaInput) {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const minDate = `${yyyy}-${mm}-${dd}`;
-    scadenzaInput.setAttribute('min', minDate);
-  }
-  Promise.all([
-    caricaTasks(),
-    caricaCategorie(),
-    caricaUtentiForm()
-  ]);
-  aggiornaNumeroSezione();
-  aggiornaNumeroSezioneCompletate();
-});
 
 function caricaTasksCompletate() {
   let url = 'https://localhost:7000/api/Task';
@@ -1087,21 +763,6 @@ function mostraNumeroTaskNonFattePerUtente(utenteId) {
       document.getElementById('numero-sezione').textContent = '0';
     });
 }
-function mostraNumeroTaskNonFattePerUtente(utenteId) {
-  if (!utenteId) {
-    document.getElementById('numero-sezione').textContent = '0';
-    return;
-  }
-  fetch(`https://localhost:7000/api/Task/UtenteStatoNo/${utenteId}`)
-    .then(res => res.json())
-    .then(tasks => {
-      const nonFatte = tasks.filter(t => !t.stato).length;
-      document.getElementById('numero-sezione').textContent = nonFatte;
-    })
-    .catch(() => {
-      document.getElementById('numero-sezione').textContent = '0';
-    });
-}
 
 function mostraNumeroTaskCompletatePerUtente(utenteId) {
   if (!utenteId) {
@@ -1118,37 +779,7 @@ function mostraNumeroTaskCompletatePerUtente(utenteId) {
       document.getElementById('numero-sezione-si').textContent = '0';
     });
 }
-function mostraNumeroTaskCompletatePerUtente(utenteId) {
-  if (!utenteId) {
-    document.getElementById('numero-sezione-si').textContent = '0';
-    return;
-  }
-  fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
-    .then(res => res.json())
-    .then(tasks => {
-      const completate = tasks.filter(t => t.stato).length;
-      document.getElementById('numero-sezione-si').textContent = completate;
-    })
-    .catch(() => {
-      document.getElementById('numero-sezione-si').textContent = '0';
-    });
-}
 
-function mostraNumeroTaskNonFattePerCategoria(categoriaId) {
-  if (!categoriaId) {
-    document.getElementById('numero-sezione').textContent = '0';
-    return;
-  }
-  fetch(`https://localhost:7000/api/Task/Categoria/${categoriaId}`)
-    .then(res => res.json())
-    .then(tasks => {
-      const nonFatte = tasks.filter(t => !t.stato).length;
-      document.getElementById('numero-sezione').textContent = nonFatte;
-    })
-    .catch(() => {
-      document.getElementById('numero-sezione').textContent = '0';
-    });
-}
 function mostraNumeroTaskNonFattePerCategoria(categoriaId) {
   if (!categoriaId) {
     document.getElementById('numero-sezione').textContent = '0';
@@ -1296,3 +927,190 @@ function caricaTasksCompletatePerCategoria(categoriaId) {
       alert("Errore nel caricamento tasks completate per categoria: " + err.message);
     });
 }
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+  // Imposta il min della data di scadenza a oggi
+  const scadenzaInput = document.getElementById('scadenza');
+  if (scadenzaInput) {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const minDate = `${yyyy}-${mm}-${dd}`;
+    scadenzaInput.setAttribute('min', minDate);
+  }
+
+  // Inizializza gestione eliminazione
+  gestioneEliminazioneTask();
+
+  // Inizializza badge utente
+  document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
+
+  Promise.all([
+    caricaTasks(),
+    caricaCategorie(),
+    caricaUtentiForm()
+  ]);
+  aggiornaNumeroSezione();
+  aggiornaNumeroSezioneCompletate();
+});
+
+// Event listener per form task
+document.getElementById('taskForm').addEventListener('submit', salvaTask);
+
+// Event listener per conferma completamento task
+document.getElementById('btnConfermaCompleta').addEventListener('click', function () {
+  if (taskIdDaCompletare !== null) {
+    aggiornaStatoTask(taskIdDaCompletare, true);
+    taskIdDaCompletare = null;
+    checkboxDaRipristinare = null;
+    var modal = bootstrap.Modal.getInstance(document.getElementById('confermaCompletaModal'));
+    modal.hide();
+  }
+});
+
+// Event listener per chiusura modal completa
+document.getElementById('confermaCompletaModal').addEventListener('hidden.bs.modal', function () {
+  if (checkboxDaRipristinare) {
+    checkboxDaRipristinare.checked = false;
+    checkboxDaRipristinare = null;
+  }
+  taskIdDaCompletare = null;
+});
+
+// Event listener per conferma utente
+document.getElementById('confermaUtenteBtn').addEventListener('click', function () {
+  const utenteId = document.getElementById('utenteDropdown').value;
+  const utenteSelect = document.getElementById('utenteDropdown');
+  const nomeUtente = utenteSelect.options[utenteSelect.selectedIndex].textContent; 
+  
+  if (utenteId === "tutti") {
+    utenteSelezionato = null;
+    categoriaSelezionata = null; // Reset anche categoria quando si seleziona "Tutti"
+    document.getElementById('utente-in-uso').textContent = "Tutti";
+
+    // Carica le task appropriate in base alla pagina corrente
+    if (window.location.pathname.endsWith('completate.html')) {
+      caricaTasksCompletate();
+    } else {
+      caricaTasks();
+    }
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
+    modal.hide();
+    return;
+  }
+  if (utenteId && utenteId !== "") {
+    utenteSelezionato = utenteId;
+    categoriaSelezionata = null; // Reset categoria quando si seleziona un utente specifico
+    document.getElementById('utente-in-uso').textContent = nomeUtente;
+
+    // Carica le task appropriate in base alla pagina corrente
+    if (window.location.pathname.endsWith('completate.html')) {
+      caricaTasksCompletatePerUtente(utenteId);
+    } else {
+      caricaTasksPerUtente(utenteId);
+    }
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
+    modal.hide();
+  } else if (utenteId === "") {
+    alert('Seleziona un utente!');
+  }
+});
+
+// Event listener per conferma categoria
+document.getElementById('confermaCategoriaBtn').addEventListener('click', function () {
+  const CategoriaID = document.getElementById('categoriaDropdown').value;
+  const categoriaSelect = document.getElementById('categoriaDropdown');
+  const nomeCategoria = categoriaSelect.options[categoriaSelect.selectedIndex].textContent;
+  
+  if (CategoriaID === "tutti") {
+    // Reset tutte le selezioni quando si sceglie "Tutti" per le categorie
+    categoriaSelezionata = null;
+    utenteSelezionato = null;
+    document.getElementById('utente-in-uso').textContent = "Tutti";
+
+    // Carica le task appropriate in base alla pagina corrente
+    if (window.location.pathname.endsWith('completate.html')) {
+      caricaTasksCompletate();
+    } else {
+      caricaTasks();
+    }
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
+    modal.hide();
+    return;
+  }
+  if (CategoriaID) {
+    categoriaSelezionata = CategoriaID;
+    utenteSelezionato = null; // Reset utente quando si seleziona una categoria specifica
+    document.getElementById('utente-in-uso').textContent = nomeCategoria;
+
+    // Carica le task appropriate in base alla pagina corrente
+    if (window.location.pathname.endsWith('completate.html')) {
+      caricaTasksCompletatePerCategoria(CategoriaID);
+    } else {
+      caricaTasksPerCategoria(CategoriaID);
+    }
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
+    modal.hide();
+  } else {
+    alert('Seleziona una categoria!');
+  }
+});
+
+// Event listener per form categoria
+document.getElementById('formAggiungiCategoria').addEventListener('submit', aggiungiCategoria);
+
+// Event listener per form utente
+document.getElementById('formAggiungiUtente').addEventListener('submit', aggiungiUtente);
+
+// Event listener per conferma eliminazione categoria
+document.getElementById('confermaEliminaCategoriaBtn').addEventListener('click', () => {
+  const categoriaId = document.getElementById('eliminaCategoriaDropdown').value;
+  if (!categoriaId) {
+    alert("Seleziona una categoria da eliminare.");
+    return;
+  }
+
+  if (confirm("Sei sicuro di voler eliminare questa categoria?")) {
+    fetch(`https://localhost:7000/api/Categorie/${categoriaId}`, {
+      method: 'DELETE'
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Errore nell\'eliminazione categoria');
+        alert("Categoria eliminata!");
+        caricaCategorie && caricaCategorie();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('eliminaCategoriaModal'));
+        modal.hide();
+      })
+      .catch(err => alert(err.message));
+  }
+});
+
+// Event listener per conferma eliminazione utente
+document.getElementById('confermaEliminaUtenteBtn').addEventListener('click', () => {
+  const utenteId = document.getElementById('eliminaUtenteDropdown').value;
+  if (!utenteId) {
+    alert("Seleziona un utente da eliminare.");
+    return;
+  }
+
+  if (confirm("Sei sicuro di voler eliminare questo utente?")) {
+    fetch(`https://localhost:7000/api/Utente/${utenteId}`, {
+      method: 'DELETE'
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Errore nell\'eliminazione utente');
+        alert("Utente eliminato!");
+        caricaUtentiForm && caricaUtentiForm();
+        caricaUtentiDropdown && caricaUtentiDropdown();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('eliminaUtenteModal'));
+        modal.hide();
+      })
+      .catch(err => alert(err.message));
+  }
+});
