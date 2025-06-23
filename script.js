@@ -214,7 +214,6 @@ function caricaSottoTask(taskId) {
 
 function resetUtenteVisualizzato() {
   utenteSelezionato = null;
-  categoriaSelezionata = null; // Reset anche categoria
   document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
   // Carica le task appropriate in base alla pagina corrente
   if (window.location.pathname.endsWith('completate.html')) {
@@ -1034,7 +1033,6 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
   if (CategoriaID === "tutti") {
     // Reset tutte le selezioni quando si sceglie "Tutti" per le categorie
     categoriaSelezionata = null;
-    utenteSelezionato = null;
     document.getElementById('categoria-in-uso').textContent = "Tutti";
 
     // Carica le task appropriate in base alla pagina corrente
