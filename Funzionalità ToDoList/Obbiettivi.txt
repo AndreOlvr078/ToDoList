@@ -1,3 +1,2 @@
-- pagina completate aggiungere la possibilità di ripristinare una task
 - Creare un sistema di scadenza funzionante
 - aggiungere la possibilita di mettere le sottotask
