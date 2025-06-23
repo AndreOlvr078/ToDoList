@@ -5,7 +5,15 @@ let taskIdDaCompletare = null;
 let checkboxDaRipristinare = null;
 let utenteSelezionato = null;
 
+<<<<<<< Updated upstream
 
+function mostraSpinner() {
+  document.getElementById('loader').style.display = 'flex';
+}
+
+function nascondiSpinner() {
+  document.getElementById('loader').style.display = 'none';
+}
 
 function caricaCategorieDropdown() {
   fetch('https://localhost:7000/api/Categorie')
@@ -25,6 +33,8 @@ function caricaCategorieDropdown() {
     });
 }
 
+=======
+>>>>>>> Stashed changes
 // Selezione utente
 function caricaUtentiDropdown() {
   fetch('https://localhost:7000/api/Utente')
@@ -87,8 +97,12 @@ function aggiornaNumeroSezione() {
 }
 
 function caricaTasksPerUtente(UtenteId) {
+<<<<<<< Updated upstream
   mostraSpinner();
   fetch(`https://localhost:7000/api/Task/UtenteStatoNo/${UtenteId}`)
+=======
+  fetch(`https://localhost:7000/api/Task/Utente/${UtenteId}`)
+>>>>>>> Stashed changes
     .then(res => res.json())
     .then(tasks => {
       const lista = document.getElementById('lista-box');
@@ -213,10 +227,14 @@ function caricaTasksPerCategoria(CategoriaId) {
         lista.appendChild(box);
       });
     })
+<<<<<<< Updated upstream
     .catch(err => alert("Errore nel caricamento tasks per categoria: " + err.message))
     .finally(() => {
       nascondiSpinner();
     });
+=======
+    .catch(err => alert("Errore nel caricamento tasks per utente: " + err.message));
+>>>>>>> Stashed changes
 }
 
 document.getElementById('confermaCategoriaBtn').addEventListener('click', function () {
@@ -434,6 +452,7 @@ function salvaTask(e) {
   const categoriaID = parseInt(document.getElementById('categoria').value);
   const utenteID = parseInt(document.getElementById('utente').value);
 
+<<<<<<< Updated upstream
   let scadenza = null;
   if (data) {
     // Se c'è l'ora, mettila, altrimenti metti mezzanotte
@@ -449,6 +468,8 @@ function salvaTask(e) {
     return;
   }
 
+=======
+>>>>>>> Stashed changes
   let url = 'https://localhost:7000/api/Task';
   let method = 'POST';
   if (taskDaModificare) {
