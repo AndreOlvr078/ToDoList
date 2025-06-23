@@ -793,49 +793,73 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function caricaTasksCompletate() {
   let url = 'https://localhost:7000/api/Task';
-  if (utenteSelezionato) {
+  
+  // Se è selezionata una categoria specifica
+  if (categoriaSelezionata) {
+    url = `https://localhost:7000/api/Task/Categoria/${categoriaSelezionata}`;
+  }
+  // Altrimenti se è selezionato un utente specifico
+  else if (utenteSelezionato) {
     url = `https://localhost:7000/api/Task/Utente/${utenteSelezionato}`;
   }
+  // Altrimenti carica tutte le task
 
   fetch(url)
     .then(res => res.json())
     .then(tasks => {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
-      tasks.filter(task => task.stato).forEach(task => {
-        const scadenza = new Date(task.scadenza);
-        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-        const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+      
+      // Filtra solo le task completate
+      const tasksCompletate = tasks.filter(task => task.stato);
+      
+      if (tasksCompletate.length === 0) {
+        // Mostra messaggio se non ci sono task completate
+        const msg = document.createElement('div');
+        msg.className = 'text-center text-muted my-4';
+        msg.textContent = 'Nessuna task completata...';
+        lista.appendChild(msg);
+      } else {
+        tasksCompletate.forEach(task => {
+          const scadenza = new Date(task.scadenza);
+          const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+          const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
 
-        const box = document.createElement('div');
-        box.className = 'card mb-2 w-100';
-        box.innerHTML = `
-          <div class="card-body p-2">
-            <div class="row align-items-center flex-wrap">
-              <div class="col-auto mx-2">
-                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);" checked 
-                  onchange="toggleStato(${task.id}, this.checked, this)">
-              </div>
-              <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
-              <div class="col-auto ms-auto d-flex gap-2">
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="notaTask(${task.id})">
-                          <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="eliminaTask(${task.id})">
-                          <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
+          const box = document.createElement('div');
+          box.className = 'card mb-2 w-100';
+          box.innerHTML = `
+            <div class="card-body p-2">
+              <div class="row align-items-center flex-wrap">
+                <div class="col-auto mx-2">
+                  <input type="checkbox" class="form-check-input" style="transform: scale(1.5);" checked 
+                    onchange="toggleStato(${task.id}, this.checked, this)">
                 </div>
+                <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
+                <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
+                <div class="col-auto ms-auto d-flex gap-2">
+                    <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 48px; height: 48px; padding: 0;"
+                            onclick="notaTask(${task.id})">
+                            <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                    </button>
+                    <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 48px; height: 48px; padding: 0;"
+                            onclick="eliminaTask(${task.id})">
+                            <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+                    </button>
+                  </div>
+              </div>
             </div>
-          </div>
-        `;
-        lista.appendChild(box);
-      });
+          `;
+          lista.appendChild(box);
+        });
+      }
       aggiornaNumeroSezioneCompletate();
+    })
+    .catch(err => {
+      console.error("Errore nel caricamento delle task completate:", err);
+      const lista = document.getElementById('lista-box');
+      lista.innerHTML = '<div class="text-center text-danger my-4">Errore nel caricamento delle task completate</div>';
     });
 }
 
