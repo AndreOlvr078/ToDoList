@@ -599,6 +599,8 @@ document.getElementById('btnConfermaElimina').addEventListener('click', function
         // Ricarica la lista giusta in base alla pagina
         if (window.location.pathname.endsWith('completate.html')) {
           caricaTasksCompletate();
+        } else if (utenteSelezionato) {
+          caricaTasksPerUtente(utenteSelezionato);
         } else {
           caricaTasks();
         }
