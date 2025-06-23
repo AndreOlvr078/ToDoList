@@ -1,14 +1,23 @@
 /* Reset e base */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f9faff;
+  background-color: #f4f6fb;
   margin: 0;
   padding: 0;
-}
-.navbar {
-  box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
+  color: #333;
 }
 
+.navbar {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  font-size: 1.8rem;
+  letter-spacing: 1.2px;
+  color: #fff !important;
+}
+
+/* Loader */
 .loader {
   width: 48px;
   height: 48px;
@@ -21,13 +30,8 @@ body {
 }
 
 @keyframes rotation {
-  0% { transform: rotate(0deg);}
-  100% { transform: rotate(360deg);}
-}
-
-.navbar-brand {
-  font-size: 1.8rem;
-  letter-spacing: 1.5px;
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Contenitore lista */
@@ -40,13 +44,15 @@ body {
 /* Card task */
 .card {
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 0.05);
-  transition: box-shadow 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
   background-color: white;
+  border: none;
 }
 
 .card:hover {
-  box-shadow: 0 8px 20px rgb(0 0 0 / 0.15);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
 }
 
 /* Card body */
@@ -63,14 +69,15 @@ body {
 /* Checkbox */
 .form-check-input {
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-check-input:hover {
-  transform: scale(1.7);
+  transform: scale(1.5);
+  box-shadow: 0 0 5px #007bff;
 }
 
-/* Testi allineati e spazi */
+/* Testi */
 .col-auto span {
   font-size: 1rem;
   color: #3a3a3a;
@@ -82,18 +89,24 @@ body {
   width: 48px;
   height: 48px;
   padding: 0;
-  transition: background-color 0.25s ease;
+  transition: background-color 0.25s ease, transform 0.25s ease;
 }
 
 .btn.btn-light.rounded-circle:hover {
   background-color: #dce9ff;
+  transform: scale(1.1);
 }
 
 /* Icone */
 .btn i.bi {
   font-size: 1.8rem;
   color: #007bff !important;
+  transition: transform 0.2s ease;
   pointer-events: none;
+}
+
+.btn:hover i.bi {
+  transform: scale(1.15);
 }
 
 /* Modal titoli */
@@ -107,49 +120,33 @@ body {
   background-color: #007bff;
   border: none;
   font-weight: 600;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .modal-footer .btn-primary:hover {
   background-color: #0056b3;
+  transform: scale(1.05);
 }
 
-/* Select menu */
+/* Select menu base */
 select.form-select {
   border-radius: 6px;
   border: 1.5px solid #ced4da;
   padding: 0.375rem 0.75rem;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
-  color: #e0e0e0;
-  background-color: #007bff;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: white;
+  color: #333;
 }
 
-/* Focus select */
 select.form-select:focus {
   border-color: #007bff;
   box-shadow: 0 0 6px #cce5ff;
   outline: none;
 }
 
-/* Freccia bianca personalizzata */
-.custom-arrow-white {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,<svg width='16' height='16' fill='white' xmlns='http://www.w3.org/2000/svg'><path d='M4 6l4 4 4-4'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 0.25rem center;
-  background-size: 1.2em;
-  padding-right: 3.5em;
-  padding-left: 0.75em;
-  background-color: #007bff;
-  color: white;
-  border: 1.5px solid #444;
-  width: 210px;        /* oppure 100%, auto, ecc. */
-  height: 40px;        /* altezza visibile */
-}
-
+/* Select personalizzato blu */
+.custom-arrow-white,
 .custom-arrow-white1 {
   appearance: none;
   -webkit-appearance: none;
@@ -163,11 +160,27 @@ select.form-select:focus {
   background-color: #007bff;
   color: white;
   border: 1.5px solid #444;
-  width: 180px;        /* oppure 100%, auto, ecc. */
-  height: 40px;        /* altezza visibile */
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.custom-arrow-white {
+  width: 210px;
+  height: 40px;
+}
+
+.custom-arrow-white1 {
+  width: 180px;
+  height: 40px;
+}
+
+.custom-arrow-white:hover,
+.custom-arrow-white1:hover {
+  background-color: #0056b3;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
 }
 
 /* Rimuove freccia default su IE */
-.custom-arrow-white::-ms-expand {
+.custom-arrow-white::-ms-expand,
+.custom-arrow-white1::-ms-expand {
   display: none;
 }
