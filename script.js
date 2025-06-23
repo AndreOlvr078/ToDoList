@@ -4,6 +4,7 @@ let taskIdDaEliminare = null;
 let taskIdDaCompletare = null;
 let checkboxDaRipristinare = null;
 let utenteSelezionato = null;
+let categoriaSelezionata = null;
 
 
 function mostraSpinner() {
@@ -69,8 +70,15 @@ if (UtenteId) {
 }
 
 
-// Funzione per aggiornare il badge con il numero di task non fatte per utente selezionato
+// Funzione per aggiornare il badge con il numero di task non fatte per utente/categoria selezionato
 function aggiornaNumeroSezione() {
+  // Se è selezionata una categoria, usa la funzione per categorie
+  if (categoriaSelezionata) {
+    mostraNumeroTaskNonFattePerCategoria(categoriaSelezionata);
+    return;
+  }
+  
+  // Altrimenti usa la logica per utenti
   let utenteId = utenteSelezionato || null;
   let url = utenteId
     ? `https://localhost:7000/api/Task/Utente/${utenteId}`
@@ -93,8 +101,15 @@ function aggiornaNumeroSezione() {
     });
 }
 
-// Funzione per aggiornare il badge con il numero di task completate per utente selezionato
+// Funzione per aggiornare il badge con il numero di task completate per utente/categoria selezionato
 function aggiornaNumeroSezioneCompletate() {
+  // Se è selezionata una categoria, usa la funzione per categorie
+  if (categoriaSelezionata) {
+    mostraNumeroTaskCompletatePerCategoria(categoriaSelezionata);
+    return;
+  }
+  
+  // Altrimenti usa la logica per utenti
   let utenteId = utenteSelezionato || null;
   let url = utenteId
     ? `https://localhost:7000/api/Task/Utente/${utenteId}`
@@ -182,18 +197,18 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
   const utenteId = document.getElementById('utenteDropdown').value;
   const utenteSelect = document.getElementById('utenteDropdown');
   const nomeUtente = utenteSelect.options[utenteSelect.selectedIndex].textContent;
-
   if (utenteId === "tutti") {
     utenteSelezionato = null;
+    categoriaSelezionata = null; // Reset anche categoria quando si seleziona "Tutti"
     document.getElementById('utente-in-uso').textContent = "Tutti";
     caricaTasks(); // Mostra tutte le task
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
     modal.hide();
     return;
   }
-
   if (utenteId && utenteId !== "") {
     utenteSelezionato = utenteId;
+    categoriaSelezionata = null; // Reset categoria quando si seleziona un utente specifico
     document.getElementById('utente-in-uso').textContent = nomeUtente;
     caricaTasksPerUtente(utenteId);
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
@@ -206,6 +221,7 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
 
 function resetUtenteVisualizzato() {
   utenteSelezionato = null;
+  categoriaSelezionata = null; // Reset anche categoria
   document.getElementById('utente-in-uso').textContent = '';
   // Carica le task appropriate in base alla pagina corrente
   if (window.location.pathname.endsWith('completate.html')) {
@@ -264,6 +280,8 @@ function caricaTasksPerCategoria(CategoriaId) {
         `;
         lista.appendChild(box);
       });
+      mostraNumeroTaskNonFattePerCategoria(CategoriaId);
+      mostraNumeroTaskCompletatePerCategoria(CategoriaId);
     })
     .catch(err => alert("Errore nel caricamento tasks per categoria: " + err.message))
     .finally(() => {
@@ -274,6 +292,7 @@ function caricaTasksPerCategoria(CategoriaId) {
 document.getElementById('confermaCategoriaBtn').addEventListener('click', function () {
   const CategoriaID = document.getElementById('categoriaDropdown').value;
   if (CategoriaID) {
+    categoriaSelezionata = CategoriaID;
     caricaTasksPerCategoria(CategoriaID);
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
     modal.hide();
@@ -788,6 +807,38 @@ function salvaTask(e) {
       return;
     }
     fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
+      .then(res => res.json())
+      .then(tasks => {
+        const completate = tasks.filter(t => t.stato).length;
+        document.getElementById('numero-sezione-si').textContent = completate;
+      })
+      .catch(() => {
+        document.getElementById('numero-sezione-si').textContent = '0';
+      });
+  }
+
+  function mostraNumeroTaskNonFattePerCategoria(categoriaId) {
+    if (!categoriaId) {
+      document.getElementById('numero-sezione').textContent = '0';
+      return;
+    }
+    fetch(`https://localhost:7000/api/Task/Categoria/${categoriaId}`)
+      .then(res => res.json())
+      .then(tasks => {
+        const nonFatte = tasks.filter(t => !t.stato).length;
+        document.getElementById('numero-sezione').textContent = nonFatte;
+      })
+      .catch(() => {
+        document.getElementById('numero-sezione').textContent = '0';
+      });
+  }
+
+  function mostraNumeroTaskCompletatePerCategoria(categoriaId) {
+    if (!categoriaId) {
+      document.getElementById('numero-sezione-si').textContent = '0';
+      return;
+    }
+    fetch(`https://localhost:7000/api/Task/Categoria/${categoriaId}`)
       .then(res => res.json())
       .then(tasks => {
         const completate = tasks.filter(t => t.stato).length;
