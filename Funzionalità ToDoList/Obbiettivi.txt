@@ -1,4 +1,3 @@
 - pagina completate sistemare la visualizzazione e il counter
 - pagina completate aggiunjgere la possibilità di ripristinare una task
 - in index appena pari selezionare l'utente da usare e visualizzare in alto il nome dell'utente usato
-
