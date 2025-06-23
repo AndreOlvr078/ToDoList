@@ -30,8 +30,13 @@ body {
 }
 
 @keyframes rotation {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Contenitore lista */
@@ -184,11 +189,12 @@ select.form-select:focus {
 .custom-arrow-white1::-ms-expand {
   display: none;
 }
+
 /* Supponendo che il testo della task abbia la classe .task-title */
 
 /* Se la checkbox è selezionata (completata), sbarramento e stile grigio */
-.form-check-input:checked ~ .task-title,
-.form-check-input:checked + label .task-title {
+.form-check-input:checked~.task-title,
+.form-check-input:checked+label .task-title {
   text-decoration: line-through;
   color: #6c757d;
   opacity: 0.7;
@@ -203,4 +209,18 @@ select.form-select:focus {
   opacity: 0.7;
   font-style: italic;
   transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+.info-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.info-button .btn {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 2px solid #0d6efd;
 }
