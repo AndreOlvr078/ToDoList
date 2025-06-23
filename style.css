@@ -132,7 +132,7 @@ select.form-select:focus {
   outline: none;
 }
 
-/* Classe per freccina bianca personalizzata */
+/* Freccia bianca personalizzata */
 .custom-arrow-white {
   appearance: none;
   -webkit-appearance: none;
@@ -146,6 +146,25 @@ select.form-select:focus {
   background-color: #007bff;
   color: white;
   border: 1.5px solid #444;
+  width: 210px;        /* oppure 100%, auto, ecc. */
+  height: 40px;        /* altezza visibile */
+}
+
+.custom-arrow-white1 {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,<svg width='16' height='16' fill='white' xmlns='http://www.w3.org/2000/svg'><path d='M4 6l4 4 4-4'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.25rem center;
+  background-size: 1.2em;
+  padding-right: 3.5em;
+  padding-left: 0.75em;
+  background-color: #007bff;
+  color: white;
+  border: 1.5px solid #444;
+  width: 180px;        /* oppure 100%, auto, ecc. */
+  height: 40px;        /* altezza visibile */
 }
 
 /* Rimuove freccia default su IE */
