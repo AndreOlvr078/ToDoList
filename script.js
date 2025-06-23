@@ -195,14 +195,16 @@ function caricaSottoTask(taskId) {
       if (!sottoTasks || sottoTasks.length === 0) {
         container.innerHTML = '<div class="text-muted small ms-3">Nessun sotto-task</div>';
       } else {
-        let items = sottoTasks.map(st =>
-          `<li><span class="dropdown-item">${st.titolo}</span></li>`
-        ).join('');
-        container.innerHTML = `
-          <ul class="dropdown-menu show" style="position:static;display:block;">
-            ${items}
-          </ul>
-        `;
+let items = sottoTasks.map(st =>
+  `<li class="py-1 px-2 border-bottom">${st.titolo}</li>`
+).join('');
+container.innerHTML = `
+  <div class="w-100 mt-2 p-2 bg-white border rounded shadow-sm">
+    <ul class="list-unstyled mb-0">
+      ${items}
+    </ul>
+  </div>
+`;
       }
       container.style.display = 'block';
     })
