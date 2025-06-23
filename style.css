@@ -230,7 +230,7 @@ select.form-select:focus {
 }
 /* Supponendo che il testo della task abbia la classe .task-title */
 
-<<<<<<< Updated upstream
+
 /* Fix per freccia su Firefox */
 .custom-arrow-white,
 .custom-arrow-white1 {
@@ -283,14 +283,20 @@ select.form-select:focus {
   .navbar {
     padding: 0.7rem 1rem;
   }
-=======
+
 .task label {
   transition: all 0.3s ease;
->>>>>>> Stashed changes
+
 }
+
+.task label {
+  transition: all 0.3s ease;
+}
+
 
 .task input[type="checkbox"]:checked + label {
   text-decoration: line-through; /* <- questa è la "sbarra" */
   color: gray;
   opacity: 0.7;
+}
 }
