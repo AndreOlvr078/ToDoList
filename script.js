@@ -362,9 +362,10 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
   if (CategoriaID) {
     categoriaSelezionata = CategoriaID;
     utenteSelezionato = null; // Reset utente quando si seleziona una categoria specifica
-    document.getElementById('utente-in-uso').textContent = nomeCategoria;    // Carica le task appropriate in base alla pagina corrente
+    document.getElementById('utente-in-uso').textContent = nomeCategoria;
+
+    // Carica le task appropriate in base alla pagina corrente
     if (window.location.pathname.endsWith('completate.html')) {
-      console.log('Caricando task completate per categoria:', CategoriaID);
       caricaTasksCompletatePerCategoria(CategoriaID);
     } else {
       caricaTasksPerCategoria(CategoriaID);
@@ -626,7 +627,7 @@ function salvaTask(e) {
       }
     })
 }
-}
+
 
 document.getElementById('taskForm').addEventListener('submit', salvaTask);
 document.getElementById('taskForm').addEventListener('submit', salvaTask);
@@ -849,17 +850,6 @@ function modificaTask(id) {
       console.error("Errore:", err);
     });
 }
-
-function notaTask(id) {
-  fetch(`https://localhost:7000/api/Task/${id}`)
-    .then(res => res.json())
-    .then(task => {
-      Promise.all([
-        fetch(`https://localhost:7000/api/Utente/${task.utenteID}`).then(r => r.json()),
-        fetch(`https://localhost:7000/api/Categorie/${task.categoriaID}`).then(r => r.json())
-      ])
-        .then(([utente, categoria]) => {
-          document.getElementById('modalDescrizioneTesto').innerHTML = `
 function notaTask(id) {
   fetch(`https://localhost:7000/api/Task/${id}`)
     .then(res => res.json())
@@ -875,21 +865,6 @@ function notaTask(id) {
             <div><strong>Utente:</strong> ${utente.nome}</div>
             <div><strong>Categoria:</strong> ${categoria.descrizione}</div>
           `;
-          var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
-          modal.show();
-        })
-        .catch(() => {
-          document.getElementById('modalDescrizioneTesto').textContent = "Errore nel caricamento di utente o categoria.";
-          var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
-          modal.show();
-        });
-    })
-    .catch(() => {
-      document.getElementById('modalDescrizioneTesto').textContent = "Descrizione non trovata.";
-      var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
-      modal.show();
-    });
-}
           var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
           modal.show();
         })
@@ -1247,20 +1222,14 @@ function caricaTasksCompletatePerUtente(utenteId) {
 }
 
 function caricaTasksCompletatePerCategoria(categoriaId) {
-  console.log('Chiamata caricaTasksCompletatePerCategoria con ID:', categoriaId);
-  fetch(`https://localhost:7000/api/Task/Categoria/${categoriaId}`)
-    .then(res => {
-      console.log('Risposta API:', res.status);
-      return res.json();
-    })
+  fetch(`https://localhost:7000/api/Task/CategoriaStatoSi/${categoriaId}`)
+    .then(res => res.json())
     .then(tasks => {
-      console.log('Task ricevute:', tasks);
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
-
+      console.log("Tasks completate per categoria:", tasks);
       // Filtra solo le task completate
       const tasksCompletate = tasks.filter(task => task.stato);
-      console.log('Task completate filtrate:', tasksCompletate);
 
       if (tasksCompletate.length === 0) {
         const msg = document.createElement('div');
