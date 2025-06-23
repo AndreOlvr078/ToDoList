@@ -38,7 +38,7 @@ function caricaUtentiDropdown() {
     .then(res => res.json())
     .then(utenti => {
       const select = document.getElementById('utenteDropdown');
-      select.innerHTML = '<option value="">Seleziona utente...</option>';
+      select.innerHTML = '<option value="">Seleziona utente...</option><option value="">Tutti</option>';
       utenti.forEach(u => {
         const option = document.createElement('option');
         option.value = u.id;
