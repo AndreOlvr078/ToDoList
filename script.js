@@ -657,7 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Inizializza con nessun utente selezionato
-  document.getElementById('utente-in-uso').textContent = 'Tutti';
+  document.getElementById('utente-in-uso').textContent = '';
 
   Promise.all([
     caricaTasks(),
