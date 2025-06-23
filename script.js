@@ -55,7 +55,7 @@ function apriModalUtente() {
 }
 
 function apriModalCategoria() {
-  caricaCategorieDropdown(); 
+  caricaCategorieDropdown();
   const modal = new bootstrap.Modal(document.getElementById('scegliCategoriaModal'));
   modal.show();
 }
@@ -157,7 +157,7 @@ function caricaTasksPerUtente(UtenteId) {
               </div>
             </div>
           </div>
-        `;        lista.appendChild(box);
+        `; lista.appendChild(box);
       });
       mostraNumeroTaskNonFattePerUtente(UtenteId);
       mostraNumeroTaskCompletatePerUtente(UtenteId);
@@ -175,20 +175,20 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
     // Trova il nome dell'utente selezionato
     const utenteSelect = document.getElementById('utenteDropdown');
     const nomeUtente = utenteSelect.options[utenteSelect.selectedIndex].textContent;
-    
+
     // Salva l'utente selezionato
     utenteSelezionato = utenteId;
-    
+
     // Aggiorna il nome visualizzato
     document.getElementById('utente-in-uso').textContent = nomeUtente;
-    
+
     // Carica le task appropriate in base alla pagina corrente
     if (window.location.pathname.endsWith('completate.html')) {
       caricaTasksCompletate();
     } else {
       caricaTasksPerUtente(utenteId);
     }
-    
+
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
     modal.hide();
   } else {
@@ -207,8 +207,8 @@ function resetUtenteVisualizzato() {
   }
 }
 
-  // Inizializza con nessun utente selezionato
-  document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
+// Inizializza con nessun utente selezionato
+document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
 
 
 function caricaTasksPerCategoria(CategoriaId) {
@@ -421,9 +421,9 @@ function caricaTasks() {
         const scadenza = new Date(task.scadenza);
 
         // Opzioni per formattare data e ora in italiano con giorno, mese, anno, ora e minuti
-        const options = { 
-          year: 'numeric', month: '2-digit', day: '2-digit', 
-          hour: '2-digit', minute: '2-digit' 
+        const options = {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit'
         };
 
         // Formatta la data/ora
@@ -460,7 +460,8 @@ function caricaTasks() {
             </div>
           </div>
         `;
-        lista.appendChild(box);      });
+        lista.appendChild(box);
+      });
       aggiornaNumeroSezione();
       aggiornaNumeroSezioneCompletate();
     })
@@ -499,25 +500,25 @@ function salvaTask(e) {
     url = `https://localhost:7000/api/Task/${taskDaModificare}`;
     method = 'PUT';
   }
-console.log("Scadenza inviata:", scadenza);
+  console.log("Scadenza inviata:", scadenza);
   fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ titolo, descrizione, stato: false, scadenza, categoriaID, utenteID })
   })
-  .then(res => {
-    if (!res.ok) throw new Error('Errore nel salvataggio');
-    return res.json();
-  })
-  .then(() => {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
-    modal.hide();
-    document.getElementById('taskForm').reset();
-    taskDaModificare = null;
-    document.getElementById('btnAggiungi').textContent = 'Aggiungi';
-    caricaTasks();
-  })
-  .catch(err => alert(err.message));
+    .then(res => {
+      if (!res.ok) throw new Error('Errore nel salvataggio');
+      return res.json();
+    })
+    .then(() => {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+      modal.hide();
+      document.getElementById('taskForm').reset();
+      taskDaModificare = null;
+      document.getElementById('btnAggiungi').textContent = 'Aggiungi';
+      caricaTasks();
+    })
+    .catch(err => alert(err.message));
 }
 document.getElementById('taskForm').addEventListener('submit', salvaTask);
 
@@ -551,7 +552,8 @@ function aggiornaStatoTask(id, nuovoStato) {
       });
     })
     .then(res => res.json())
-    .then(() => {      if (utenteSelezionato) caricaTasksPerUtente(utenteSelezionato);
+    .then(() => {
+      if (utenteSelezionato) caricaTasksPerUtente(utenteSelezionato);
       else caricaTasks();
       aggiornaNumeroSezione();
       aggiornaNumeroSezioneCompletate();
@@ -590,7 +592,8 @@ document.getElementById('btnConfermaElimina').addEventListener('click', function
         if (window.location.pathname.endsWith('completate.html')) {
           caricaTasksCompletate();
         } else {
-          caricaTasks();        }
+          caricaTasks();
+        }
         aggiornaNumeroSezione();
         aggiornaNumeroSezioneCompletate();
       });
@@ -706,7 +709,7 @@ function caricaTasksCompletate() {
   if (utenteSelezionato) {
     url = `https://localhost:7000/api/Task/Utente/${utenteSelezionato}`;
   }
-  
+
   fetch(url)
     .then(res => res.json())
     .then(tasks => {
