@@ -1,8 +1,9 @@
 - pagina completate aggiunjgere la possibilità di ripristinare una task
 - Se non presenti task mostrare un testo con scritto "Ancora nessuna task..."
-- nelle completate avere sempre lapossibilità di visualizzare per utente
+- nelle completate avere sempre lapossibilità di visualizzare per utente e categoria, sistemare eliminazione
 - Creare un sistema di scadenza funzionante
 - Aggiungere in Frontend la visualizzazione delle sottotask 
 - Nella scelta utente aver la possibiloità di tornare alla schermata con tutti gli utenti
 - sistemare la descrizione e ora nella task durante la modifica, bisogna visualizare la desczrizione e ora della task che si vuole modificare 
 - sistemre categorie, quando si filtra per categorie il counter rimane a quelle totali di tutto 
+- mettere opzione tutti nelle categorie
