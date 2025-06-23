@@ -733,24 +733,41 @@ document.getElementById('confermaCompletaModal').addEventListener('hidden.bs.mod
 });
 
 document.getElementById('btnConfermaElimina').addEventListener('click', function () {
+  console.log('Tentativo di eliminazione, taskId:', taskIdDaEliminare);
   if (taskIdDaEliminare !== null) {
+    console.log('Chiamata API DELETE per task:', taskIdDaEliminare);
     fetch(`https://localhost:7000/api/Task/${taskIdDaEliminare}`, {
       method: 'DELETE'
     })
-      .then(() => {
+      .then(response => {
+        console.log('Risposta DELETE:', response.status);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         taskIdDaEliminare = null;
         var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
-        modal.hide();        // Ricarica la lista giusta in base alla pagina e ai filtri attivi
+        modal.hide();
+        
+        console.log('Controllo pagina corrente:', window.location.pathname);
+        console.log('categoriaSelezionata:', categoriaSelezionata);
+        console.log('utenteSelezionato:', utenteSelezionato);
+        
+        // Ricarica la lista giusta in base alla pagina e ai filtri attivi
         if (window.location.pathname.endsWith('completate.html')) {
+          console.log('Siamo nella pagina completate');
           // Pagina completate - considera sia categoria che utente
           if (categoriaSelezionata) {
+            console.log('Ricaricando per categoria:', categoriaSelezionata);
             caricaTasksCompletatePerCategoria(categoriaSelezionata);
           } else if (utenteSelezionato) {
+            console.log('Ricaricando per utente:', utenteSelezionato);
             caricaTasksCompletatePerUtente(utenteSelezionato);
           } else {
+            console.log('Ricaricando tutte le task completate');
             caricaTasksCompletate();
           }
         } else {
+          console.log('Siamo nella pagina principale');
           // Pagina principale - considera sia categoria che utente
           if (categoriaSelezionata) {
             caricaTasksPerCategoria(categoriaSelezionata);
@@ -762,7 +779,13 @@ document.getElementById('btnConfermaElimina').addEventListener('click', function
         }
         aggiornaNumeroSezione();
         aggiornaNumeroSezioneCompletate();
+      })
+      .catch(err => {
+        console.error('Errore durante eliminazione:', err);
+        alert('Errore durante l\'eliminazione della task: ' + err.message);
       });
+  } else {
+    console.log('taskIdDaEliminare è null!');
   }
 });
 function modificaTask(id) {
