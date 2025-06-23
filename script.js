@@ -949,8 +949,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Inizializza gestione eliminazione
   gestioneEliminazioneTask();
 
-  // Inizializza badge utente
-  document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
+  // Inizializza badge categoria
+  document.getElementById('categoria-in-uso').textContent = 'Nessuna categoria selezionata';
 
   Promise.all([
     caricaTasks(),
@@ -1035,7 +1035,7 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
     // Reset tutte le selezioni quando si sceglie "Tutti" per le categorie
     categoriaSelezionata = null;
     utenteSelezionato = null;
-    document.getElementById('utente-in-uso').textContent = "Tutti";
+    document.getElementById('categoria-in-uso').textContent = "Tutti";
 
     // Carica le task appropriate in base alla pagina corrente
     if (window.location.pathname.endsWith('completate.html')) {
@@ -1051,7 +1051,7 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
   if (CategoriaID) {
     categoriaSelezionata = CategoriaID;
     utenteSelezionato = null; // Reset utente quando si seleziona una categoria specifica
-    document.getElementById('utente-in-uso').textContent = nomeCategoria;
+    document.getElementById('categoria-in-uso').textContent = nomeCategoria;
 
     // Carica le task appropriate in base alla pagina corrente
     if (window.location.pathname.endsWith('completate.html')) {
