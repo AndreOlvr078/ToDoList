@@ -1,4 +1,3 @@
-- pagina completate sistemare la visualizzazione e il counter
 - pagina completate aggiunjgere la possibilità di ripristinare una task
 - Se non presenti task mostrare un testo con scritto "Ancora nessuna task..."
 - nelle completate avere sempre lapossibilità di visualizzare per utente
