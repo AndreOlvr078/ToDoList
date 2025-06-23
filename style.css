@@ -184,20 +184,9 @@ select.form-select:focus {
 .custom-arrow-white1::-ms-expand {
   display: none;
 }
-/* Supponendo che il testo della task abbia la classe .task-title */
 
-/* Se la checkbox è selezionata (completata), sbarramento e stile grigio */
-.form-check-input:checked ~ .task-title,
-.form-check-input:checked + label .task-title {
-  text-decoration: line-through;
-  color: #6c757d;
-  opacity: 0.7;
-  font-style: italic;
-  transition: color 0.3s ease, text-decoration 0.3s ease;
-}
-
-/* Se usi una classe .completed per task completate */
-.completed .task-title {
+/* ======= STILE PER TASK COMPLETATE - SBARRATO ======= */
+.form-check-input:checked + span {
   text-decoration: line-through;
   color: #6c757d;
   opacity: 0.7;
