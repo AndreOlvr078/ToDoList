@@ -7,14 +7,6 @@ let utenteSelezionato = null;
 let categoriaSelezionata = null;
 
 
-function mostraSpinner() {
-  document.getElementById('loader').style.display = 'flex';
-}
-
-function nascondiSpinner() {
-  document.getElementById('loader').style.display = 'none';
-}
-
 function caricaCategorieDropdown() {
   fetch('https://localhost:7000/api/Categorie')
     .then(res => res.json())
@@ -131,7 +123,6 @@ function aggiornaNumeroSezioneCompletate() {
 }
 
 function caricaTasksPerUtente(UtenteId) {
-  mostraSpinner();
   fetch(`https://localhost:7000/api/Task/UtenteStatoNo/${UtenteId}`)
     .then(res => res.json())
     .then(tasks => {
@@ -186,10 +177,7 @@ function caricaTasksPerUtente(UtenteId) {
       mostraNumeroTaskNonFattePerUtente(UtenteId);
       mostraNumeroTaskCompletatePerUtente(UtenteId);
     })
-    .catch(err => alert("Errore nel caricamento tasks per utente: " + err.message))
-    .finally(() => {
-      nascondiSpinner();
-    });
+    .catch(err => alert("Errore nel caricamento tasks per utente: " + err.message));
 }
 
 
@@ -249,7 +237,6 @@ document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionat
 
 
 function caricaTasksPerCategoria(CategoriaId) {
-  mostraSpinner();
   fetch(`https://localhost:7000/api/Task/Categoria/${CategoriaId}`)
     .then(res => res.json())
     .then(tasks => {
@@ -296,10 +283,7 @@ function caricaTasksPerCategoria(CategoriaId) {
       mostraNumeroTaskNonFattePerCategoria(CategoriaId);
       mostraNumeroTaskCompletatePerCategoria(CategoriaId);
     })
-    .catch(err => alert("Errore nel caricamento tasks per categoria: " + err.message))
-    .finally(() => {
-      nascondiSpinner();
-    });
+    .catch(err => alert("Errore nel caricamento tasks per categoria: " + err.message));
 }
 
 document.getElementById('confermaCategoriaBtn').addEventListener('click', function () {
@@ -928,7 +912,6 @@ function mostraNumeroTaskCompletatePerCategoria(categoriaId) {
 }
 
 function caricaTasksCompletatePerUtente(utenteId) {
-  mostraSpinner();
   fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
     .then(res => res.json())
     .then(tasks => {
@@ -983,14 +966,10 @@ function caricaTasksCompletatePerUtente(utenteId) {
     .catch(err => {
       console.error("Errore nel caricamento tasks completate per utente:", err);
       alert("Errore nel caricamento tasks completate per utente: " + err.message);
-    })
-    .finally(() => {
-      nascondiSpinner();
     });
 }
 
 function caricaTasksCompletatePerCategoria(categoriaId) {
-  mostraSpinner();
   fetch(`https://localhost:7000/api/Task/Categoria/${categoriaId}`)
     .then(res => res.json())
     .then(tasks => {
@@ -1045,8 +1024,5 @@ function caricaTasksCompletatePerCategoria(categoriaId) {
     .catch(err => {
       console.error("Errore nel caricamento tasks completate per categoria:", err);
       alert("Errore nel caricamento tasks completate per categoria: " + err.message);
-    })
-    .finally(() => {
-      nascondiSpinner();
     });
 }
