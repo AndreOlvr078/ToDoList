@@ -122,43 +122,52 @@ function caricaTasksPerUtente(UtenteId) {
     .then(tasks => {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
-      tasks.forEach(task => {
-        const scadenza = new Date(task.scadenza);
-        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-        const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+      if (!tasks || tasks.length === 0) {
+        // Mostra il messaggio se non ci sono task
+        const msg = document.createElement('div');
+        msg.className = 'text-center text-muted my-4';
+        msg.textContent = 'Ancora nessuna task...';
+        lista.appendChild(msg);
+      } else {
+        tasks.forEach(task => {
+          const scadenza = new Date(task.scadenza);
+          const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+          const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
 
-        const box = document.createElement('div');
-        box.className = 'card mb-2 w-100';
-        box.innerHTML = `
-          <div class="card-body p-2">
-            <div class="row align-items-center flex-wrap">
-              <div class="col-auto mx-2">
-                <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
-                ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
-              </div>
-              <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-              <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
-              <div class="col-auto ms-auto d-flex gap-2">
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="notaTask(${task.id})">
-                  <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-                </button>
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="modificaTask(${task.id})">
-                  <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
-                </button>
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="eliminaTask(${task.id})">
-                  <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-                </button>
+          const box = document.createElement('div');
+          box.className = 'card mb-2 w-100';
+          box.innerHTML = `
+            <div class="card-body p-2">
+              <div class="row align-items-center flex-wrap">
+                <div class="col-auto mx-2">
+                  <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
+                  ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
+                </div>
+                <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
+                <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
+                <div class="col-auto ms-auto d-flex gap-2">
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="notaTask(${task.id})">
+                    <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="modificaTask(${task.id})">
+                    <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="eliminaTask(${task.id})">
+                    <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        `; lista.appendChild(box);
-      });
+          `;
+          lista.appendChild(box);
+        });
+      }
       mostraNumeroTaskNonFattePerUtente(UtenteId);
       mostraNumeroTaskCompletatePerUtente(UtenteId);
     })
