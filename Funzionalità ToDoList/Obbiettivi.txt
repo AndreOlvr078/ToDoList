@@ -1,4 +1,6 @@
 - pagina completate sistemare la visualizzazione e il counter
 - pagina completate aggiunjgere la possibilità di ripristinare una task
-- in index appena pari selezionare l'utente da usare e visualizzare in alto il nome dell'utente usato
-
+- Se non presenti task mostrare un testo con scritto "Ancora nessuna task..."
+- nelle completate avere sempre lapossibilità di visualizzare per utente
+- Creare un sistema di scadenza funzionante
+- Aggiungere in Frontend la visualizzazione delle sottotask 

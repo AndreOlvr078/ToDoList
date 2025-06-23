@@ -14,6 +14,7 @@ namespace ToDoListAPI.Data
         public DbSet<Utente> Utente { get; set; } //RAPPRESENTA GLI UTENTI DELL'APPLICAZIONE
         public DbSet<TaskJoinDto> TaskJoinDto { get; set; } //utilizzato per mappare i risultati di una stored procedure (senza chiave primaria).
         public DbSet<CountResultDto> CountResultDto { get; set; }
+        public DbSet<SottoTask> SottoTask { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
