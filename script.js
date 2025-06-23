@@ -517,10 +517,28 @@ function aggiornaStatoTask(id, nuovoStato) {
     })
     .then(res => res.json())
     .then(() => {
-      if (utenteSelezionato) caricaTasksPerUtente(utenteSelezionato);
-      else caricaTasks();
-      aggiornaNumeroSezione();
-      aggiornaNumeroSezioneCompletate();
+      // Ricarica la lista in base al filtro attivo e alla pagina
+      const isCompletate = window.location.pathname.endsWith('completate.html');
+      if (isCompletate) {
+        if (categoriaSelezionata) {
+          caricaTasksCompletatePerCategoria(categoriaSelezionata);
+        } else if (utenteSelezionato) {
+          caricaTasksCompletatePerUtente(utenteSelezionato);
+        } else {
+          caricaTasksCompletate();
+        }
+        aggiornaNumeroSezioneCompletate();
+      } else {
+        if (categoriaSelezionata) {
+          caricaTasksPerCategoria(categoriaSelezionata);
+        } else if (utenteSelezionato) {
+          caricaTasksPerUtente(utenteSelezionato);
+        } else {
+          caricaTasks();
+        }
+        aggiornaNumeroSezione();
+        aggiornaNumeroSezioneCompletate();
+      }
     })
     .catch(err => alert(err.message));
 }
@@ -569,7 +587,7 @@ function gestioneEliminazioneTask() {
             }
           } else {
             console.log('Siamo nella pagina principale');
-            // Pagina principale - considera sia categoria che utente
+            // Pagina principale - considera sia categoria e utente
             if (categoriaSelezionata) {
               caricaTasksPerCategoria(categoriaSelezionata);
             } else if (utenteSelezionato) {
