@@ -732,60 +732,74 @@ document.getElementById('confermaCompletaModal').addEventListener('hidden.bs.mod
   taskIdDaCompletare = null;
 });
 
-document.getElementById('btnConfermaElimina').addEventListener('click', function () {
-  console.log('Tentativo di eliminazione, taskId:', taskIdDaEliminare);
-  if (taskIdDaEliminare !== null) {
-    console.log('Chiamata API DELETE per task:', taskIdDaEliminare);
-    fetch(`https://localhost:7000/api/Task/${taskIdDaEliminare}`, {
-      method: 'DELETE'
-    })
-      .then(response => {
-        console.log('Risposta DELETE:', response.status);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        taskIdDaEliminare = null;
-        var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
-        modal.hide();
-        
-        console.log('Controllo pagina corrente:', window.location.pathname);
-        console.log('categoriaSelezionata:', categoriaSelezionata);
-        console.log('utenteSelezionato:', utenteSelezionato);
-        
-        // Ricarica la lista giusta in base alla pagina e ai filtri attivi
-        if (window.location.pathname.endsWith('completate.html')) {
-          console.log('Siamo nella pagina completate');
-          // Pagina completate - considera sia categoria che utente
-          if (categoriaSelezionata) {
-            console.log('Ricaricando per categoria:', categoriaSelezionata);
-            caricaTasksCompletatePerCategoria(categoriaSelezionata);
-          } else if (utenteSelezionato) {
-            console.log('Ricaricando per utente:', utenteSelezionato);
-            caricaTasksCompletatePerUtente(utenteSelezionato);
-          } else {
-            console.log('Ricaricando tutte le task completate');
-            caricaTasksCompletate();
-          }
-        } else {
-          console.log('Siamo nella pagina principale');
-          // Pagina principale - considera sia categoria che utente
-          if (categoriaSelezionata) {
-            caricaTasksPerCategoria(categoriaSelezionata);
-          } else if (utenteSelezionato) {
-            caricaTasksPerUtente(utenteSelezionato);
-          } else {
-            caricaTasks();
-          }
-        }
-        aggiornaNumeroSezione();
-        aggiornaNumeroSezioneCompletate();
+// Funzione per gestire l'eliminazione task
+function gestioneEliminazioneTask() {
+  document.getElementById('btnConfermaElimina').addEventListener('click', function () {
+    console.log('Tentativo di eliminazione, taskId:', taskIdDaEliminare);
+    if (taskIdDaEliminare !== null) {
+      console.log('Chiamata API DELETE per task:', taskIdDaEliminare);
+      fetch(`https://localhost:7000/api/Task/${taskIdDaEliminare}`, {
+        method: 'DELETE'
       })
-      .catch(err => {
-        console.error('Errore durante eliminazione:', err);
-        alert('Errore durante l\'eliminazione della task: ' + err.message);
-      });
+        .then(response => {
+          console.log('Risposta DELETE:', response.status);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          taskIdDaEliminare = null;
+          var modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaModal'));
+          modal.hide();
+          
+          console.log('Controllo pagina corrente:', window.location.pathname);
+          console.log('categoriaSelezionata:', categoriaSelezionata);
+          console.log('utenteSelezionato:', utenteSelezionato);
+          
+          // Ricarica la lista giusta in base alla pagina e ai filtri attivi
+          if (window.location.pathname.endsWith('completate.html')) {
+            console.log('Siamo nella pagina completate');
+            // Pagina completate - considera sia categoria che utente
+            if (categoriaSelezionata) {
+              console.log('Ricaricando per categoria:', categoriaSelezionata);
+              caricaTasksCompletatePerCategoria(categoriaSelezionata);
+            } else if (utenteSelezionato) {
+              console.log('Ricaricando per utente:', utenteSelezionato);
+              caricaTasksCompletatePerUtente(utenteSelezionato);
+            } else {
+              console.log('Ricaricando tutte le task completate');
+              caricaTasksCompletate();
+            }
+          } else {
+            console.log('Siamo nella pagina principale');
+            // Pagina principale - considera sia categoria che utente
+            if (categoriaSelezionata) {
+              caricaTasksPerCategoria(categoriaSelezionata);
+            } else if (utenteSelezionato) {
+              caricaTasksPerUtente(utenteSelezionato);
+            } else {
+              caricaTasks();
+            }
+          }
+          aggiornaNumeroSezione();
+          aggiornaNumeroSezioneCompletate();
+        })
+        .catch(err => {
+          console.error('Errore durante eliminazione:', err);
+          alert('Errore durante l\'eliminazione della task: ' + err.message);
+        });
+    } else {
+      console.log('taskIdDaEliminare è null!');
+    }
+  });
+}
+
+// Inizializza l'event listener quando il DOM è pronto
+document.addEventListener('DOMContentLoaded', function() {
+  const btnElimina = document.getElementById('btnConfermaElimina');
+  if (btnElimina) {
+    console.log('Bottone btnConfermaElimina trovato, aggiungendo event listener');
+    gestioneEliminazioneTask();
   } else {
-    console.log('taskIdDaEliminare è null!');
+    console.log('Bottone btnConfermaElimina NON trovato nel DOM');
   }
 });
 function modificaTask(id) {
