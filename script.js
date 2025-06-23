@@ -19,7 +19,7 @@ function caricaCategorieDropdown() {
     .then(res => res.json())
     .then(categorie => {
       const select = document.getElementById('categoriaDropdown');
-      select.innerHTML = '<option value="">Seleziona categoria...</option><option value="">Tutti</option>';
+      select.innerHTML = '<option value="">Seleziona categoria...</option>';
       categorie.forEach(cat => {
         const option = document.createElement('option');
         option.value = cat.id;
@@ -38,7 +38,7 @@ function caricaUtentiDropdown() {
     .then(res => res.json())
     .then(utenti => {
       const select = document.getElementById('utenteDropdown');
-      select.innerHTML = '<option value="">Seleziona utente...</option><option value="">Tutti</option>';
+      select.innerHTML = '<option value="">Seleziona utente...</option><option value="tutti">Tutti</option>';
       utenti.forEach(u => {
         const option = document.createElement('option');
         option.value = u.id;
