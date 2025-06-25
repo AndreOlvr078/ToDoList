@@ -1,4 +1,3 @@
-- pagina completate aggiungere la possibilità di ripristinare una task
-- nelle completate avere sempre la possibilità di visualizzare per categoria, sistemare eliminazione
 - Creare un sistema di scadenza funzionante
-- Aggiungere in Frontend la visualizzazione delle sottotask 
+- aggiungere la possibilita di mettere le sottotask
+-aggiungere nel frontend il fatto che se premo unaa categoria e un utente escvano solo le cose lewgate ai due
