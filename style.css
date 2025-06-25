@@ -57,7 +57,7 @@ body {
 .card {
   border-radius: 14px;
   box-shadow: 0 4px 18px 0 rgba(0, 123, 255, 0.07);
-  transition: box-shadow 0.3s cubic-bezier(.4,2,.6,1), transform 0.2s;
+  transition: box-shadow 0.3s cubic-bezier(.4,2,.6,1), transform 0.2s, background 0.3s;
   background: linear-gradient(120deg, #f9faff 80%, #e3f0ff 100%);
   margin-bottom: 1.2rem;
   border: none;
@@ -65,8 +65,9 @@ body {
 }
 
 .card:hover {
-  box-shadow: 0 12px 32px 0 rgba(0, 123, 255, 0.18);
-  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 16px 40px 0 rgba(0, 123, 255, 0.22);
+  transform: translateY(-6px) scale(1.025);
+  background: linear-gradient(120deg, #e3f0ff 60%, #f9faff 100%);
 }
 
 /* Card body */
@@ -120,12 +121,13 @@ body {
   background: linear-gradient(135deg, #e3f0ff 60%, #f9faff 100%);
   box-shadow: 0 2px 8px 0 rgba(0,123,255,0.07);
   border: none;
+  will-change: transform;
 }
 
 .btn.btn-light.rounded-circle:hover {
   background: linear-gradient(135deg, #dce9ff 80%, #b3e0ff 100%);
   box-shadow: 0 4px 16px 0 rgba(0,198,255,0.13);
-  transform: scale(1.1);
+  transform: scale(1.13) rotate(-4deg);
 }
 
 /* Icone */
@@ -307,4 +309,49 @@ select.form-select:focus {
 #helpModal .modal-body .subtask-info i {
   color: #00c6ff;
   margin-right: 0.5rem;
+}
+
+/* Sottotask-container più moderna */
+#lista-box .sottotask-container {
+  width: 100%;
+  margin-top: 0.5rem;
+  margin-bottom: 1.2rem;
+  background: linear-gradient(90deg, #f0f7ff 80%, #e3f0ff 100%);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,123,255,0.08);
+  border-left: 5px solid #007bff;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  padding: 0.85rem 1.2rem;
+  transition: box-shadow 0.3s, background 0.3s, max-height 0.4s cubic-bezier(.4,2,.6,1);
+  overflow: hidden;
+}
+
+#lista-box .sottotask-container ul {
+  margin-bottom: 0;
+}
+
+#lista-box .sottotask-container li {
+  border-bottom: 1px solid #e5e5e5;
+  padding: 0.4rem 0;
+  list-style: none;
+  font-size: 1.08rem;
+  color: #2a2a2a;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+#lista-box .sottotask-container li:last-child {
+  border-bottom: none;
+}
+
+/* Transizione apertura sottotask */
+#lista-box .sottotask-container {
+  animation: sottotaskFadeIn 0.35s cubic-bezier(.4,2,.6,1);
+}
+
+@keyframes sottotaskFadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
