@@ -1517,20 +1517,7 @@ function toggleStatoSottoTask(sottoTaskId, nuovoStato, taskId) {
         body: JSON.stringify({ ...sottoTask, stato: nuovoStato })
       });
     })
-    .then(async res => {
-      if (!res.ok) throw new Error('Errore nel cambio stato della sottotask');
-      // Gestione robusta risposta vuota o non JSON
-      if (res.status === 204) return; // No Content
-      const contentType = res.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) return;
-      const text = await res.text();
-      if (!text) return;
-      try {
-        return JSON.parse(text);
-      } catch (e) {
-        return; // non è JSON, ignora
-      }
-    })
+    .then(res => res.json())
     .then(() => {
       caricaSottoTask(taskId, '');
     })
