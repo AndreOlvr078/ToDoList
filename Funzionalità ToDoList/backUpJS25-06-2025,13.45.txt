@@ -5,6 +5,15 @@ let taskIdDaCompletare = null;
 let checkboxDaRipristinare = null;
 let utenteSelezionato = null;
 let categoriaSelezionata = null;
+let sottoTaskIdDaModificare = null;
+let sottoTaskTaskIdRiferimento = null;
+let sottoTaskTitoloAttuale = '';
+let sottoTaskStatoAttuale = null;
+
+// Variabili globali per gestione modali sottotask
+let sottoTaskDaModificare = null;
+let sottoTaskDaEliminare = null;
+let taskIdCorrente = null;
 
 function caricaCategorieDropdown() {
   fetch('https://localhost:7000/api/Categorie')
@@ -233,7 +242,7 @@ function caricaSottoTask(taskId, keepOpenInputValue = '') {
               <span>${st.titolo}</span>
             </span>
             <span class="d-flex gap-2">
-              <button class="btn btn-light rounded-circle btn-sm" title="Modifica sottotask" onclick="modificaSottoTask(${st.id}, ${taskId})">
+              <button class="btn btn-light rounded-circle btn-sm" title="Modifica sottotask" onclick="modificaSottoTask(${st.id}, ${taskId}, this)">
                 <i class="bi bi-pencil"></i>
               </button>
               <button class="btn btn-light rounded-circle btn-sm" title="Elimina sottotask" onclick="eliminaSottoTask(${st.id}, ${taskId})">
@@ -304,41 +313,79 @@ function aggiungiSottoTask(taskId, titolo) {
     .catch(err => alert(err.message));
 }
 
-function modificaSottoTask(sottoTaskId, taskId) {
-  const nuovoTitolo = prompt('Modifica il titolo della sottotask:');
-  if (!nuovoTitolo || nuovoTitolo.trim() === '') return;
-
-  fetch(`https://localhost:7000/api/SottoTask/${sottoTaskId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      titolo: nuovoTitolo,
-      taskId: taskId
-    })
-  })
-    .then(res => {
-      if (!res.ok) throw new Error("Errore nella modifica della sottotask");
-      return res.json();
-    })
-    .then(() => {
-      caricaSottoTask(taskId, ''); // Ricarica e lascia la dropdown aperta
-    })
-    .catch(err => alert(err.message));
+// --- MODALI SOTTOTASK ---
+// Funzione per aprire la modale di modifica sottotask
+function modificaSottoTask(sottoTaskId, taskId, buttonElement) {
+  sottoTaskDaModificare = sottoTaskId;
+  taskIdCorrente = taskId;
+  // Trova il titolo corrente dal DOM
+  const liElement = buttonElement.closest('li');
+  const spanElement = liElement.querySelector('span span');
+  const titoloCorrente = spanElement ? spanElement.textContent : '';
+  document.getElementById('titoloSottoTaskModifica').value = titoloCorrente;
+  const modal = new bootstrap.Modal(document.getElementById('modificaSottoTaskModal'));
+  modal.show();
 }
 
+// Funzione per aprire la modale di eliminazione sottotask
 function eliminaSottoTask(sottoTaskId, taskId) {
-  if (!confirm('Sei sicuro di voler eliminare questa sottotask?')) return;
-  fetch(`https://localhost:7000/api/SottoTask/${sottoTaskId}`, {
-    method: 'DELETE'
-  })
-    .then(res => {
-      if (!res.ok) throw new Error("Errore nell'eliminazione della sottotask");
-      return res.json();
+  sottoTaskDaEliminare = sottoTaskId;
+  taskIdCorrente = taskId;
+  const modal = new bootstrap.Modal(document.getElementById('eliminaSottoTaskModal'));
+  modal.show();
+}
+
+// Listener per conferma modifica sottotask
+const btnConfermaModificaSottoTask = document.getElementById('confermaModificaSottoTaskBtn');
+if (btnConfermaModificaSottoTask) {
+  btnConfermaModificaSottoTask.addEventListener('click', async () => {
+    const nuovoTitolo = document.getElementById('titoloSottoTaskModifica').value.trim();
+    if (!nuovoTitolo) {
+      alert('Inserisci un titolo valido');
+      return;
+    }
+    btnConfermaModificaSottoTask.disabled = true;
+    try {
+      const res = await fetch(`https://localhost:7000/api/SottoTask/${sottoTaskDaModificare}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ titolo: nuovoTitolo, taskID: taskIdCorrente })
+      });
+      if (!res.ok) throw new Error('Errore nella modifica della sottotask');
+      await res.json();
+      caricaSottoTask(taskIdCorrente, '');
+      sottoTaskDaModificare = null;
+      taskIdCorrente = null;
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modificaSottoTaskModal'));
+      modal.hide();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      btnConfermaModificaSottoTask.disabled = false;
+    }
+  });
+}
+
+// Listener per conferma eliminazione sottotask
+const btnConfermaEliminaSottoTask = document.getElementById('confermaEliminaSottoTaskBtn');
+if (btnConfermaEliminaSottoTask) {
+  btnConfermaEliminaSottoTask.addEventListener('click', () => {
+    fetch(`https://localhost:7000/api/SottoTask/${sottoTaskDaEliminare}`, {
+      method: 'DELETE'
     })
-    .then(() => {
-      caricaSottoTask(taskId, ''); // Ricarica e lascia la dropdown aperta
-    })
-    .catch(err => alert(err.message));
+      .then(res => {
+        if (!res.ok) throw new Error('Errore nell\'eliminazione della sottotask');
+        return res.json();
+      })
+      .then(() => {
+        caricaSottoTask(taskIdCorrente, '');
+        sottoTaskDaEliminare = null;
+        taskIdCorrente = null;
+        const modal = bootstrap.Modal.getInstance(document.getElementById('eliminaSottoTaskModal'));
+        modal.hide();
+      })
+      .catch(err => alert(err.message));
+  });
 }
 
 function caricaTasksPerCategoria(CategoriaId) {
@@ -1495,3 +1542,76 @@ function toggleStatoSottoTask(sottoTaskId, nuovoStato, taskId) {
     })
     .catch(err => alert('Errore nel cambio stato della sottotask: ' + err.message));
 }
+
+// === FUNZIONE CONFERMA MODIFICA SOTTOTASK ===
+function confermaSalvaModificaSottoTask() {
+  const nuovoTitolo = document.getElementById('titoloSottoTaskModifica').value.trim();
+  if (!nuovoTitolo) {
+    alert('Il titolo non può essere vuoto');
+    return;
+  }
+  fetch(`https://localhost:7000/api/SottoTask/${sottoTaskDaModificare}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ titolo: nuovoTitolo, taskID: taskIdCorrente })
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Errore nella modifica della sottotask');
+      return res.json();
+    })
+    .then(() => {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modificaSottoTaskModal'));
+      modal.hide();
+      caricaSottoTask(taskIdCorrente, '');
+      sottoTaskDaModificare = null;
+      taskIdCorrente = null;
+    })
+    .catch(err => alert('Errore nella modifica della sottotask: ' + err.message));
+}
+
+// === FUNZIONE CONFERMA ELIMINAZIONE SOTTOTASK ===
+function confermaEliminaSottoTask() {
+  fetch(`https://localhost:7000/api/SottoTask/${sottoTaskDaEliminare}`, {
+    method: 'DELETE'
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Errore nell\'eliminazione della sottotask');
+      return res.json();
+    })
+    .then(() => {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('eliminaSottoTaskModal'));
+      modal.hide();
+      caricaSottoTask(taskIdCorrente, '');
+      sottoTaskDaEliminare = null;
+      taskIdCorrente = null;
+    })
+    .catch(err => alert('Errore nell\'eliminazione della sottotask: ' + err.message));
+}
+
+// === LISTENER UNIFICATI PER LE MODALI SOTTOTASK ===
+document.addEventListener('DOMContentLoaded', () => {
+  const btnConfermaSalvaModifica = document.getElementById('btnConfermaSalvaModificaSottoTask');
+  if (btnConfermaSalvaModifica) {
+    btnConfermaSalvaModifica.addEventListener('click', confermaSalvaModificaSottoTask);
+  }
+  const btnConfermaEliminaSottoTask = document.getElementById('btnConfermaEliminaSottoTask');
+  if (btnConfermaEliminaSottoTask) {
+    btnConfermaEliminaSottoTask.addEventListener('click', confermaEliminaSottoTask);
+  }
+  // Reset variabili quando si chiudono le modali
+  const modificaSottoTaskModal = document.getElementById('modificaSottoTaskModal');
+  if (modificaSottoTaskModal) {
+    modificaSottoTaskModal.addEventListener('hidden.bs.modal', () => {
+      sottoTaskDaModificare = null;
+      taskIdCorrente = null;
+      document.getElementById('titoloSottoTaskModifica').value = '';
+    });
+  }
+  const eliminaSottoTaskModal = document.getElementById('eliminaSottoTaskModal');
+  if (eliminaSottoTaskModal) {
+    eliminaSottoTaskModal.addEventListener('hidden.bs.modal', () => {
+      sottoTaskDaEliminare = null;
+      taskIdCorrente = null;
+    });
+  }
+});

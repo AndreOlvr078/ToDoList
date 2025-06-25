@@ -1,4 +1,4 @@
--agiustare modifica e check e togliere dalle completate aggiunta e modifica
+-togliere dalle completate aggiunta e modifica
 
 CREATE OR ALTER TRIGGER trg_AggiornaSottoTaskStato
 ON Task
