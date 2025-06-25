@@ -5,16 +5,16 @@ let taskIdDaCompletare = null;
 let checkboxDaRipristinare = null;
 let utenteSelezionato = null;
 let categoriaSelezionata = null;
-let sottoTaskIdDaModificare = null;
-let sottoTaskTaskIdRiferimento = null;
-let sottoTaskTitoloAttuale = '';
-let sottoTaskIdDaEliminare = null;
+let sottoTaskDaModificare = null;
+let sottoTaskDaEliminare = null;
+let taskIdCorrente = null;
 
 function caricaCategorieDropdown() {
   fetch('https://localhost:7000/api/Categorie')
     .then(res => res.json())
     .then(categorie => {
       const select = document.getElementById('categoriaDropdown');
+      if (!select) return; // Element doesn't exist on this page
       select.innerHTML = '<option value="">Seleziona categoria...</option><option value="tutti">Tutti</option>';
       categorie.forEach(cat => {
         const option = document.createElement('option');
@@ -34,6 +34,7 @@ function caricaUtentiDropdown() {
     .then(res => res.json())
     .then(utenti => {
       const select = document.getElementById('utenteDropdown');
+      if (!select) return; // Element doesn't exist on this page
       select.innerHTML = '<option value="">Seleziona utente...</option><option value="tutti">Tutti</option>';
       utenti.forEach(u => {
         const option = document.createElement('option');
@@ -231,15 +232,13 @@ function caricaSottoTask(taskId, keepOpenInputValue = '') {
         sottoTasks.forEach(st => {
           const li = document.createElement('li');
           li.className = 'mb-1 ps-2 d-flex align-items-center justify-content-between';
-          // Passa il titolo attuale come terzo parametro, gestendo eventuali apici singoli
-          const titoloSanificato = st.titolo ? st.titolo.replace(/'/g, "\\'") : '';
           li.innerHTML = `
             <span class="d-flex align-items-center gap-2">
               <input type="checkbox" class="form-check-input me-2" style="transform: scale(1.4);" ${st.stato ? 'checked' : ''} onchange="toggleStatoSottoTask(${st.id}, this.checked, ${taskId})">
               <span>${st.titolo}</span>
             </span>
             <span class="d-flex gap-2">
-              <button class="btn btn-light rounded-circle btn-sm" title="Modifica sottotask" onclick="modificaSottoTask(${st.id}, ${taskId}, '${titoloSanificato}')">
+              <button class="btn btn-light rounded-circle btn-sm" title="Modifica sottotask" onclick="modificaSottoTask(${st.id}, ${taskId}, this)">
                 <i class="bi bi-pencil"></i>
               </button>
               <button class="btn btn-light rounded-circle btn-sm" title="Elimina sottotask" onclick="eliminaSottoTask(${st.id}, ${taskId})">
@@ -310,76 +309,32 @@ function aggiungiSottoTask(taskId, titolo) {
     .catch(err => alert(err.message));
 }
 
-function modificaSottoTask(id, taskId, titoloAttuale) {
-  sottoTaskIdDaModificare = id;
-  sottoTaskTaskIdRiferimento = taskId;
-  sottoTaskTitoloAttuale = titoloAttuale;
-  const input = document.getElementById('inputNomeSottoTask');
-  if (input) input.value = titoloAttuale ? titoloAttuale : '';
+function modificaSottoTask(sottoTaskId, taskId, buttonElement) {
+  // Imposta le variabili globali
+  sottoTaskDaModificare = sottoTaskId;
+  taskIdCorrente = taskId;
+  
+  // Trova il titolo della sotto-task dal DOM
+  const liElement = buttonElement.closest('li');
+  const spanElement = liElement.querySelector('span span');
+  const titoloCorrente = spanElement ? spanElement.textContent : '';
+  
+  // Popola il campo di input con il titolo corrente
+  document.getElementById('titoloSottoTaskModifica').value = titoloCorrente;
+  
+  // Apri il modal
   const modal = new bootstrap.Modal(document.getElementById('modificaSottoTaskModal'));
   modal.show();
 }
 
-function eliminaSottoTask(id, taskId) {
-  sottoTaskIdDaEliminare = id;
-  sottoTaskTaskIdRiferimento = taskId;
-  const modal = new bootstrap.Modal(document.getElementById('confermaEliminaSottoTaskModal'));
+function eliminaSottoTask(sottoTaskId, taskId) {
+  // Imposta le variabili globali
+  sottoTaskDaEliminare = sottoTaskId;
+  taskIdCorrente = taskId;
+  
+  // Apri il modal di conferma
+  const modal = new bootstrap.Modal(document.getElementById('eliminaSottoTaskModal'));
   modal.show();
-}
-
-// Gestione submit modifica sottotask
-const formModificaSottoTask = document.getElementById('formModificaSottoTask');
-if (formModificaSottoTask) {
-  formModificaSottoTask.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const nuovoTitolo = document.getElementById('inputNomeSottoTask').value.trim();
-    if (!nuovoTitolo) return;
-    if (sottoTaskIdDaModificare && sottoTaskTaskIdRiferimento) {
-      fetch(`https://localhost:7000/api/SottoTask/${sottoTaskIdDaModificare}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ titolo: nuovoTitolo, taskID: sottoTaskTaskIdRiferimento })
-      })
-        .then(res => {
-          if (!res.ok) throw new Error("Errore nella modifica della sottotask");
-          return res.json();
-        })
-        .then(() => {
-          const modal = bootstrap.Modal.getInstance(document.getElementById('modificaSottoTaskModal'));
-          modal.hide();
-          // Reset variabili dopo la chiusura della modale
-          const taskId = sottoTaskTaskIdRiferimento;
-          sottoTaskIdDaModificare = null;
-          sottoTaskTaskIdRiferimento = null;
-          sottoTaskTitoloAttuale = '';
-          caricaSottoTask(taskId, '');
-        })
-        .catch(err => alert(err.message));
-    }
-  });
-}
-
-// Gestione conferma eliminazione sottotask
-const btnConfermaEliminaSottoTask = document.getElementById('btnConfermaEliminaSottoTask');
-if (btnConfermaEliminaSottoTask) {
-  btnConfermaEliminaSottoTask.addEventListener('click', function () {
-    if (sottoTaskIdDaEliminare && sottoTaskTaskIdRiferimento) {
-      fetch(`https://localhost:7000/api/SottoTask/${sottoTaskIdDaEliminare}`, {
-        method: 'DELETE'
-      })
-        .then(res => {
-          if (!res.ok) throw new Error("Errore nell'eliminazione della sottotask");
-          return res.json();
-        })
-        .then(() => {
-          sottoTaskIdDaEliminare = null;
-          const modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaSottoTaskModal'));
-          modal.hide();
-          caricaSottoTask(sottoTaskTaskIdRiferimento, '');
-        })
-        .catch(err => alert(err.message));
-    }
-  });
 }
 
 function caricaTasksPerCategoria(CategoriaId) {
@@ -471,6 +426,7 @@ function apriModalEliminaCategoria() {
     .then(res => res.json())
     .then(categorie => {
       const select = document.getElementById('eliminaCategoriaDropdown');
+      if (!select) return; // Element doesn't exist on this page
       select.innerHTML = '<option value="">Seleziona categoria da eliminare...</option>';
       categorie.forEach(cat => {
         const option = document.createElement('option');
@@ -514,6 +470,7 @@ function apriModalEliminaUtente() {
     .then(res => res.json())
     .then(utenti => {
       const select = document.getElementById('eliminaUtenteDropdown');
+      if (!select) return; // Element doesn't exist on this page
       select.innerHTML = '<option value="">Seleziona utente da eliminare...</option>';
       utenti.forEach(u => {
         const option = document.createElement('option');
@@ -635,7 +592,9 @@ function salvaTask(e) {
       const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
       modal.hide();
       document.getElementById('taskForm').reset();
-      taskDaModificare = null;      document.getElementById('btnAggiungi').textContent = 'Aggiungi';
+      taskDaModificare = null;
+      const btnAggiungi = document.getElementById('btnAggiungi');
+      if (btnAggiungi) btnAggiungi.textContent = 'Aggiungi';
       caricaTasksConFiltri();
     })
 }
@@ -739,7 +698,8 @@ function modificaTask(id) {
       }
 
       taskDaModificare = id;
-      document.getElementById('btnAggiungi').textContent = 'Salva modifiche';
+      const btnAggiungi = document.getElementById('btnAggiungi');
+      if (btnAggiungi) btnAggiungi.textContent = 'Salva modifiche';
 
       const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
       modal.show();
@@ -759,23 +719,28 @@ function notaTask(id) {
         fetch(`https://localhost:7000/api/Categorie/${task.categoriaID}`).then(r => r.json())
       ])
         .then(([utente, categoria]) => {
-          document.getElementById('modalDescrizioneTesto').innerHTML = `
-            <div><strong>Titolo:</strong> ${task.titolo}</div>
-            <div><strong>Descrizione:</strong> ${task.descrizione}</div>
-            <div><strong>Utente:</strong> ${utente.nome}</div>
-            <div><strong>Categoria:</strong> ${categoria.descrizione}</div>
-          `;
+          const modalTesto = document.getElementById('modalDescrizioneTesto');
+          if (modalTesto) {
+            modalTesto.innerHTML = `
+              <div><strong>Titolo:</strong> ${task.titolo}</div>
+              <div><strong>Descrizione:</strong> ${task.descrizione}</div>
+              <div><strong>Utente:</strong> ${utente.nome}</div>
+              <div><strong>Categoria:</strong> ${categoria.descrizione}</div>
+            `;
+          }
           var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
           modal.show();
         })
         .catch(() => {
-          document.getElementById('modalDescrizioneTesto').textContent = "Errore nel caricamento di utente o categoria.";
+          const modalTesto = document.getElementById('modalDescrizioneTesto');
+          if (modalTesto) modalTesto.textContent = "Errore nel caricamento di utente o categoria.";
           var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
           modal.show();
         });
     })
     .catch(() => {
-      document.getElementById('modalDescrizioneTesto').textContent = "Descrizione non trovata.";
+      const modalTesto = document.getElementById('modalDescrizioneTesto');
+      if (modalTesto) modalTesto.textContent = "Descrizione non trovata.";
       var modal = new bootstrap.Modal(document.getElementById('descrizioneModal'));
       modal.show();
     });
@@ -786,6 +751,7 @@ function caricaCategorie() {
     .then(res => res.json())
     .then(categorie => {
       const select = document.getElementById('categoria');
+      if (!select) return; // Element doesn't exist on this page
       select.innerHTML = '<option value="">Seleziona categoria...</option>';
       categorie.forEach(cat => {
         const option = document.createElement('option');
@@ -802,6 +768,7 @@ function caricaUtentiForm() {
     .then(res => res.json())
     .then(utenti => {
       const select = document.getElementById('utente');
+      if (!select) return; // Element doesn't exist on this page
       select.innerHTML = '<option value="">Seleziona utente...</option>';
       utenti.forEach(u => {
         const option = document.createElement('option');
@@ -895,65 +862,77 @@ function caricaTasksCompletate() {
 
 function mostraNumeroTaskNonFattePerUtente(utenteId) {
   if (!utenteId) {
-    document.getElementById('numero-sezione').textContent = '0';
+    const badge = document.getElementById('numero-sezione');
+    if (badge) badge.textContent = '0';
     return;
   }
   fetch(`https://localhost:7000/api/Task/UtenteStatoNo/${utenteId}`)
     .then(res => res.json())
     .then(tasks => {
       const nonFatte = tasks.filter(t => !t.stato).length;
-      document.getElementById('numero-sezione').textContent = nonFatte;
+      const badge = document.getElementById('numero-sezione');
+      if (badge) badge.textContent = nonFatte;
     })
     .catch(() => {
-      document.getElementById('numero-sezione').textContent = '0';
+      const badge = document.getElementById('numero-sezione');
+      if (badge) badge.textContent = '0';
     });
 }
 
 function mostraNumeroTaskCompletatePerUtente(utenteId) {
   if (!utenteId) {
-    document.getElementById('numero-sezione-si').textContent = '0';
+    const badge = document.getElementById('numero-sezione-si');
+    if (badge) badge.textContent = '0';
     return;
   }
   fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
     .then(res => res.json())
     .then(tasks => {
       const completate = tasks.filter(t => t.stato).length;
-      document.getElementById('numero-sezione-si').textContent = completate;
+      const badge = document.getElementById('numero-sezione-si');
+      if (badge) badge.textContent = completate;
     })
     .catch(() => {
-      document.getElementById('numero-sezione-si').textContent = '0';
+      const badge = document.getElementById('numero-sezione-si');
+      if (badge) badge.textContent = '0';
     });
 }
 
 function mostraNumeroTaskNonFattePerCategoria(categoriaId) {
   if (!categoriaId) {
-    document.getElementById('numero-sezione').textContent = '0';
+    const badge = document.getElementById('numero-sezione');
+    if (badge) badge.textContent = '0';
     return;
   }
   fetch(`https://localhost:7000/api/Task/Categoria/${categoriaId}`)
     .then(res => res.json())
     .then(tasks => {
       const nonFatte = tasks.filter(t => !t.stato).length;
-      document.getElementById('numero-sezione').textContent = nonFatte;
+      const badge = document.getElementById('numero-sezione');
+      if (badge) badge.textContent = nonFatte;
     })
     .catch(() => {
-      document.getElementById('numero-sezione').textContent = '0';
+      const badge = document.getElementById('numero-sezione');
+      if (badge) badge.textContent = '0';
     });
 }
 
 function mostraNumeroTaskCompletatePerCategoria(categoriaId) {
   if (!categoriaId) {
-    document.getElementById('numero-sezione-si').textContent = '0';
+    const badge = document.getElementById('numero-sezione-si');
+    if (badge) badge.textContent = '0';
     return;
   }
   fetch(`https://localhost:7000/api/Task/Categoria/${categoriaId}`)
     .then(res => res.json())
     .then(tasks => {
       const completate = tasks.filter(t => t.stato).length;
-      document.getElementById('numero-sezione-si').textContent = completate;
+      const badge = document.getElementById('numero-sezione-si');
+      if (badge) badge.textContent = completate;
     })
     .catch(() => {
-      document.getElementById('numero-sezione-si').textContent = '0';
+      const badge = document.getElementById('numero-sezione-si');
+      if (badge) badge.textContent = '0';
     });
 }
 
@@ -1324,8 +1303,10 @@ function aggiornaConteggiConFiltriCombinati() {
 function resettaTuttiFiltri() {
   utenteSelezionato = null;
   categoriaSelezionata = null;
-  document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
-  document.getElementById('categoria-in-uso').textContent = 'Nessuna categoria selezionata';
+  const utenteInUso = document.getElementById('utente-in-uso');
+  const categoriaInUso = document.getElementById('categoria-in-uso');
+  if (utenteInUso) utenteInUso.textContent = 'Nessun utente selezionato';
+  if (categoriaInUso) categoriaInUso.textContent = 'Nessuna categoria selezionata';
   
   // Carica le task appropriate in base alla pagina corrente
   caricaTasksConFiltri();
@@ -1348,8 +1329,10 @@ document.addEventListener('DOMContentLoaded', () => {
   gestioneEliminazioneTask();
 
   // Inizializza badge categoria
-  document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
-  document.getElementById('categoria-in-uso').textContent = 'Nessuna categoria selezionata';
+  const utenteInUso = document.getElementById('utente-in-uso');
+  const categoriaInUso = document.getElementById('categoria-in-uso');
+  if (utenteInUso) utenteInUso.textContent = 'Nessun utente selezionato';
+  if (categoriaInUso) categoriaInUso.textContent = 'Nessuna categoria selezionata';
   Promise.all([
     caricaTasksConFiltri(),
     caricaCategorie(),
@@ -1393,7 +1376,8 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
   if (utenteId === "tutti") {
     utenteSelezionato = null;
     // NON resettare la categoria, mantieni il filtro categoria se presente
-    document.getElementById('utente-in-uso').textContent = "Tutti";
+    const utenteInUso = document.getElementById('utente-in-uso');
+    if (utenteInUso) utenteInUso.textContent = "Tutti";
 
     // Carica le task appropriate in base alla pagina corrente
     caricaTasksConFiltri();
@@ -1404,7 +1388,8 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
   }
   if (utenteId && utenteId !== "") {
     utenteSelezionato = utenteId;
-    document.getElementById('utente-in-uso').textContent = nomeUtente;
+    const utenteInUso = document.getElementById('utente-in-uso');
+    if (utenteInUso) utenteInUso.textContent = nomeUtente;
 
     // Carica le task con i filtri combinati
     caricaTasksConFiltri();
@@ -1425,7 +1410,8 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
   if (CategoriaID === "tutti") {
     // Reset solo la categoria, mantieni l'utente se selezionato
     categoriaSelezionata = null;
-    document.getElementById('categoria-in-uso').textContent = "Tutti";
+    const categoriaInUso = document.getElementById('categoria-in-uso');
+    if (categoriaInUso) categoriaInUso.textContent = "Tutti";
 
     // Carica le task appropriate in base alla pagina corrente
     caricaTasksConFiltri();
@@ -1436,7 +1422,8 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
   }
   if (CategoriaID) {
     categoriaSelezionata = CategoriaID;
-    document.getElementById('categoria-in-uso').textContent = nomeCategoria;
+    const categoriaInUso = document.getElementById('categoria-in-uso');
+    if (categoriaInUso) categoriaInUso.textContent = nomeCategoria;
 
     // Carica le task con i filtri combinati
     caricaTasksConFiltri();
@@ -1520,11 +1507,11 @@ if (btnConfermaEliminaUtente && selectEliminaUtente) {
   });
 }
 
-function toggleStatoSottoTask(id, nuovoStato, taskId) {
-  fetch(`https://localhost:7000/api/SottoTask/${id}`)
+function toggleStatoSottoTask(sottoTaskId, nuovoStato, taskId) {
+  fetch(`https://localhost:7000/api/SottoTask/${sottoTaskId}`)
     .then(res => res.json())
     .then(sottoTask => {
-      return fetch(`https://localhost:7000/api/SottoTask/${id}`, {
+      return fetch(`https://localhost:7000/api/SottoTask/${sottoTaskId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...sottoTask, stato: nuovoStato })
@@ -1536,3 +1523,91 @@ function toggleStatoSottoTask(id, nuovoStato, taskId) {
     })
     .catch(err => alert('Errore nel cambio stato della sottotask: ' + err.message));
 }
+
+// Funzioni per gestire le modal delle sotto-task
+function confermaSalvaModificaSottoTask() {
+  const nuovoTitolo = document.getElementById('titoloSottoTaskModifica').value.trim();
+  
+  if (!nuovoTitolo) {
+    alert('Il titolo non può essere vuoto');
+    return;
+  }
+
+  fetch(`https://localhost:7000/api/SottoTask/${sottoTaskDaModificare}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      titolo: nuovoTitolo,
+      taskId: taskIdCorrente
+    })
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Errore nella modifica della sottotask");
+      return res.json();
+    })
+    .then(() => {
+      // Chiudi il modal e ricarica le sotto-task
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modificaSottoTaskModal'));
+      modal.hide();
+      caricaSottoTask(taskIdCorrente, ''); // Ricarica e lascia la dropdown aperta
+      
+      // Reset delle variabili
+      sottoTaskDaModificare = null;
+      taskIdCorrente = null;
+    })
+    .catch(err => alert('Errore nella modifica della sottotask: ' + err.message));
+}
+
+function confermaEliminaSottoTask() {
+  fetch(`https://localhost:7000/api/SottoTask/${sottoTaskDaEliminare}`, {
+    method: 'DELETE'
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Errore nell'eliminazione della sottotask");
+      return res.json();
+    })
+    .then(() => {
+      // Chiudi il modal e ricarica le sotto-task
+      const modal = bootstrap.Modal.getInstance(document.getElementById('eliminaSottoTaskModal'));
+      modal.hide();
+      caricaSottoTask(taskIdCorrente, ''); // Ricarica e lascia la dropdown aperta
+      
+      // Reset delle variabili
+      sottoTaskDaEliminare = null;
+      taskIdCorrente = null;
+    })
+    .catch(err => alert('Errore nell\'eliminazione della sottotask: ' + err.message));
+}
+
+// Event listeners per le modal delle sotto-task
+document.addEventListener('DOMContentLoaded', () => {
+  // Event listener per la conferma modifica sotto-task
+  const btnConfermaSalvaModifica = document.getElementById('btnConfermaSalvaModificaSottoTask');
+  if (btnConfermaSalvaModifica) {
+    btnConfermaSalvaModifica.addEventListener('click', confermaSalvaModificaSottoTask);
+  }
+
+  // Event listener per la conferma eliminazione sotto-task
+  const btnConfermaEliminaSottoTask = document.getElementById('btnConfermaEliminaSottoTask');
+  if (btnConfermaEliminaSottoTask) {
+    btnConfermaEliminaSottoTask.addEventListener('click', confermaEliminaSottoTask);
+  }
+
+  // Event listener per reset variabili quando si chiudono le modal
+  const modificaSottoTaskModal = document.getElementById('modificaSottoTaskModal');
+  if (modificaSottoTaskModal) {
+    modificaSottoTaskModal.addEventListener('hidden.bs.modal', () => {
+      sottoTaskDaModificare = null;
+      taskIdCorrente = null;
+      document.getElementById('titoloSottoTaskModifica').value = '';
+    });
+  }
+
+  const eliminaSottoTaskModal = document.getElementById('eliminaSottoTaskModal');
+  if (eliminaSottoTaskModal) {
+    eliminaSottoTaskModal.addEventListener('hidden.bs.modal', () => {
+      sottoTaskDaEliminare = null;
+      taskIdCorrente = null;
+    });
+  }
+});
