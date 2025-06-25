@@ -22,7 +22,6 @@ body {
   letter-spacing: 2px;
   font-weight: 700;
   color: #fff !important;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.08);
   text-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
 }
 
@@ -69,23 +68,19 @@ body {
   animation: fadeIn 0.5s ease forwards;
 }
 
-.card:hover {
-  box-shadow: 0 12px 32px 0 rgba(0, 123, 255, 0.18);
-  transform: translateY(-4px) scale(1.02);
-}
-
-/* Card body */
+/* Card body con bottoni allineati */
 .card-body {
   padding: 1.2rem 2rem;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Distribuisce tra sinistra e destra */
+  justify-content: space-between;
 }
 
-/* Righe e colonne */
-.row.align-items-center {
-  flex-wrap: wrap;
-  gap: 0.7rem;
+/* Wrapper bottoni */
+.button-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
 /* Checkbox */
@@ -168,7 +163,33 @@ body {
   transform: scale(1.05);
 }
 
-/* Select menu base */
+/* Sotto-task container allineato e ampio */
+.sottotask-container {
+  width: 100%;
+  padding: 0.5rem 2.5rem;
+  margin-top: -0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.sottotask-container ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: #f9faff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,123,255,0.08);
+}
+
+.sottotask-container li {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #e3f0ff;
+}
+
+.sottotask-container li:last-child {
+  border-bottom: none;
+}
+
+/* Select menu */
 select.form-select {
   border-radius: 8px;
   border: 1.5px solid #b5c9e2;
@@ -179,8 +200,6 @@ select.form-select {
   color: #222;
   box-shadow: 0 2px 8px rgba(0,123,255,0.04);
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
   position: relative;
 }
 
@@ -191,41 +210,35 @@ select.form-select:focus {
   background-color: #f4faff;
 }
 
-/* Select personalizzato blu */
+/* Freccia dropdown personalizzata */
 .custom-arrow-white,
 .custom-arrow-white1 {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
   background-color: #007bff;
   color: #fff;
   border: 1.5px solid #444;
-  transition: box-shadow 0.3s, background-color 0.3s;
-  box-shadow: 0 2px 8px rgba(0,123,255,0.08);
   padding-right: 3.5em;
   padding-left: 0.85em;
   width: 210px;
   height: 40px;
-  /* Freccia custom visibile su tutti i browser */
   background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 6l4 4 4-4' stroke='white' stroke-width='2' fill='none'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1.2em center;
   background-size: 1.2em;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  scrollbar-width: thin;
 }
 
 .custom-arrow-white1 {
   width: 180px;
-  /* height: 40px; già incluso sopra */
 }
 
-/* Fix per la freccia su Firefox e altri browser */
 .custom-arrow-white::-ms-expand,
 .custom-arrow-white1::-ms-expand {
   display: none;
 }
-/* Supponendo che il testo della task abbia la classe .task-title */
 
-<<<<<<< Updated upstream
 .custom-arrow-white:focus,
 .custom-arrow-white1:focus,
 .custom-arrow-white:hover,
@@ -235,32 +248,7 @@ select.form-select:focus {
   outline: none;
 }
 
-/* Fix per freccia su Firefox */
-.custom-arrow-white,
-.custom-arrow-white1 {
-  scrollbar-width: thin;
-}
-
-/* Supponendo che il testo della task abbia la classe .task-title */
-.form-check-input:checked~.task-title,
-.form-check-input:checked+label .task-title {
-  text-decoration: line-through;
-  color: #6c757d;
-  opacity: 0.7;
-  font-style: italic;
-  transition: color 0.3s, text-decoration 0.3s;
-}
-
-/* Se usi una classe .completed per task completate */
-.completed .task-title {
-  text-decoration: line-through;
-  color: #6c757d;
-  opacity: 0.7;
-  font-style: italic;
-  transition: color 0.3s, text-decoration 0.3s;
-}
-
-/* Titolo task: effetto ombra quando si passa sopra con il mouse */
+/* Titolo task hover */
 .task-title {
   transition: color 0.3s ease, text-shadow 0.3s ease;
 }
@@ -270,7 +258,18 @@ select.form-select:focus {
   text-shadow: 0 0 6px rgba(0, 123, 255, 0.7);
 }
 
-/* Pulsante info flottante con effetto glow */
+/* Task completata */
+.form-check-input:checked~.task-title,
+.form-check-input:checked+label .task-title,
+.completed .task-title {
+  text-decoration: line-through;
+  color: #6c757d;
+  opacity: 0.7;
+  font-style: italic;
+  transition: color 0.3s, text-decoration 0.3s;
+}
+
+/* Pulsante info flottante */
 .info-button {
   position: fixed;
   bottom: 20px;
@@ -296,17 +295,15 @@ select.form-select:focus {
   #lista-box {
     padding: 1rem 0.3rem;
   }
+
   .card-body {
     flex-direction: column;
     align-items: flex-start;
     padding: 1rem 1rem;
   }
+
   .navbar {
     padding: 0.7rem 1rem;
-  }
-
-  .task label {
-    transition: all 0.3s ease;
   }
 
   .form-check-input {
@@ -315,24 +312,8 @@ select.form-select:focus {
   }
 }
 
-.task input[type="checkbox"]:checked + label {
-  text-decoration: line-through; /* <- questa è la "sbarra" */
-  color: gray;
-  opacity: 0.7;
-}
-
-/* Animazione fade-in per le card */
+/* Animazione fade-in */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
-=======
-.task label {
-  transition: all 0.3s ease;
->>>>>>> Stashed changes
-}
-
-.task input[type="checkbox"]:checked + label {
-  text-decoration: line-through; /* <- questa è la "sbarra" */
-  color: gray;
-  opacity: 0.7;
 }
