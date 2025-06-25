@@ -54,6 +54,12 @@ function apriModalCategoria() {
 
 // Funzione per aggiornare il badge con il numero di task non fatte per utente/categoria selezionato
 function aggiornaNumeroSezione() {
+  // Se entrambi i filtri sono attivi, usa la nuova funzione
+  if (utenteSelezionato && categoriaSelezionata) {
+    aggiornaConteggiConFiltriCombinati();
+    return;
+  }
+  
   // Se è selezionata una categoria, usa la funzione per categorie
   if (categoriaSelezionata) {
     mostraNumeroTaskNonFattePerCategoria(categoriaSelezionata);
@@ -85,6 +91,12 @@ function aggiornaNumeroSezione() {
 
 // Funzione per aggiornare il badge con il numero di task completate per utente/categoria selezionato
 function aggiornaNumeroSezioneCompletate() {
+  // Se entrambi i filtri sono attivi, usa la nuova funzione
+  if (utenteSelezionato && categoriaSelezionata) {
+    aggiornaConteggiConFiltriCombinati();
+    return;
+  }
+  
   // Se è selezionata una categoria, usa la funzione per categorie
   if (categoriaSelezionata) {
     mostraNumeroTaskCompletatePerCategoria(categoriaSelezionata);
@@ -544,35 +556,8 @@ function gestioneEliminazioneTask() {
 
           console.log('Controllo pagina corrente:', window.location.pathname);
           console.log('categoriaSelezionata:', categoriaSelezionata);
-          console.log('utenteSelezionato:', utenteSelezionato);
-
-          // Ricarica la lista giusta in base alla pagina e ai filtri attivi
-          if (window.location.pathname.endsWith('completate.html')) {
-            console.log('Siamo nella pagina completate');
-            // Pagina completate - considera sia categoria che utente
-            if (categoriaSelezionata) {
-              console.log('Ricaricando per categoria:', categoriaSelezionata);
-              caricaTasksCompletatePerCategoria(categoriaSelezionata);
-            } else if (utenteSelezionato) {
-              console.log('Ricaricando per utente:', utenteSelezionato);
-              caricaTasksCompletatePerUtente(utenteSelezionato);
-            } else {
-              console.log('Ricaricando tutte le task completate');
-              caricaTasksCompletate();
-            }
-          } else {
-            console.log('Siamo nella pagina principale');
-            // Pagina principale - considera sia categoria e utente
-            if (categoriaSelezionata) {
-              caricaTasksPerCategoria(categoriaSelezionata);
-            } else if (utenteSelezionato) {
-              caricaTasksPerUtente(utenteSelezionato);
-            } else {
-              caricaTasks();
-            }
-          }
-          aggiornaNumeroSezione();
-          aggiornaNumeroSezioneCompletate();
+          console.log('utenteSelezionato:', utenteSelezionato);          // Ricarica con la nuova logica di filtri combinati
+          caricaTasksConFiltri();
         })
         .catch(err => {
           console.error('Errore durante eliminazione:', err);
@@ -957,8 +942,6 @@ function caricaTasksConFiltri() {
     } else {
       caricaTasks();
     }
-    aggiornaNumeroSezione();
-    aggiornaNumeroSezioneCompletate();
     return;
   }
   
@@ -1227,7 +1210,7 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
     document.getElementById('utente-in-uso').textContent = "Tutti";
     document.getElementById('categoria-in-uso').textContent = "Nessuna categoria selezionata";
 
-    // Carica le task con la nuova logica
+    // Carica le task appropriate in base alla pagina corrente
     caricaTasksConFiltri();
 
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
@@ -1238,7 +1221,7 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
     utenteSelezionato = utenteId;
     document.getElementById('utente-in-uso').textContent = nomeUtente;
 
-    // Carica le task con filtri combinati
+    // Carica le task con i filtri combinati
     caricaTasksConFiltri();
 
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
@@ -1261,7 +1244,7 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
     document.getElementById('categoria-in-uso').textContent = "Tutti";
     document.getElementById('utente-in-uso').textContent = "Nessun utente selezionato";
 
-    // Carica le task con la nuova logica
+    // Carica le task appropriate in base alla pagina corrente
     caricaTasksConFiltri();
 
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
@@ -1272,11 +1255,10 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
     categoriaSelezionata = CategoriaID;
     document.getElementById('categoria-in-uso').textContent = nomeCategoria;
 
-    // Carica le task con filtri combinati
+    // Carica le task con i filtri combinati
     caricaTasksConFiltri();
 
-    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
-    modal.hide();
+    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));    modal.hide();
   } else {
     alert('Seleziona una categoria!');
   }
