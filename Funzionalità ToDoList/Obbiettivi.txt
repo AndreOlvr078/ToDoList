@@ -1,4 +1,5 @@
--aggiungere la possibilita di eliminare,modificare,spuntar le sottotask e di non visualizzare la modifica e l'aggiunta enlle completate
+-agiustare modifica e check e togliere dalle completate aggiunta e modifica
+
 CREATE OR ALTER TRIGGER trg_AggiornaSottoTaskStato
 ON Task
 AFTER UPDATE
