@@ -5,6 +5,10 @@ let taskIdDaCompletare = null;
 let checkboxDaRipristinare = null;
 let utenteSelezionato = null;
 let categoriaSelezionata = null;
+let sottoTaskIdDaModificare = null;
+let sottoTaskTaskIdRiferimento = null;
+let sottoTaskTitoloAttuale = '';
+let sottoTaskIdDaEliminare = null;
 
 function caricaCategorieDropdown() {
   fetch('https://localhost:7000/api/Categorie')
@@ -227,13 +231,15 @@ function caricaSottoTask(taskId, keepOpenInputValue = '') {
         sottoTasks.forEach(st => {
           const li = document.createElement('li');
           li.className = 'mb-1 ps-2 d-flex align-items-center justify-content-between';
+          // Passa il titolo attuale come terzo parametro, gestendo eventuali apici singoli
+          const titoloSanificato = st.titolo ? st.titolo.replace(/'/g, "\\'") : '';
           li.innerHTML = `
             <span class="d-flex align-items-center gap-2">
               <input type="checkbox" class="form-check-input me-2" style="transform: scale(1.4);" ${st.stato ? 'checked' : ''} onchange="toggleStatoSottoTask(${st.id}, this.checked, ${taskId})">
               <span>${st.titolo}</span>
             </span>
             <span class="d-flex gap-2">
-              <button class="btn btn-light rounded-circle btn-sm" title="Modifica sottotask" onclick="modificaSottoTask(${st.id}, ${taskId})">
+              <button class="btn btn-light rounded-circle btn-sm" title="Modifica sottotask" onclick="modificaSottoTask(${st.id}, ${taskId}, '${titoloSanificato}')">
                 <i class="bi bi-pencil"></i>
               </button>
               <button class="btn btn-light rounded-circle btn-sm" title="Elimina sottotask" onclick="eliminaSottoTask(${st.id}, ${taskId})">
@@ -304,41 +310,76 @@ function aggiungiSottoTask(taskId, titolo) {
     .catch(err => alert(err.message));
 }
 
-function modificaSottoTask(sottoTaskId, taskId) {
-  const nuovoTitolo = prompt('Modifica il titolo della sottotask:');
-  if (!nuovoTitolo || nuovoTitolo.trim() === '') return;
-
-  fetch(`https://localhost:7000/api/SottoTask/${sottoTaskId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      titolo: nuovoTitolo,
-      taskId: taskId
-    })
-  })
-    .then(res => {
-      if (!res.ok) throw new Error("Errore nella modifica della sottotask");
-      return res.json();
-    })
-    .then(() => {
-      caricaSottoTask(taskId, ''); // Ricarica e lascia la dropdown aperta
-    })
-    .catch(err => alert(err.message));
+function modificaSottoTask(id, taskId, titoloAttuale) {
+  sottoTaskIdDaModificare = id;
+  sottoTaskTaskIdRiferimento = taskId;
+  sottoTaskTitoloAttuale = titoloAttuale;
+  const input = document.getElementById('inputNomeSottoTask');
+  if (input) input.value = titoloAttuale ? titoloAttuale : '';
+  const modal = new bootstrap.Modal(document.getElementById('modificaSottoTaskModal'));
+  modal.show();
 }
 
-function eliminaSottoTask(sottoTaskId, taskId) {
-  if (!confirm('Sei sicuro di voler eliminare questa sottotask?')) return;
-  fetch(`https://localhost:7000/api/SottoTask/${sottoTaskId}`, {
-    method: 'DELETE'
-  })
-    .then(res => {
-      if (!res.ok) throw new Error("Errore nell'eliminazione della sottotask");
-      return res.json();
-    })
-    .then(() => {
-      caricaSottoTask(taskId, ''); // Ricarica e lascia la dropdown aperta
-    })
-    .catch(err => alert(err.message));
+function eliminaSottoTask(id, taskId) {
+  sottoTaskIdDaEliminare = id;
+  sottoTaskTaskIdRiferimento = taskId;
+  const modal = new bootstrap.Modal(document.getElementById('confermaEliminaSottoTaskModal'));
+  modal.show();
+}
+
+// Gestione submit modifica sottotask
+const formModificaSottoTask = document.getElementById('formModificaSottoTask');
+if (formModificaSottoTask) {
+  formModificaSottoTask.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const nuovoTitolo = document.getElementById('inputNomeSottoTask').value.trim();
+    if (!nuovoTitolo) return;
+    if (sottoTaskIdDaModificare && sottoTaskTaskIdRiferimento) {
+      fetch(`https://localhost:7000/api/SottoTask/${sottoTaskIdDaModificare}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ titolo: nuovoTitolo, taskID: sottoTaskTaskIdRiferimento })
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Errore nella modifica della sottotask");
+          return res.json();
+        })
+        .then(() => {
+          const modal = bootstrap.Modal.getInstance(document.getElementById('modificaSottoTaskModal'));
+          modal.hide();
+          // Reset variabili dopo la chiusura della modale
+          const taskId = sottoTaskTaskIdRiferimento;
+          sottoTaskIdDaModificare = null;
+          sottoTaskTaskIdRiferimento = null;
+          sottoTaskTitoloAttuale = '';
+          caricaSottoTask(taskId, '');
+        })
+        .catch(err => alert(err.message));
+    }
+  });
+}
+
+// Gestione conferma eliminazione sottotask
+const btnConfermaEliminaSottoTask = document.getElementById('btnConfermaEliminaSottoTask');
+if (btnConfermaEliminaSottoTask) {
+  btnConfermaEliminaSottoTask.addEventListener('click', function () {
+    if (sottoTaskIdDaEliminare && sottoTaskTaskIdRiferimento) {
+      fetch(`https://localhost:7000/api/SottoTask/${sottoTaskIdDaEliminare}`, {
+        method: 'DELETE'
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Errore nell'eliminazione della sottotask");
+          return res.json();
+        })
+        .then(() => {
+          sottoTaskIdDaEliminare = null;
+          const modal = bootstrap.Modal.getInstance(document.getElementById('confermaEliminaSottoTaskModal'));
+          modal.hide();
+          caricaSottoTask(sottoTaskTaskIdRiferimento, '');
+        })
+        .catch(err => alert(err.message));
+    }
+  });
 }
 
 function caricaTasksPerCategoria(CategoriaId) {
@@ -1479,11 +1520,11 @@ if (btnConfermaEliminaUtente && selectEliminaUtente) {
   });
 }
 
-function toggleStatoSottoTask(sottoTaskId, nuovoStato, taskId) {
-  fetch(`https://localhost:7000/api/SottoTask/${sottoTaskId}`)
+function toggleStatoSottoTask(id, nuovoStato, taskId) {
+  fetch(`https://localhost:7000/api/SottoTask/${id}`)
     .then(res => res.json())
     .then(sottoTask => {
-      return fetch(`https://localhost:7000/api/SottoTask/${sottoTaskId}`, {
+      return fetch(`https://localhost:7000/api/SottoTask/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...sottoTask, stato: nuovoStato })
