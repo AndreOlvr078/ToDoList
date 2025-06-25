@@ -44,11 +44,16 @@
                 <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
                     style="width: 48px; height: 48px; padding: 0;" onclick="apriModalUtente()">
                     <i class="bi bi-person" style="font-size: 2rem; font-weight: bold;"></i>
-                </button>
-                <!--Visualizza per categoria-->
+                </button>                <!--Visualizza per categoria-->
                 <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
                     style="width: 48px; height: 48px; padding: 0;" onclick="apriModalCategoria()">
                     <i class="bi bi-folder" style="font-size: 2rem; font-weight: bold;"></i>
+                </button>
+                
+                <!-- Reset filtri-->
+                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                    style="width: 48px; height: 48px; padding: 0;" onclick="resetUtenteVisualizzato()">
+                    <i class="bi bi-arrow-clockwise" style="font-size: 2rem; font-weight: bold;"></i>
                 </button>
             </div>
         </div>
@@ -164,15 +169,15 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
-    <script>
+    <script src="script.js"></script>    <script>
         document.addEventListener('DOMContentLoaded', () => {
-            caricaTasksCompletate();
+            caricaTasksConFiltri();
             caricaCategorie();
             caricaUtentiForm();
             aggiornaNumeroSezioneCompletate();
             // Inizializza il testo dell'utente
             document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
+            document.getElementById('categoria-in-uso').textContent = 'Nessuna categoria selezionata';
         });
     </script>
 </body>

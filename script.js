@@ -222,12 +222,13 @@ function caricaSottoTask(taskId) {
 }
 
 function resetUtenteVisualizzato() {
+  utenteSelezionato = null;
+  categoriaSelezionata = null;
+  document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
+  document.getElementById('categoria-in-uso').textContent = 'Nessuna categoria selezionata';
+  
   // Carica le task appropriate in base alla pagina corrente
-  if (window.location.pathname.endsWith('completate.html')) {
-    caricaTasksCompletate();
-  } else {
-    caricaTasks();
-  }
+  caricaTasksConFiltri();
 }
 
 function caricaTasksPerCategoria(CategoriaId) {
@@ -476,13 +477,8 @@ function salvaTask(e) {
       const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
       modal.hide();
       document.getElementById('taskForm').reset();
-      taskDaModificare = null;
-      document.getElementById('btnAggiungi').textContent = 'Aggiungi';
-      if (utenteSelezionato) {
-        caricaTasksPerUtente(utenteSelezionato);
-      } else {
-        caricaTasks();
-      }
+      taskDaModificare = null;      document.getElementById('btnAggiungi').textContent = 'Aggiungi';
+      caricaTasksConFiltri();
     })
 }
 
@@ -515,30 +511,9 @@ function aggiornaStatoTask(id, nuovoStato) {
         body: JSON.stringify({ ...task, stato: nuovoStato })
       });
     })
-    .then(res => res.json())
-    .then(() => {
-      // Ricarica la lista in base al filtro attivo e alla pagina
-      const isCompletate = window.location.pathname.endsWith('completate.html');
-      if (isCompletate) {
-        if (categoriaSelezionata) {
-          caricaTasksCompletatePerCategoria(categoriaSelezionata);
-        } else if (utenteSelezionato) {
-          caricaTasksCompletatePerUtente(utenteSelezionato);
-        } else {
-          caricaTasksCompletate();
-        }
-        aggiornaNumeroSezioneCompletate();
-      } else {
-        if (categoriaSelezionata) {
-          caricaTasksPerCategoria(categoriaSelezionata);
-        } else if (utenteSelezionato) {
-          caricaTasksPerUtente(utenteSelezionato);
-        } else {
-          caricaTasks();
-        }
-        aggiornaNumeroSezione();
-        aggiornaNumeroSezioneCompletate();
-      }
+    .then(res => res.json())    .then(() => {
+      // Ricarica con la nuova logica di filtri combinati
+      caricaTasksConFiltri();
     })
     .catch(err => alert(err.message));
 }
@@ -971,6 +946,226 @@ function caricaTasksCompletatePerCategoria(categoriaId) {
     });
 }
 
+// Funzione principale per caricare le task con filtri combinati
+function caricaTasksConFiltri() {
+  const isCompletate = window.location.pathname.endsWith('completate.html');
+  
+  // Se nessun filtro è attivo, carica tutte le task
+  if (!utenteSelezionato && !categoriaSelezionata) {
+    if (isCompletate) {
+      caricaTasksCompletate();
+    } else {
+      caricaTasks();
+    }
+    aggiornaNumeroSezione();
+    aggiornaNumeroSezioneCompletate();
+    return;
+  }
+  
+  // Se solo utente è selezionato
+  if (utenteSelezionato && !categoriaSelezionata) {
+    if (isCompletate) {
+      caricaTasksCompletatePerUtente(utenteSelezionato);
+    } else {
+      caricaTasksPerUtente(utenteSelezionato);
+    }
+    return;
+  }
+  
+  // Se solo categoria è selezionata
+  if (!utenteSelezionato && categoriaSelezionata) {
+    if (isCompletate) {
+      caricaTasksCompletatePerCategoria(categoriaSelezionata);
+    } else {
+      caricaTasksPerCategoria(categoriaSelezionata);
+    }
+    return;
+  }
+  
+  // Se entrambi sono selezionati, carica con filtro combinato
+  if (utenteSelezionato && categoriaSelezionata) {
+    if (isCompletate) {
+      caricaTasksCompletatePerUtenteECategoria(utenteSelezionato, categoriaSelezionata);
+    } else {
+      caricaTasksPerUtenteECategoria(utenteSelezionato, categoriaSelezionata);
+    }
+  }
+}
+
+// Funzione per caricare task filtrate per utente E categoria (task attive)
+function caricaTasksPerUtenteECategoria(utenteId, categoriaId) {
+  // Prima prendo tutte le task dell'utente, poi filtro per categoria
+  fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
+    .then(res => res.json())
+    .then(tasks => {
+      const lista = document.getElementById('lista-box');
+      lista.innerHTML = '';
+      
+      // Filtra per categoria e stato (non completate)
+      const tasksFiltrate = tasks.filter(task => 
+        task.categoriaID == categoriaId && !task.stato
+      );
+      
+      if (tasksFiltrate.length === 0) {
+        const msg = document.createElement('div');
+        msg.className = 'text-center text-muted my-4';
+        msg.textContent = 'Nessuna task trovata per questo utente e categoria...';
+        lista.appendChild(msg);
+      } else {
+        tasksFiltrate.forEach(task => {
+          const scadenza = new Date(task.scadenza);
+          const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+          const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+
+          const box = document.createElement('div');
+          box.className = 'card mb-2 w-100';
+          box.setAttribute('data-task-id', task.id);
+          box.innerHTML = `
+            <div class="card-body p-2">
+              <div class="row align-items-center flex-wrap">
+                <div class="col-auto mx-2">
+                  <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
+                  ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
+                </div>
+                <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
+                <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
+                <div class="col-auto ms-auto d-flex gap-2">
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
+                    <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="notaTask(${task.id})">
+                    <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="modificaTask(${task.id})">
+                    <i class="bi bi-pencil-square" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="eliminaTask(${task.id})">
+                    <i class="bi bi-trash3" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          lista.appendChild(box);
+        });
+      }
+      
+      // Aggiorna i counter
+      aggiornaConteggiConFiltriCombinati();
+    })
+    .catch(err => {
+      console.error("Errore nel caricamento tasks per utente e categoria:", err);
+      alert("Errore nel caricamento tasks per utente e categoria: " + err.message);
+    });
+}
+
+// Funzione per caricare task completate filtrate per utente E categoria
+function caricaTasksCompletatePerUtenteECategoria(utenteId, categoriaId) {
+  fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
+    .then(res => res.json())
+    .then(tasks => {
+      const lista = document.getElementById('lista-box');
+      lista.innerHTML = '';
+      
+      // Filtra per categoria e stato (completate)
+      const tasksFiltrate = tasks.filter(task => 
+        task.categoriaID == categoriaId && task.stato
+      );
+      
+      if (tasksFiltrate.length === 0) {
+        const msg = document.createElement('div');
+        msg.className = 'text-center text-muted my-4';
+        msg.textContent = 'Nessuna task completata trovata per questo utente e categoria...';
+        lista.appendChild(msg);
+      } else {
+        tasksFiltrate.forEach(task => {
+          const scadenza = new Date(task.scadenza);
+          const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+          const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+
+          const box = document.createElement('div');
+          box.className = 'card mb-2 w-100';
+          box.setAttribute('data-task-id', task.id);
+          box.innerHTML = `
+            <div class="card-body p-2">
+              <div class="row align-items-center flex-wrap">
+                <div class="col-auto mx-2">
+                  <input type="checkbox" class="form-check-input" style="transform: scale(1.5);" checked 
+                    onchange="toggleStato(${task.id}, this.checked, this)">
+                </div>
+                <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
+                <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
+                <div class="col-auto ms-auto d-flex gap-2">
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
+                    <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="notaTask(${task.id})">
+                    <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                          style="width: 48px; height: 48px; padding: 0;"
+                          onclick="eliminaTask(${task.id})">
+                    <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          lista.appendChild(box);
+        });
+      }
+      
+      // Aggiorna i counter
+      aggiornaConteggiConFiltriCombinati();
+    })
+    .catch(err => {
+      console.error("Errore nel caricamento tasks completate per utente e categoria:", err);
+      alert("Errore nel caricamento tasks completate per utente e categoria: " + err.message);
+    });
+}
+
+// Funzione per aggiornare i counter con filtri combinati
+function aggiornaConteggiConFiltriCombinati() {
+  if (utenteSelezionato && categoriaSelezionata) {
+    // Entrambi i filtri attivi - prendo le task dell'utente e filtro per categoria
+    fetch(`https://localhost:7000/api/Task/Utente/${utenteSelezionato}`)
+      .then(res => res.json())
+      .then(tasks => {
+        const tasksFiltrate = tasks.filter(task => task.categoriaID == categoriaSelezionata);
+        const nonFatte = tasksFiltrate.filter(t => !t.stato).length;
+        const completate = tasksFiltrate.filter(t => t.stato).length;
+        
+        const badgeNonFatte = document.getElementById('numero-sezione');
+        const badgeCompletate = document.getElementById('numero-sezione-si');
+        
+        if (badgeNonFatte) badgeNonFatte.textContent = nonFatte;
+        if (badgeCompletate) badgeCompletate.textContent = completate;
+      })
+      .catch(() => {
+        const badgeNonFatte = document.getElementById('numero-sezione');
+        const badgeCompletate = document.getElementById('numero-sezione-si');
+        if (badgeNonFatte) badgeNonFatte.textContent = '0';
+        if (badgeCompletate) badgeCompletate.textContent = '0';
+      });
+  } else {
+    // Usa le funzioni esistenti per aggiornare i counter
+    aggiornaNumeroSezione();
+    aggiornaNumeroSezioneCompletate();
+  }
+}
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
   // Imposta il min della data di scadenza a oggi
@@ -990,14 +1185,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Inizializza badge categoria
   document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
   document.getElementById('categoria-in-uso').textContent = 'Nessuna categoria selezionata';
-
   Promise.all([
-    caricaTasks(),
+    caricaTasksConFiltri(),
     caricaCategorie(),
     caricaUtentiForm()
   ]);
-  aggiornaNumeroSezione();
-  aggiornaNumeroSezioneCompletate();
 });
 
 // Event listener per form task
@@ -1033,13 +1225,10 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
     utenteSelezionato = null;
     categoriaSelezionata = null; // Reset anche categoria quando si seleziona "Tutti"
     document.getElementById('utente-in-uso').textContent = "Tutti";
+    document.getElementById('categoria-in-uso').textContent = "Nessuna categoria selezionata";
 
-    // Carica le task appropriate in base alla pagina corrente
-    if (window.location.pathname.endsWith('completate.html')) {
-      caricaTasksCompletate();
-    } else {
-      caricaTasks();
-    }
+    // Carica le task con la nuova logica
+    caricaTasksConFiltri();
 
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
     modal.hide();
@@ -1047,15 +1236,10 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
   }
   if (utenteId && utenteId !== "") {
     utenteSelezionato = utenteId;
-    categoriaSelezionata = null; // Reset categoria quando si seleziona un utente specifico
     document.getElementById('utente-in-uso').textContent = nomeUtente;
 
-    // Carica le task appropriate in base alla pagina corrente
-    if (window.location.pathname.endsWith('completate.html')) {
-      caricaTasksCompletatePerUtente(utenteId);
-    } else {
-      caricaTasksPerUtente(utenteId);
-    }
+    // Carica le task con filtri combinati
+    caricaTasksConFiltri();
 
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliUtenteModal'));
     modal.hide();
@@ -1073,14 +1257,12 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
   if (CategoriaID === "tutti") {
     // Reset tutte le selezioni quando si sceglie "Tutti" per le categorie
     categoriaSelezionata = null;
+    utenteSelezionato = null;
     document.getElementById('categoria-in-uso').textContent = "Tutti";
+    document.getElementById('utente-in-uso').textContent = "Nessun utente selezionato";
 
-    // Carica le task appropriate in base alla pagina corrente
-    if (window.location.pathname.endsWith('completate.html')) {
-      caricaTasksCompletate();
-    } else {
-      caricaTasks();
-    }
+    // Carica le task con la nuova logica
+    caricaTasksConFiltri();
 
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
     modal.hide();
@@ -1090,12 +1272,8 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
     categoriaSelezionata = CategoriaID;
     document.getElementById('categoria-in-uso').textContent = nomeCategoria;
 
-    // Carica le task appropriate in base alla pagina corrente
-    if (window.location.pathname.endsWith('completate.html')) {
-      caricaTasksCompletatePerCategoria(CategoriaID);
-    } else {
-      caricaTasksPerCategoria(CategoriaID);
-    }
+    // Carica le task con filtri combinati
+    caricaTasksConFiltri();
 
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
     modal.hide();
