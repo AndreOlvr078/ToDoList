@@ -226,21 +226,10 @@ function caricaSottoTask(taskId) {
     .catch(() => {
       // Rimuovi eventuali altre sottotask-container aperte
       document.querySelectorAll('.sottotask-container').forEach(el => el.remove());
-      const container = document.createElement('div');
-      container.className = 'sottotask-container';
+      const container = document.createElement('div');      container.className = 'sottotask-container';
       container.innerHTML = '<div class="text-danger small ms-3">Errore caricamento sotto-task</div>';
       card.parentNode.insertBefore(container, card.nextSibling);
     });
-}
-
-function resetUtenteVisualizzato() {
-  utenteSelezionato = null;
-  categoriaSelezionata = null;
-  document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
-  document.getElementById('categoria-in-uso').textContent = 'Nessuna categoria selezionata';
-  
-  // Carica le task appropriate in base alla pagina corrente
-  caricaTasksConFiltri();
 }
 
 function caricaTasksPerCategoria(CategoriaId) {
@@ -942,6 +931,11 @@ function caricaTasksConFiltri() {
     } else {
       caricaTasks();
     }
+    // Aggiorna conteggi anche quando non ci sono filtri
+    aggiornaNumeroSezione();
+    if (typeof aggiornaNumeroSezioneCompletate === 'function') {
+      aggiornaNumeroSezioneCompletate();
+    }
     return;
   }
   
@@ -1149,6 +1143,17 @@ function aggiornaConteggiConFiltriCombinati() {
   }
 }
 
+// Funzione per resettare completamente tutti i filtri
+function resettaTuttiFiltri() {
+  utenteSelezionato = null;
+  categoriaSelezionata = null;
+  document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
+  document.getElementById('categoria-in-uso').textContent = 'Nessuna categoria selezionata';
+  
+  // Carica le task appropriate in base alla pagina corrente
+  caricaTasksConFiltri();
+}
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
   // Imposta il min della data di scadenza a oggi
@@ -1206,9 +1211,8 @@ document.getElementById('confermaUtenteBtn').addEventListener('click', function 
 
   if (utenteId === "tutti") {
     utenteSelezionato = null;
-    categoriaSelezionata = null; // Reset anche categoria quando si seleziona "Tutti"
+    // NON resettare la categoria, mantieni il filtro categoria se presente
     document.getElementById('utente-in-uso').textContent = "Tutti";
-    document.getElementById('categoria-in-uso').textContent = "Nessuna categoria selezionata";
 
     // Carica le task appropriate in base alla pagina corrente
     caricaTasksConFiltri();
@@ -1238,11 +1242,9 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
   const nomeCategoria = categoriaSelect.options[categoriaSelect.selectedIndex].textContent;
 
   if (CategoriaID === "tutti") {
-    // Reset tutte le selezioni quando si sceglie "Tutti" per le categorie
+    // Reset solo la categoria, mantieni l'utente se selezionato
     categoriaSelezionata = null;
-    utenteSelezionato = null;
     document.getElementById('categoria-in-uso').textContent = "Tutti";
-    document.getElementById('utente-in-uso').textContent = "Nessun utente selezionato";
 
     // Carica le task appropriate in base alla pagina corrente
     caricaTasksConFiltri();
@@ -1258,9 +1260,9 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
     // Carica le task con i filtri combinati
     caricaTasksConFiltri();
 
-    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));    modal.hide();
-  } else {
-    alert('Seleziona una categoria!');
+    const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
+    modal.hide();
+  } else {    alert('Seleziona una categoria!');
   }
 });
 
