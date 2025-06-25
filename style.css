@@ -6,6 +6,7 @@ body {
   padding: 0;
   color: #333;
   min-height: 100vh;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 .navbar {
@@ -22,6 +23,7 @@ body {
   font-weight: 700;
   color: #fff !important;
   text-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  text-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
 }
 
 /* Loader */
@@ -58,10 +60,13 @@ body {
   border-radius: 14px;
   box-shadow: 0 4px 18px 0 rgba(0, 123, 255, 0.07);
   transition: box-shadow 0.3s cubic-bezier(.4,2,.6,1), transform 0.2s;
-  background: linear-gradient(120deg, #f9faff 80%, #e3f0ff 100%);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   margin-bottom: 1.2rem;
   border: none;
   position: relative;
+  animation: fadeIn 0.5s ease forwards;
 }
 
 .card:hover {
@@ -76,6 +81,7 @@ body {
   align-items: center;
   justify-content: space-between; /* Distribuisce tra sinistra e destra */
 }
+
 /* Righe e colonne */
 .row.align-items-center {
   flex-wrap: wrap;
@@ -122,9 +128,9 @@ body {
 }
 
 .btn.btn-light.rounded-circle:hover {
-  background: linear-gradient(135deg, #dce9ff 80%, #b3e0ff 100%);
-  box-shadow: 0 4px 16px 0 rgba(0,198,255,0.13);
-  transform: scale(1.1);
+  background: linear-gradient(135deg, #a3cfff 80%, #bde6ff 100%);
+  box-shadow: 0 6px 24px 0 rgba(0, 198, 255, 0.25);
+  transform: scale(1.15);
 }
 
 /* Icone */
@@ -145,6 +151,7 @@ body {
   font-weight: 700;
   color: #00c6ff;
   letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(0, 198, 255, 0.5);
 }
 
 /* Pulsanti modali */
@@ -226,9 +233,6 @@ select.form-select:focus {
   outline: none;
 }
 
-/* Supponendo che il testo della task abbia la classe .task-title */
-
-
 /* Fix per freccia su Firefox */
 .custom-arrow-white,
 .custom-arrow-white1 {
@@ -254,6 +258,17 @@ select.form-select:focus {
   transition: color 0.3s, text-decoration 0.3s;
 }
 
+/* Titolo task: effetto ombra quando si passa sopra con il mouse */
+.task-title {
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.task-title:hover {
+  color: #007bff;
+  text-shadow: 0 0 6px rgba(0, 123, 255, 0.7);
+}
+
+/* Pulsante info flottante con effetto glow */
 .info-button {
   position: fixed;
   bottom: 20px;
@@ -266,6 +281,12 @@ select.form-select:focus {
   height: 48px;
   padding: 0;
   border: 2px solid #0d6efd;
+  box-shadow: 0 0 10px 2px rgba(13, 110, 253, 0.6);
+  transition: box-shadow 0.3s ease;
+}
+
+.info-button .btn:hover {
+  box-shadow: 0 0 20px 4px rgba(13, 110, 253, 0.9);
 }
 
 /* Responsive */
@@ -282,18 +303,15 @@ select.form-select:focus {
     padding: 0.7rem 1rem;
   }
 
-.task label {
-  transition: all 0.3s ease;
+  .task label {
+    transition: all 0.3s ease;
+  }
 
+  .form-check-input {
+    width: 24px;
+    height: 24px;
+  }
 }
-
-.task label {
-  transition: all 0.3s ease;
-}
-
-
-}
-
 
 .task input[type="checkbox"]:checked + label {
   text-decoration: line-through; /* <- questa è la "sbarra" */
@@ -301,4 +319,8 @@ select.form-select:focus {
   opacity: 0.7;
 }
 
- 
+/* Animazione fade-in per le card */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
