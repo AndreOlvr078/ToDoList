@@ -215,28 +215,43 @@ function caricaSottoTask(taskId) {
       const container = document.createElement('div');
       container.className = 'sottotask-container';
       container.style.width = '100%';
+      let items = '';
       if (!sottoTasks || sottoTasks.length === 0) {
-        container.innerHTML = '<div class="text-muted small ms-3">Nessun sotto-task</div>';
+        items = '<div class="text-muted small ms-3">Nessun sotto-task</div>';
       } else {
-        let items = sottoTasks.map(st =>
-          `<li>${st.titolo}</li>`
-        ).join('');
-        container.innerHTML = `
-          <ul class="mb-0">
-            ${items}
-          </ul>
-        `;
+        items = `<ul class="mb-2">${sottoTasks.map(st => `<li>${st.titolo}</li>`).join('')}</ul>`;
       }
+      // Pulsante aggiungi sottotask
+      const btnAggiungi = `<button class="btn btn-sm btn-primary ms-3 mb-2" onclick="aggiungiSottoTaskPrompt(${taskId})"><i class='bi bi-plus-lg'></i> Aggiungi sottotask</button>`;
+      container.innerHTML = `${items}${btnAggiungi}`;
       // Inserisci subito dopo la card
       card.parentNode.insertBefore(container, card.nextSibling);
     })
     .catch(() => {
-      // Rimuovi eventuali altre sottotask-container aperte
       document.querySelectorAll('.sottotask-container').forEach(el => el.remove());
-      const container = document.createElement('div');      container.className = 'sottotask-container';
+      const container = document.createElement('div');
+      container.className = 'sottotask-container';
       container.innerHTML = '<div class="text-danger small ms-3">Errore caricamento sotto-task</div>';
       card.parentNode.insertBefore(container, card.nextSibling);
     });
+}
+
+function aggiungiSottoTaskPrompt(taskId) {
+  const titolo = prompt('Inserisci il titolo della nuova sottotask:');
+  if (!titolo || titolo.trim() === '') return;
+  fetch('https://localhost:7000/api/SottoTask', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ titolo, taskID: taskId })
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Errore nell\'aggiunta della sottotask');
+      return res.json();
+    })
+    .then(() => {
+      caricaSottoTask(taskId); // Ricarica la lista delle sottotask
+    })
+    .catch(err => alert(err.message));
 }
 
 function caricaTasksPerCategoria(CategoriaId) {
