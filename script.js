@@ -125,66 +125,73 @@ function aggiornaNumeroSezioneCompletate() {
 }
 
 function caricaTasksPerUtente(UtenteId) {
-  fetch(`https://localhost:7000/api/Task/UtenteStatoNo/${UtenteId}`)
+  return fetch(`https://localhost:7000/api/Task/UtenteStatoNo/${UtenteId}`)
     .then(res => res.json())
     .then(tasks => {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
+
       if (!tasks || tasks.length === 0) {
-        // Mostra il messaggio se non ci sono task
         const msg = document.createElement('div');
         msg.className = 'text-center text-muted my-4';
         msg.textContent = 'Ancora nessuna task...';
         lista.appendChild(msg);
-      } else {
-        tasks.forEach(task => {
-          const scadenza = new Date(task.scadenza);
-          const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-          const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+        return;
+      }
 
-          const box = document.createElement('div');
-          box.className = 'card mb-2 w-100';
-          box.setAttribute('data-task-id', task.id);
-          box.innerHTML = `
-            <div class="card-body d-flex align-items-center p-2">
-              <div class="d-flex align-items-center flex-wrap gap-3">
-                <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.5);"
-                ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
-                <span><strong>Titolo:</strong> ${task.titolo}</span>
-                <span class="ms-3"><strong>Scadenza:</strong> ${scadenzaFormattata}</span>
+      tasks.forEach(task => {
+        const scadenza = new Date(task.scadenza);
+        const options = {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit'
+        };
+        const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+
+        const isCompletato = task.stato === true;
+        const taskClass = isCompletato ? 'completed' : '';
+
+        const box = document.createElement('div');
+        box.className = `card mb-2 w-100 ${taskClass}`;
+        box.setAttribute('data-task-id', task.id);
+
+        box.innerHTML = `
+          <div class="card-body">
+            <div class="row align-items-center w-100">
+              <div class="col-auto d-flex align-items-center">
+                <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.4);"
+                  ${isCompletato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
               </div>
-              <div class="d-flex ms-auto gap-2">
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
-                  <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
+              <div class="col d-flex flex-column">
+                <span class="task-title"><strong>${task.titolo}</strong></span>
+                <small class="text-muted">Scadenza: ${scadenzaFormattata}</small>
+              </div>
+              <div class="col-auto d-flex gap-2">
+                <button class="btn btn-light rounded-circle" title="Sottotask" onclick="caricaSottoTask(${task.id})">
+                  <i class="bi bi-list-task"></i>
                 </button>
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="notaTask(${task.id})">
-                  <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                <button class="btn btn-light rounded-circle" title="Nota" onclick="notaTask(${task.id})">
+                  <i class="bi bi-sticky"></i>
                 </button>
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="modificaTask(${task.id})">
-                  <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
+                <button class="btn btn-light rounded-circle" title="Modifica" onclick="modificaTask(${task.id})">
+                  <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="eliminaTask(${task.id})">
-                  <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+                <button class="btn btn-light rounded-circle" title="Elimina" onclick="eliminaTask(${task.id})">
+                  <i class="bi bi-trash"></i>
                 </button>
               </div>
             </div>
-          `;
-          lista.appendChild(box);
-        });
-      }
+          </div>
+        `;
+
+        lista.appendChild(box);
+      });
+
       mostraNumeroTaskNonFattePerUtente(UtenteId);
       mostraNumeroTaskCompletatePerUtente(UtenteId);
     })
-    .catch(err => alert("Errore nel caricamento tasks per utente: " + err.message));
+    .catch(err => console.error("Errore nel caricamento tasks per utente:", err));
 }
+
 
 function caricaSottoTask(taskId) {
   // Trova la card della task selezionata
@@ -233,58 +240,65 @@ function caricaSottoTask(taskId) {
 }
 
 function caricaTasksPerCategoria(CategoriaId) {
-  fetch(`https://localhost:7000/api/Task/Categoria/${CategoriaId}`)
+  return fetch(`https://localhost:7000/api/Task/Categoria/${CategoriaId}`)
     .then(res => res.json())
     .then(tasks => {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
+
       tasks.forEach(task => {
         const scadenza = new Date(task.scadenza);
-        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+        const options = {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit'
+        };
         const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
 
+        const isCompletato = task.stato === true;
+        const taskClass = isCompletato ? 'completed' : '';
+
         const box = document.createElement('div');
-        box.className = 'card mb-2 w-100';
+        box.className = `card mb-2 w-100 ${taskClass}`;
         box.setAttribute('data-task-id', task.id);
+
         box.innerHTML = `
-          <div class="card-body d-flex align-items-center p-2">
-            <div class="d-flex align-items-center flex-wrap gap-3">
-              <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.5);"
-              ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
-              <span><strong>Titolo:</strong> ${task.titolo}</span>
-              <span class="ms-3"><strong>Scadenza:</strong> ${scadenzaFormattata}</span>
-            </div>
-            <div class="d-flex ms-auto gap-2">
-              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                      style="width: 48px; height: 48px; padding: 0;"
-                      onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
-                <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
-              </button>
-              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                      style="width: 48px; height: 48px; padding: 0;"
-                      onclick="notaTask(${task.id})">
-                <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-              </button>
-              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                      style="width: 48px; height: 48px; padding: 0;"
-                      onclick="modificaTask(${task.id})">
-                <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
-              </button>
-              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                      style="width: 48px; height: 48px; padding: 0;"
-                      onclick="eliminaTask(${task.id})">
-                <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-              </button>
+          <div class="card-body">
+            <div class="row align-items-center w-100">
+              <div class="col-auto d-flex align-items-center">
+                <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.4);"
+                  ${isCompletato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
+              </div>
+              <div class="col d-flex flex-column">
+                <span class="task-title"><strong>${task.titolo}</strong></span>
+                <small class="text-muted">Scadenza: ${scadenzaFormattata}</small>
+              </div>
+              <div class="col-auto d-flex gap-2">
+                <button class="btn btn-light rounded-circle" title="Sottotask" onclick="caricaSottoTask(${task.id})">
+                  <i class="bi bi-list-task"></i>
+                </button>
+                <button class="btn btn-light rounded-circle" title="Nota" onclick="notaTask(${task.id})">
+                  <i class="bi bi-sticky"></i>
+                </button>
+                <button class="btn btn-light rounded-circle" title="Modifica" onclick="modificaTask(${task.id})">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-light rounded-circle" title="Elimina" onclick="eliminaTask(${task.id})">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
             </div>
           </div>
         `;
+
         lista.appendChild(box);
       });
+
       mostraNumeroTaskNonFattePerCategoria(CategoriaId);
       mostraNumeroTaskCompletatePerCategoria(CategoriaId);
     })
-    .catch(err => alert("Errore nel caricamento tasks per categoria: " + err.message));
+    .catch(err => console.error("Errore nel caricamento tasks per categoria:", err));
 }
+
 
 function aggiungiCategoria(e) {
   e.preventDefault();
@@ -377,61 +391,61 @@ function caricaTasks() {
     .then(tasks => {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
-      tasks.forEach(task => {
-        // Trasforma la stringa scadenza in oggetto Date
-        const scadenza = new Date(task.scadenza);
 
-        // Opzioni per formattare data e ora in italiano con giorno, mese, anno, ora e minuti
+      tasks.forEach(task => {
+        const scadenza = new Date(task.scadenza);
         const options = {
           year: 'numeric', month: '2-digit', day: '2-digit',
           hour: '2-digit', minute: '2-digit'
         };
-
-        // Formatta la data/ora
         const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
 
+        // Controlla se il task è completato
+        const isCompletato = task.stato === true;
+        const taskClass = isCompletato ? 'completed' : '';
+
         const box = document.createElement('div');
-        box.className = 'card mb-2 w-100';
+        box.className = `card mb-2 w-100 ${taskClass}`;
         box.setAttribute('data-task-id', task.id);
+
         box.innerHTML = `
-          <div class="card-body d-flex align-items-center p-2">
-            <div class="d-flex align-items-center flex-wrap gap-3">
-              <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.5);"
-                ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
-              <span><strong>Titolo:</strong> ${task.titolo}</span>
-              <span class="ms-3"><strong>Scadenza:</strong> ${scadenzaFormattata}</span>
-            </div>
-            <div class="d-flex ms-auto gap-2">
-              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                      style="width: 48px; height: 48px; padding: 0;"
-                      onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
-                <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
-              </button>
-              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                      style="width: 48px; height: 48px; padding: 0;"
-                      onclick="notaTask(${task.id})">
-                <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-              </button>
-              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                      style="width: 48px; height: 48px; padding: 0;"
-                      onclick="modificaTask(${task.id})">
-                <i class="bi bi-pencil" style="font-size: 2rem; font-weight: bold;"></i>
-              </button>
-              <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                      style="width: 48px; height: 48px; padding: 0;"
-                      onclick="eliminaTask(${task.id})">
-                <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-              </button>
+          <div class="card-body">
+            <div class="row align-items-center w-100">
+              <div class="col-auto d-flex align-items-center">
+                <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.4);"
+                  ${isCompletato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
+              </div>
+              <div class="col d-flex flex-column">
+                <span class="task-title"><strong>${task.titolo}</strong></span>
+                <small class="text-muted">Scadenza: ${scadenzaFormattata}</small>
+              </div>
+              <div class="col-auto d-flex gap-2">
+                <button class="btn btn-light rounded-circle" title="Sottotask" onclick="caricaSottoTask(${task.id})">
+                  <i class="bi bi-list-task"></i>
+                </button>
+                <button class="btn btn-light rounded-circle" title="Nota" onclick="notaTask(${task.id})">
+                  <i class="bi bi-sticky"></i>
+                </button>
+                <button class="btn btn-light rounded-circle" title="Modifica" onclick="modificaTask(${task.id})">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-light rounded-circle" title="Elimina" onclick="eliminaTask(${task.id})">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
             </div>
           </div>
         `;
+
         lista.appendChild(box);
       });
+
       aggiornaNumeroSezione();
       aggiornaNumeroSezioneCompletate();
     })
     .catch(err => console.error("Errore nel caricamento delle task:", err));
 }
+
 
 function salvaTask(e) {
   if (e) e.preventDefault();
@@ -659,15 +673,11 @@ function caricaUtentiForm() {
 function caricaTasksCompletate() {
   let url = 'https://localhost:7000/api/Task';
 
-  // Se è selezionata una categoria specifica
   if (categoriaSelezionata) {
     url = `https://localhost:7000/api/Task/Categoria/${categoriaSelezionata}`;
-  }
-  // Altrimenti se è selezionato un utente specifico
-  else if (utenteSelezionato) {
+  } else if (utenteSelezionato) {
     url = `https://localhost:7000/api/Task/Utente/${utenteSelezionato}`;
   }
-  // Altrimenti carica tutte le task
 
   fetch(url)
     .then(res => res.json())
@@ -675,62 +685,70 @@ function caricaTasksCompletate() {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
 
-      // Filtra solo le task completate
-      const tasksCompletate = tasks.filter(task => task.stato);
+      const completate = tasks.filter(task => task.stato === true);
 
-      if (tasksCompletate.length === 0) {
-        // Mostra messaggio se non ci sono task completate
+      if (completate.length === 0) {
         const msg = document.createElement('div');
         msg.className = 'text-center text-muted my-4';
         msg.textContent = 'Nessuna task completata...';
         lista.appendChild(msg);
-      } else {
-        tasksCompletate.forEach(task => {
-          const scadenza = new Date(task.scadenza);
-          const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-          const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+        return;
+      }
 
-          const box = document.createElement('div');
-          box.className = 'card mb-2 w-100';
-          box.setAttribute('data-task-id', task.id);
-          box.innerHTML = `
-            <div class="card-body d-flex align-items-center p-2">
-              <div class="d-flex align-items-center flex-wrap gap-3">
-                <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.5);" checked 
+      completate.forEach(task => {
+        const scadenza = new Date(task.scadenza);
+        const options = {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit'
+        };
+        const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+
+        const box = document.createElement('div');
+        box.className = 'card mb-2 w-100 completed';
+        box.setAttribute('data-task-id', task.id);
+
+        box.innerHTML = `
+          <div class="card-body">
+            <div class="row align-items-center w-100">
+              <div class="col-auto d-flex align-items-center">
+                <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.4);" checked
                   onchange="toggleStato(${task.id}, this.checked, this)">
-                <span><strong>Titolo:</strong> ${task.titolo}</span>
-                <span class="ms-3"><strong>Scadenza:</strong> ${scadenzaFormattata}</span>
               </div>
-              <div class="d-flex ms-auto gap-2">
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
-                  <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
+              <div class="col d-flex flex-column">
+                <span class="task-title"><strong>${task.titolo}</strong></span>
+                <small class="text-muted">Scadenza: ${scadenzaFormattata}</small>
+              </div>
+              <div class="col-auto d-flex gap-2">
+                <button class="btn btn-light rounded-circle" title="Sottotask" onclick="caricaSottoTask(${task.id})">
+                  <i class="bi bi-list-task"></i>
                 </button>
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="notaTask(${task.id})">
-                  <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
+                <button class="btn btn-light rounded-circle" title="Nota" onclick="notaTask(${task.id})">
+                  <i class="bi bi-sticky"></i>
                 </button>
-                <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width: 48px; height: 48px; padding: 0;"
-                        onclick="eliminaTask(${task.id})">
-                  <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
+                <button class="btn btn-light rounded-circle" title="Elimina" onclick="eliminaTask(${task.id})">
+                  <i class="bi bi-trash"></i>
                 </button>
               </div>
             </div>
-          `;
-          lista.appendChild(box);
-        });
-      }
+          </div>
+        `;
+
+        lista.appendChild(box);
+      });
+
       aggiornaNumeroSezioneCompletate();
     })
     .catch(err => {
       console.error("Errore nel caricamento delle task completate:", err);
       const lista = document.getElementById('lista-box');
-      lista.innerHTML = '<div class="text-center text-danger my-4">Errore nel caricamento delle task completate</div>';
+      lista.innerHTML = `
+        <div class="text-center text-danger my-4">
+          Errore nel caricamento delle task completate
+        </div>
+      `;
     });
 }
+
 
 function mostraNumeroTaskNonFattePerUtente(utenteId) {
   if (!utenteId) {
@@ -803,60 +821,70 @@ function caricaTasksCompletatePerUtente(utenteId) {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
 
-      // Filtra solo le task completate
-      const tasksCompletate = tasks.filter(task => task.stato);
+      const completate = tasks.filter(task => task.stato === true);
 
-      if (tasksCompletate.length === 0) {
+      if (completate.length === 0) {
         const msg = document.createElement('div');
         msg.className = 'text-center text-muted my-4';
         msg.textContent = 'Nessuna task completata per questo utente...';
         lista.appendChild(msg);
-      } else {
-        tasksCompletate.forEach(task => {
-          const scadenza = new Date(task.scadenza);
-          const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-          const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
-
-          const box = document.createElement('div');
-          box.className = 'card mb-2 w-100';
-          box.setAttribute('data-task-id', task.id);
-          box.innerHTML = `
-              <div class="card-body d-flex align-items-center p-2">
-                <div class="d-flex align-items-center flex-wrap gap-3">
-                  <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.5);" checked
-                  onchange="toggleStato(${task.id}, this.checked, this)">
-                  <span><strong>Titolo:</strong> ${task.titolo}</span>
-                  <span class="ms-3"><strong>Scadenza:</strong> ${scadenzaFormattata}</span>
-                </div>
-                <div class="d-flex ms-auto gap-2">
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
-                    <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="notaTask(${task.id})">
-                    <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="eliminaTask(${task.id})">
-                    <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                </div>
-              </div>
-            `;
-          lista.appendChild(box);
-        });
+        return;
       }
+
+      completate.forEach(task => {
+        const scadenza = new Date(task.scadenza);
+        const options = {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit'
+        };
+        const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+
+        const box = document.createElement('div');
+        box.className = 'card mb-2 w-100 completed';
+        box.setAttribute('data-task-id', task.id);
+
+        box.innerHTML = `
+          <div class="card-body">
+            <div class="row align-items-center w-100">
+              <div class="col-auto d-flex align-items-center">
+                <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.4);" checked
+                  onchange="toggleStato(${task.id}, this.checked, this)">
+              </div>
+              <div class="col d-flex flex-column">
+                <span class="task-title"><strong>${task.titolo}</strong></span>
+                <small class="text-muted">Scadenza: ${scadenzaFormattata}</small>
+              </div>
+              <div class="col-auto d-flex gap-2">
+                <button class="btn btn-light rounded-circle" title="Sottotask" onclick="caricaSottoTask(${task.id})">
+                  <i class="bi bi-list-task"></i>
+                </button>
+                <button class="btn btn-light rounded-circle" title="Nota" onclick="notaTask(${task.id})">
+                  <i class="bi bi-sticky"></i>
+                </button>
+                <button class="btn btn-light rounded-circle" title="Elimina" onclick="eliminaTask(${task.id})">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        lista.appendChild(box);
+      });
+
       mostraNumeroTaskCompletatePerUtente(utenteId);
     })
     .catch(err => {
       console.error("Errore nel caricamento tasks completate per utente:", err);
-      alert("Errore nel caricamento tasks completate per utente: " + err.message);
+      const lista = document.getElementById('lista-box');
+      lista.innerHTML = `
+        <div class="text-center text-danger my-4">
+          Errore nel caricamento delle task completate per l'utente
+        </div>
+      `;
     });
 }
+
 
 function caricaTasksCompletatePerCategoria(categoriaId) {
   fetch(`https://localhost:7000/api/Task/CategoriaStatoSi/${categoriaId}`)
@@ -864,61 +892,71 @@ function caricaTasksCompletatePerCategoria(categoriaId) {
     .then(tasks => {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
-      console.log("Tasks completate per categoria:", tasks);
-      // Filtra solo le task completate
-      const tasksCompletate = tasks.filter(task => task.stato);
 
-      if (tasksCompletate.length === 0) {
+      const completate = tasks.filter(task => task.stato === true);
+
+      if (completate.length === 0) {
         const msg = document.createElement('div');
         msg.className = 'text-center text-muted my-4';
         msg.textContent = 'Nessuna task completata per questa categoria...';
         lista.appendChild(msg);
-      } else {
-        tasksCompletate.forEach(task => {
-          const scadenza = new Date(task.scadenza);
-          const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-          const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
-
-          const box = document.createElement('div');
-          box.className = 'card mb-2 w-100';
-          box.setAttribute('data-task-id', task.id);
-          box.innerHTML = `
-              <div class="card-body d-flex align-items-center p-2">
-                <div class="d-flex align-items-center flex-wrap gap-3">
-                  <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.5);" checked
-                  onchange="toggleStato(${task.id}, this.checked, this)">
-                  <span><strong>Titolo:</strong> ${task.titolo}</span>
-                  <span class="ms-3"><strong>Scadenza:</strong> ${scadenzaFormattata}</span>
-                </div>
-                <div class="d-flex ms-auto gap-2">
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
-                    <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="notaTask(${task.id})">
-                    <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="eliminaTask(${task.id})">
-                    <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                </div>
-              </div>
-            `;
-          lista.appendChild(box);
-        });
+        return;
       }
+
+      completate.forEach(task => {
+        const scadenza = new Date(task.scadenza);
+        const options = {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit'
+        };
+        const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+
+        const box = document.createElement('div');
+        box.className = 'card mb-2 w-100 completed';
+        box.setAttribute('data-task-id', task.id);
+
+        box.innerHTML = `
+          <div class="card-body">
+            <div class="row align-items-center w-100">
+              <div class="col-auto d-flex align-items-center">
+                <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.4);" checked
+                  onchange="toggleStato(${task.id}, this.checked, this)">
+              </div>
+              <div class="col d-flex flex-column">
+                <span class="task-title"><strong>${task.titolo}</strong></span>
+                <small class="text-muted">Scadenza: ${scadenzaFormattata}</small>
+              </div>
+              <div class="col-auto d-flex gap-2">
+                <button class="btn btn-light rounded-circle" title="Sottotask" onclick="caricaSottoTask(${task.id})">
+                  <i class="bi bi-list-task"></i>
+                </button>
+                <button class="btn btn-light rounded-circle" title="Nota" onclick="notaTask(${task.id})">
+                  <i class="bi bi-sticky"></i>
+                </button>
+                <button class="btn btn-light rounded-circle" title="Elimina" onclick="eliminaTask(${task.id})">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        lista.appendChild(box);
+      });
+
       mostraNumeroTaskCompletatePerCategoria(categoriaId);
     })
     .catch(err => {
       console.error("Errore nel caricamento tasks completate per categoria:", err);
-      alert("Errore nel caricamento tasks completate per categoria: " + err.message);
+      const lista = document.getElementById('lista-box');
+      lista.innerHTML = `
+        <div class="text-center text-danger my-4">
+          Errore nel caricamento delle task completate per la categoria
+        </div>
+      `;
     });
 }
+
 
 // Funzione principale per caricare le task con filtri combinati
 function caricaTasksConFiltri() {
@@ -969,149 +1007,151 @@ function caricaTasksConFiltri() {
   }
 }
 
-// Funzione per caricare task filtrate per utente E categoria (task attive)
+// Funzione per caricare task filtrate per utente e categoria (task attive)
 function caricaTasksPerUtenteECategoria(utenteId, categoriaId) {
-  // Prima prendo tutte le task dell'utente, poi filtro per categoria
-  fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
+  fetch(`https://localhost:7000/api/Task/UtenteCategoria/${utenteId}/${categoriaId}`)
     .then(res => res.json())
     .then(tasks => {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
-      
-      // Filtra per categoria e stato (non completate)
-      const tasksFiltrate = tasks.filter(task => 
-        task.categoriaID == categoriaId && !task.stato
-      );
-      
+
+      const tasksFiltrate = tasks.filter(task => task.stato === false);
+
       if (tasksFiltrate.length === 0) {
         const msg = document.createElement('div');
         msg.className = 'text-center text-muted my-4';
         msg.textContent = 'Nessuna task trovata per questo utente e categoria...';
         lista.appendChild(msg);
-      } else {
-        tasksFiltrate.forEach(task => {
-          const scadenza = new Date(task.scadenza);
-          const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-          const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+        return;
+      }
 
-          const box = document.createElement('div');
-          box.className = 'card mb-2 w-100';
-          box.setAttribute('data-task-id', task.id);
-          box.innerHTML = `
-            <div class="card-body p-2">
-              <div class="row align-items-center flex-wrap">
-                <div class="col-auto mx-2">
-                  <input type="checkbox" class="form-check-input" style="transform: scale(1.5);"
+      tasksFiltrate.forEach(task => {
+        const scadenza = new Date(task.scadenza);
+        const options = {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit'
+        };
+        const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+
+        const box = document.createElement('div');
+        box.className = 'card mb-2 w-100';
+        box.setAttribute('data-task-id', task.id);
+
+        box.innerHTML = `
+          <div class="card-body">
+            <div class="row align-items-center w-100">
+              <div class="col-auto d-flex align-items-center">
+                <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.4);"
                   ${task.stato ? 'checked' : ''} onchange="toggleStato(${task.id}, this.checked, this)">
-                </div>
-                <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-                <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
-                <div class="col-auto ms-auto d-flex gap-2">
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
-                    <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="notaTask(${task.id})">
-                    <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="modificaTask(${task.id})">
-                    <i class="bi bi-pencil-square" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="eliminaTask(${task.id})">
-                    <i class="bi bi-trash3" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                </div>
+              </div>
+              <div class="col d-flex flex-column">
+                <span class="task-title"><strong>${task.titolo}</strong></span>
+                <small class="text-muted">Scadenza: ${scadenzaFormattata}</small>
+              </div>
+              <div class="col-auto d-flex gap-2">
+                <button class="btn btn-light rounded-circle" title="Sottotask" onclick="caricaSottoTask(${task.id})">
+                  <i class="bi bi-list-task"></i>
+                </button>
+                <button class="btn btn-light rounded-circle" title="Nota" onclick="notaTask(${task.id})">
+                  <i class="bi bi-sticky"></i>
+                </button>
+                <button class="btn btn-light rounded-circle" title="Modifica" onclick="modificaTask(${task.id})">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                <button class="btn btn-light rounded-circle" title="Elimina" onclick="eliminaTask(${task.id})">
+                  <i class="bi bi-trash3"></i>
+                </button>
               </div>
             </div>
-          `;
-          lista.appendChild(box);
-        });
-      }
-      
-      // Aggiorna i counter
-      aggiornaConteggiConFiltriCombinati();
+          </div>
+        `;
+
+        lista.appendChild(box);
+      });
+
+      aggiornaConteggiConFiltriCombinati(); // funzione di aggiornamento contatori
     })
     .catch(err => {
       console.error("Errore nel caricamento tasks per utente e categoria:", err);
-      alert("Errore nel caricamento tasks per utente e categoria: " + err.message);
+      const lista = document.getElementById('lista-box');
+      lista.innerHTML = `
+        <div class="text-center text-danger my-4">
+          Errore nel caricamento delle task filtrate
+        </div>
+      `;
     });
 }
 
-// Funzione per caricare task completate filtrate per utente E categoria
+
 function caricaTasksCompletatePerUtenteECategoria(utenteId, categoriaId) {
-  fetch(`https://localhost:7000/api/Task/Utente/${utenteId}`)
+  fetch(`https://localhost:7000/api/Task/UtenteCategoriaCompletate/${utenteId}/${categoriaId}`)
     .then(res => res.json())
     .then(tasks => {
       const lista = document.getElementById('lista-box');
       lista.innerHTML = '';
-      
-      // Filtra per categoria e stato (completate)
-      const tasksFiltrate = tasks.filter(task => 
-        task.categoriaID == categoriaId && task.stato
-      );
-      
-      if (tasksFiltrate.length === 0) {
+
+      if (!tasks || tasks.length === 0) {
         const msg = document.createElement('div');
         msg.className = 'text-center text-muted my-4';
         msg.textContent = 'Nessuna task completata trovata per questo utente e categoria...';
         lista.appendChild(msg);
-      } else {
-        tasksFiltrate.forEach(task => {
-          const scadenza = new Date(task.scadenza);
-          const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-          const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
-
-          const box = document.createElement('div');
-          box.className = 'card mb-2 w-100';
-          box.setAttribute('data-task-id', task.id);
-          box.innerHTML = `
-            <div class="card-body p-2">
-              <div class="row align-items-center flex-wrap">
-                <div class="col-auto mx-2">
-                  <input type="checkbox" class="form-check-input" style="transform: scale(1.5);" checked 
-                    onchange="toggleStato(${task.id}, this.checked, this)">
-                </div>
-                <div class="col-auto mx-2"><span><strong>Titolo:</strong> ${task.titolo}</span></div>
-                <div class="col-auto mx-2"><span><strong>Scadenza:</strong> ${scadenzaFormattata}</span></div>
-                <div class="col-auto ms-auto d-flex gap-2">
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="caricaSottoTask(${task.id})" title="Visualizza sottotask">
-                    <i class="bi bi-list-task" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="notaTask(${task.id})">
-                    <i class="bi bi-sticky" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                  <button class="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                          style="width: 48px; height: 48px; padding: 0;"
-                          onclick="eliminaTask(${task.id})">
-                    <i class="bi bi-trash" style="font-size: 2rem; font-weight: bold;"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          `;
-          lista.appendChild(box);
-        });
+        return;
       }
-      
-      // Aggiorna i counter
+
+      tasks.forEach(task => {
+  const scadenza = new Date(task.scadenza);
+  const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+  const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+
+  const taskClass = task.stato ? 'completed' : '';
+  const box = document.createElement('div');
+  box.className = `card mb-2 w-100 ${taskClass}`;
+  box.setAttribute('data-task-id', task.id);
+
+  box.innerHTML = `
+    <div class="card-body">
+      <div class="row align-items-center w-100">
+        <div class="col-auto d-flex align-items-center">
+          <input type="checkbox" class="form-check-input me-3" style="transform: scale(1.4);" checked
+            onchange="toggleStato(${task.id}, this.checked, this)">
+        </div>
+        <div class="col d-flex flex-column">
+          <span class="task-title"><strong>${task.titolo}</strong></span>
+          <small class="text-muted">Scadenza: ${scadenzaFormattata}</small>
+        </div>
+        <div class="col-auto d-flex gap-2">
+          <button class="btn btn-light rounded-circle" title="Sottotask" onclick="caricaSottoTask(${task.id})">
+            <i class="bi bi-list-task"></i>
+          </button>
+          <button class="btn btn-light rounded-circle" title="Nota" onclick="notaTask(${task.id})">
+            <i class="bi bi-sticky"></i>
+          </button>
+          <button class="btn btn-light rounded-circle" title="Elimina" onclick="eliminaTask(${task.id})">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  lista.appendChild(box);
+});
+
+
       aggiornaConteggiConFiltriCombinati();
     })
     .catch(err => {
       console.error("Errore nel caricamento tasks completate per utente e categoria:", err);
-      alert("Errore nel caricamento tasks completate per utente e categoria: " + err.message);
+      const lista = document.getElementById('lista-box');
+      lista.innerHTML = `
+        <div class="text-center text-danger my-4">
+          Errore nel caricamento delle task completate
+        </div>
+      `;
     });
 }
+
+
 
 // Funzione per aggiornare i counter con filtri combinati
 function aggiornaConteggiConFiltriCombinati() {
@@ -1181,8 +1221,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Event listener per form task
-document.getElementById('taskForm').addEventListener('submit', salvaTask);
-
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('taskForm');
+  if (form) {
+    form.addEventListener('submit', salvaTask);
+  }
+});
 // Event listener per conferma completamento task
 document.getElementById('btnConfermaCompleta').addEventListener('click', function () {
   if (taskIdDaCompletare !== null) {
@@ -1267,54 +1311,74 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
 });
 
 // Event listener per form categoria
-document.getElementById('formAggiungiCategoria').addEventListener('submit', aggiungiCategoria);
+document.addEventListener('DOMContentLoaded', () => {
+  const formCategoria = document.getElementById('formAggiungiCategoria');
+  if (formCategoria) {
+    formCategoria.addEventListener('submit', aggiungiCategoria);
+  }
+});
 
 // Event listener per form utente
-document.getElementById('formAggiungiUtente').addEventListener('submit', aggiungiUtente);
-
-// Event listener per conferma eliminazione categoria
-document.getElementById('confermaEliminaCategoriaBtn').addEventListener('click', () => {
-  const categoriaId = document.getElementById('eliminaCategoriaDropdown').value;
-  if (!categoriaId) {
-    alert("Seleziona una categoria da eliminare.");
-    return;
-  }
-
-  if (confirm("Sei sicuro di voler eliminare questa categoria?")) {
-    fetch(`https://localhost:7000/api/Categorie/${categoriaId}`, {
-      method: 'DELETE'
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Errore nell\'eliminazione categoria');
-        alert("Categoria eliminata!");
-        caricaCategorie && caricaCategorie();
-        const modal = bootstrap.Modal.getInstance(document.getElementById('eliminaCategoriaModal'));
-        modal.hide();
-      })
-      .catch(err => alert(err.message));
+document.addEventListener('DOMContentLoaded', () => {
+  const formUtente = document.getElementById('formAggiungiUtente');
+  if (formUtente) {
+    formUtente.addEventListener('submit', aggiungiUtente);
   }
 });
+
+const btnConfermaEliminaCategoria = document.getElementById('confermaEliminaCategoriaBtn');
+const selectEliminaCategoria = document.getElementById('eliminaCategoriaDropdown');
+
+if (btnConfermaEliminaCategoria && selectEliminaCategoria) {
+  btnConfermaEliminaCategoria.addEventListener('click', () => {
+    const categoriaId = selectEliminaCategoria.value;
+    if (!categoriaId) {
+      alert("Seleziona una categoria da eliminare.");
+      return;
+    }
+
+    if (confirm("Sei sicuro di voler eliminare questa categoria?")) {
+      fetch(`https://localhost:7000/api/Categorie/${categoriaId}`, {
+        method: 'DELETE'
+      })
+        .then(res => {
+          if (!res.ok) throw new Error('Errore nell\'eliminazione categoria');
+          alert("Categoria eliminata!");
+          caricaCategorie && caricaCategorie();
+          const modal = bootstrap.Modal.getInstance(document.getElementById('eliminaCategoriaModal'));
+          modal.hide();
+        })
+        .catch(err => alert(err.message));
+    }
+  });
+}
+
 
 // Event listener per conferma eliminazione utente
-document.getElementById('confermaEliminaUtenteBtn').addEventListener('click', () => {
-  const utenteId = document.getElementById('eliminaUtenteDropdown').value;
-  if (!utenteId) {
-    alert("Seleziona un utente da eliminare.");
-    return;
-  }
+const btnConfermaEliminaUtente = document.getElementById('confermaEliminaUtenteBtn');
+const selectEliminaUtente = document.getElementById('eliminaUtenteDropdown');
 
-  if (confirm("Sei sicuro di voler eliminare questo utente?")) {
-    fetch(`https://localhost:7000/api/Utente/${utenteId}`, {
-      method: 'DELETE'
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Errore nell\'eliminazione utente');
-        alert("Utente eliminato!");
-        caricaUtentiForm && caricaUtentiForm();
-        caricaUtentiDropdown && caricaUtentiDropdown();
-        const modal = bootstrap.Modal.getInstance(document.getElementById('eliminaUtenteModal'));
-        modal.hide();
+if (btnConfermaEliminaUtente && selectEliminaUtente) {
+  btnConfermaEliminaUtente.addEventListener('click', () => {
+    const utenteId = selectEliminaUtente.value;
+    if (!utenteId) {
+      alert("Seleziona un utente da eliminare.");
+      return;
+    }
+
+    if (confirm("Sei sicuro di voler eliminare questo utente?")) {
+      fetch(`https://localhost:7000/api/Utente/${utenteId}`, {
+        method: 'DELETE'
       })
-      .catch(err => alert(err.message));
-  }
-});
+        .then(res => {
+          if (!res.ok) throw new Error('Errore nell\'eliminazione utente');
+          alert("Utente eliminato!");
+          caricaUtentiForm && caricaUtentiForm();
+          caricaUtentiDropdown && caricaUtentiDropdown();
+          const modal = bootstrap.Modal.getInstance(document.getElementById('eliminaUtenteModal'));
+          modal.hide();
+        })
+        .catch(err => alert(err.message));
+    }
+  });
+}
