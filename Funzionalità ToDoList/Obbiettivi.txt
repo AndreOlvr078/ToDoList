@@ -1,3 +1,1 @@
--Creare un sistema di scadenza funzionante
--aggiungere la possibilita di mettere le sottotask
--aggiungere nel frontend il fatto che se premo una categoria e un utente escano solo le cose legate ai due
+-aggiungere la possibilita di eliminare,modificare,spuntar le sottotask e di non visualizzare la modifica e l'aggiunta enlle completate

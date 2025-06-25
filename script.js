@@ -194,65 +194,98 @@ function caricaTasksPerUtente(UtenteId) {
 
 
 function caricaSottoTask(taskId) {
-  // Trova la card della task selezionata
   const card = document.querySelector(`.card[data-task-id='${taskId}']`);
   if (!card) return;
 
-  // Se la sottotask-container esiste già subito dopo la card, la rimuovo (toggle)
   const nextElem = card.nextElementSibling;
   if (nextElem && nextElem.classList.contains('sottotask-container')) {
     nextElem.remove();
     return;
   }
 
-  // Altrimenti, creo e inserisco la sottotask-container subito dopo la card
+  document.querySelectorAll('.sottotask-container').forEach(el => el.remove());
+
   fetch(`https://localhost:7000/api/SottoTask/Task/${taskId}`)
     .then(res => res.json())
     .then(sottoTasks => {
-      // Rimuovi eventuali altre sottotask-container aperte
-      document.querySelectorAll('.sottotask-container').forEach(el => el.remove());
-
       const container = document.createElement('div');
-      container.className = 'sottotask-container';
-      container.style.width = '100%';
-      let items = '';
+      container.className = 'sottotask-container border-top bg-light-subtle px-4 py-3';
+      container.style.borderRadius = '0 0 10px 10px';
+
+      const lista = document.createElement('ul');
+      lista.className = 'list-unstyled mb-2';
+
       if (!sottoTasks || sottoTasks.length === 0) {
-        items = '<div class="text-muted small ms-3">Nessun sotto-task</div>';
+        const li = document.createElement('li');
+        li.className = 'text-muted fst-italic';
+        li.textContent = 'Nessun sotto-task';
+        lista.appendChild(li);
       } else {
-        items = `<ul class="mb-2">${sottoTasks.map(st => `<li>${st.titolo}</li>`).join('')}</ul>`;
+        sottoTasks.forEach(st => {
+          const li = document.createElement('li');
+          li.className = 'mb-1 ps-2';
+          li.innerHTML = `<i class="bi bi-dot"></i> ${st.titolo}`;
+          lista.appendChild(li);
+        });
       }
-      // Pulsante aggiungi sottotask
-      const btnAggiungi = `<button class="btn btn-sm btn-primary ms-3 mb-2" onclick="aggiungiSottoTaskPrompt(${taskId})"><i class='bi bi-plus-lg'></i> Aggiungi sottotask</button>`;
-      container.innerHTML = `${items}${btnAggiungi}`;
-      // Inserisci subito dopo la card
+
+      // Input + pulsante
+      const inputRow = document.createElement('div');
+      inputRow.className = 'd-flex align-items-center gap-2 mt-2';
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = 'Aggiungi una nuova sotto-task';
+      input.className = 'form-control form-control-sm';
+      input.style.maxWidth = '320px';
+      input.style.fontSize = '0.9rem';
+
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-outline-secondary p-0 d-flex align-items-center justify-content-center';
+      btn.style.width = '24px';
+      btn.style.height = '24px';
+      btn.style.borderRadius = '50%';
+      btn.innerHTML = `<i class="bi bi-plus-lg" style="font-size: 0.9rem;"></i>`;
+      btn.title = 'Aggiungi sotto-task';
+
+      btn.onclick = () => {
+        const titolo = input.value.trim();
+        if (!titolo) return;
+        aggiungiSottoTask(taskId, titolo);
+      };
+
+      inputRow.appendChild(input);
+      inputRow.appendChild(btn);
+
+      container.appendChild(lista);
+      container.appendChild(inputRow);
+
       card.parentNode.insertBefore(container, card.nextSibling);
     })
     .catch(() => {
-      document.querySelectorAll('.sottotask-container').forEach(el => el.remove());
-      const container = document.createElement('div');
-      container.className = 'sottotask-container';
-      container.innerHTML = '<div class="text-danger small ms-3">Errore caricamento sotto-task</div>';
-      card.parentNode.insertBefore(container, card.nextSibling);
+      const errorBox = document.createElement('div');
+      errorBox.className = 'sottotask-container text-danger px-4 py-2';
+      errorBox.textContent = 'Errore nel caricamento delle sotto-task.';
+      card.parentNode.insertBefore(errorBox, card.nextSibling);
     });
 }
 
-function aggiungiSottoTaskPrompt(taskId) {
-  const titolo = prompt('Inserisci il titolo della nuova sottotask:');
-  if (!titolo || titolo.trim() === '') return;
+function aggiungiSottoTask(taskId, titolo) {
   fetch('https://localhost:7000/api/SottoTask', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ titolo, taskID: taskId })
   })
     .then(res => {
-      if (!res.ok) throw new Error('Errore nell\'aggiunta della sottotask');
+      if (!res.ok) throw new Error("Errore nell'aggiunta della sottotask");
       return res.json();
     })
     .then(() => {
-      caricaSottoTask(taskId); // Ricarica la lista delle sottotask
+      caricaSottoTask(taskId); // Ricarica per aggiornare
     })
     .catch(err => alert(err.message));
 }
+
 
 function caricaTasksPerCategoria(CategoriaId) {
   return fetch(`https://localhost:7000/api/Task/Categoria/${CategoriaId}`)
@@ -1168,35 +1201,31 @@ function caricaTasksCompletatePerUtenteECategoria(utenteId, categoriaId) {
 
 
 
-// Funzione per aggiornare i counter con filtri combinati
 function aggiornaConteggiConFiltriCombinati() {
+  const badgeNonFatte = document.getElementById('numero-sezione');
+  const badgeCompletate = document.getElementById('numero-sezione-si');
+
   if (utenteSelezionato && categoriaSelezionata) {
-    // Entrambi i filtri attivi - prendo le task dell'utente e filtro per categoria
-    fetch(`https://localhost:7000/api/Task/Utente/${utenteSelezionato}`)
+    fetch(`https://localhost:7000/api/Task/UtenteCategoria/${utenteSelezionato}/${categoriaSelezionata}`)
       .then(res => res.json())
       .then(tasks => {
-        const tasksFiltrate = tasks.filter(task => task.categoriaID == categoriaSelezionata);
-        const nonFatte = tasksFiltrate.filter(t => !t.stato).length;
-        const completate = tasksFiltrate.filter(t => t.stato).length;
-        
-        const badgeNonFatte = document.getElementById('numero-sezione');
-        const badgeCompletate = document.getElementById('numero-sezione-si');
-        
-        if (badgeNonFatte) badgeNonFatte.textContent = nonFatte;
+        const nonCompletate = tasks.filter(task => !task.stato).length;
+        const completate = tasks.filter(task => task.stato).length;
+
+        if (badgeNonFatte) badgeNonFatte.textContent = nonCompletate;
         if (badgeCompletate) badgeCompletate.textContent = completate;
       })
-      .catch(() => {
-        const badgeNonFatte = document.getElementById('numero-sezione');
-        const badgeCompletate = document.getElementById('numero-sezione-si');
+      .catch(err => {
+        console.error("Errore nel conteggio con filtri combinati:", err);
         if (badgeNonFatte) badgeNonFatte.textContent = '0';
         if (badgeCompletate) badgeCompletate.textContent = '0';
       });
   } else {
-    // Usa le funzioni esistenti per aggiornare i counter
     aggiornaNumeroSezione();
     aggiornaNumeroSezioneCompletate();
   }
 }
+
 
 // Funzione per resettare completamente tutti i filtri
 function resettaTuttiFiltri() {

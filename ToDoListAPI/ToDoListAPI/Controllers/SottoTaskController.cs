@@ -34,12 +34,11 @@ namespace ToDoListAPI.Controllers
 
             return Ok(sottoTasks);
         }
-
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] SottoTaskDto dto)
         {
-            var sql = "EXEC AggiornaSottoTask @p0, @p1, @p2";
-            _context.Database.ExecuteSqlRaw(sql, id, dto.Titolo, dto.Stato);
+            var sql = "EXEC AggiornaSottoTask @p0, @p1, @p2, @p3";
+            _context.Database.ExecuteSqlRaw(sql, id, dto.Titolo, dto.Stato, dto.TaskID);
             return Ok(new { message = "SottoTask aggiornata." });
         }
 
