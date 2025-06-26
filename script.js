@@ -63,18 +63,18 @@ function apriModalCategoria() {
 
 // Funzione per aggiornare il badge con il numero di task non fatte per utente/categoria selezionato
 function aggiornaNumeroSezione() {
+  const badge = document.getElementById('numero-sezione');
+  if (badge) badge.textContent = '0'; // azzera sempre subito
   // Se entrambi i filtri sono attivi, usa la nuova funzione
   if (utenteSelezionato && categoriaSelezionata) {
     aggiornaConteggiConFiltriCombinati();
     return;
   }
-  
   // Se è selezionata una categoria, usa la funzione per categorie
   if (categoriaSelezionata) {
     mostraNumeroTaskNonFattePerCategoria(categoriaSelezionata);
     return;
   }
-
   // Altrimenti usa la logica per utenti
   let utenteId = utenteSelezionato || null;
   let url = utenteId
@@ -83,35 +83,32 @@ function aggiornaNumeroSezione() {
   fetch(url)
     .then(res => res.json())
     .then(tasks => {
-      let count = 0;
-      if (Array.isArray(tasks)) {
-        count = utenteId
+      if (Array.isArray(tasks) && tasks.length > 0) {
+        const count = utenteId
           ? tasks.filter(t => !t.stato).length
           : tasks.length;
+        if (badge) badge.textContent = count;
       }
-      const badge = document.getElementById('numero-sezione');
-      if (badge) badge.textContent = count;
     })
     .catch(() => {
-      const badge = document.getElementById('numero-sezione');
       if (badge) badge.textContent = '0';
     });
 }
 
 // Funzione per aggiornare il badge con il numero di task completate per utente/categoria selezionato
 function aggiornaNumeroSezioneCompletate() {
+  const badge = document.getElementById('numero-sezione-si');
+  if (badge) badge.textContent = '0'; // azzera sempre subito
   // Se entrambi i filtri sono attivi, usa la nuova funzione
   if (utenteSelezionato && categoriaSelezionata) {
     aggiornaConteggiConFiltriCombinati();
     return;
   }
-  
   // Se è selezionata una categoria, usa la funzione per categorie
   if (categoriaSelezionata) {
     mostraNumeroTaskCompletatePerCategoria(categoriaSelezionata);
     return;
   }
-
   // Altrimenti usa la logica per utenti
   let utenteId = utenteSelezionato || null;
   let url = utenteId
@@ -120,15 +117,12 @@ function aggiornaNumeroSezioneCompletate() {
   fetch(url)
     .then(res => res.json())
     .then(tasks => {
-      let count = 0;
-      if (Array.isArray(tasks)) {
-        count = tasks.filter(t => t.stato).length;
+      if (Array.isArray(tasks) && tasks.length > 0) {
+        const count = tasks.filter(t => t.stato).length;
+        if (badge) badge.textContent = count;
       }
-      const badge = document.getElementById('numero-sezione-si');
-      if (badge) badge.textContent = count;
     })
     .catch(() => {
-      const badge = document.getElementById('numero-sezione-si');
       if (badge) badge.textContent = '0';
     });
 }
@@ -794,7 +788,7 @@ function salvaTask(e) {
       const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
       modal.hide();
       document.getElementById('taskForm').reset();
-      taskDaModificare = null;      document.getElementById('btnAggiungi').textContent = 'Aggiungi';
+      taskDaModificare = null; document.getElementById('btnAggiungi').textContent = 'Aggiungi';
       caricaTasksConFiltri();
     })
 }
@@ -828,7 +822,7 @@ function aggiornaStatoTask(id, nuovoStato) {
         body: JSON.stringify({ ...task, stato: nuovoStato })
       });
     })
-    .then(res => res.json())    .then(() => {
+    .then(res => res.json()).then(() => {
       // Ricarica con la nuova logica di filtri combinati
       caricaTasksConFiltri();
     })
@@ -1262,7 +1256,7 @@ function caricaTasksCompletatePerCategoria(categoriaId) {
 // Funzione principale per caricare le task con filtri combinati
 function caricaTasksConFiltri() {
   const isCompletate = window.location.pathname.endsWith('completate.html');
-  
+
   // Se nessun filtro è attivo, carica tutte le task
   if (!utenteSelezionato && !categoriaSelezionata) {
     if (isCompletate) {
@@ -1277,7 +1271,7 @@ function caricaTasksConFiltri() {
     }
     return;
   }
-  
+
   // Se solo utente è selezionato
   if (utenteSelezionato && !categoriaSelezionata) {
     if (isCompletate) {
@@ -1287,7 +1281,7 @@ function caricaTasksConFiltri() {
     }
     return;
   }
-  
+
   // Se solo categoria è selezionata
   if (!utenteSelezionato && categoriaSelezionata) {
     if (isCompletate) {
@@ -1297,7 +1291,7 @@ function caricaTasksConFiltri() {
     }
     return;
   }
-  
+
   // Se entrambi sono selezionati, carica con filtro combinato
   if (utenteSelezionato && categoriaSelezionata) {
     if (isCompletate) {
@@ -1400,16 +1394,16 @@ function caricaTasksCompletatePerUtenteECategoria(utenteId, categoriaId) {
       }
 
       tasks.forEach(task => {
-  const scadenza = new Date(task.scadenza);
-  const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-  const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
+        const scadenza = new Date(task.scadenza);
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+        const scadenzaFormattata = scadenza.toLocaleString('it-IT', options);
 
-  const taskClass = task.stato ? 'completed' : '';
-  const box = document.createElement('div');
-  box.className = `card mb-2 w-100 ${taskClass}`;
-  box.setAttribute('data-task-id', task.id);
+        const taskClass = task.stato ? 'completed' : '';
+        const box = document.createElement('div');
+        box.className = `card mb-2 w-100 ${taskClass}`;
+        box.setAttribute('data-task-id', task.id);
 
-  box.innerHTML = `
+        box.innerHTML = `
     <div class="card-body">
       <div class="row align-items-center w-100">
         <div class="col-auto d-flex align-items-center">
@@ -1435,8 +1429,8 @@ function caricaTasksCompletatePerUtenteECategoria(utenteId, categoriaId) {
     </div>
   `;
 
-  lista.appendChild(box);
-});
+        lista.appendChild(box);
+      });
 
 
       aggiornaConteggiConFiltriCombinati();
@@ -1457,22 +1451,46 @@ function caricaTasksCompletatePerUtenteECategoria(utenteId, categoriaId) {
 function aggiornaConteggiConFiltriCombinati() {
   const badgeNonFatte = document.getElementById('numero-sezione');
   const badgeCompletate = document.getElementById('numero-sezione-si');
+  const isCompletatePage = window.location.pathname.endsWith('completate.html');
 
   if (utenteSelezionato && categoriaSelezionata) {
-    fetch(`https://localhost:7000/api/Task/UtenteCategoria/${utenteSelezionato}/${categoriaSelezionata}`)
-      .then(res => res.json())
-      .then(tasks => {
-        const nonCompletate = tasks.filter(task => !task.stato).length;
-        const completate = tasks.filter(task => task.stato).length;
-
-        if (badgeNonFatte) badgeNonFatte.textContent = nonCompletate;
-        if (badgeCompletate) badgeCompletate.textContent = completate;
-      })
-      .catch(err => {
-        console.error("Errore nel conteggio con filtri combinati:", err);
-        if (badgeNonFatte) badgeNonFatte.textContent = '0';
-        if (badgeCompletate) badgeCompletate.textContent = '0';
-      });
+    // Se siamo nella pagina completate, conta solo le completate
+    if (isCompletatePage) {
+      fetch(`https://localhost:7000/api/Task/UtenteCategoriaCompletate/${utenteSelezionato}/${categoriaSelezionata}`)
+        .then(res => res.json())
+        .then(tasks => {
+          if (!tasks || tasks.length === 0) {
+            if (badgeCompletate) badgeCompletate.textContent = '0';
+            if (badgeNonFatte) badgeNonFatte.textContent = '0';
+            return;
+          }
+          if (badgeCompletate) badgeCompletate.textContent = tasks.length;
+          if (badgeNonFatte) badgeNonFatte.textContent = '0';
+        })
+        .catch(() => {
+          if (badgeCompletate) badgeCompletate.textContent = '0';
+          if (badgeNonFatte) badgeNonFatte.textContent = '0';
+        });
+    } else {
+      // Pagina normale: conta fatte e non fatte
+      fetch(`https://localhost:7000/api/Task/UtenteCategoria/${utenteSelezionato}/${categoriaSelezionata}`)
+        .then(res => res.json())
+        .then(tasks => {
+          if (!tasks || tasks.length === 0) {
+            if (badgeNonFatte) badgeNonFatte.textContent = '0';
+            if (badgeCompletate) badgeCompletate.textContent = '0';
+            return;
+          }
+          const nonCompletate = tasks.filter(task => !task.stato).length;
+          const completate = tasks.filter(task => task.stato).length;
+          if (badgeNonFatte) badgeNonFatte.textContent = nonCompletate;
+          if (badgeCompletate) badgeCompletate.textContent = completate;
+        })
+        .catch(() => {
+          if (badgeNonFatte) badgeNonFatte.textContent = '0';
+          if (badgeCompletate) badgeCompletate.textContent = '0';
+        });
+    }
   } else {
     aggiornaNumeroSezione();
     aggiornaNumeroSezioneCompletate();
@@ -1485,7 +1503,7 @@ function resettaTuttiFiltri() {
   categoriaSelezionata = null;
   document.getElementById('utente-in-uso').textContent = 'Nessun utente selezionato';
   document.getElementById('categoria-in-uso').textContent = 'Nessuna categoria selezionata';
-  
+
   // Carica le task appropriate in base alla pagina corrente
   caricaTasksConFiltri();
 }
@@ -1602,7 +1620,8 @@ document.getElementById('confermaCategoriaBtn').addEventListener('click', functi
 
     const modal = bootstrap.Modal.getInstance(document.getElementById('scegliCategoriaModal'));
     modal.hide();
-  } else {    alert('Seleziona una categoria!');
+  } else {
+    alert('Seleziona una categoria!');
   }
 });
 
@@ -1688,28 +1707,8 @@ function confermaSalvaModificaSottoTask() {
   }
   fetch(`https://localhost:7000/api/SottoTask/${sottoTaskDaModificare}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ titolo: nuovoTitolo, taskID: taskIdCorrente })
   })
-    .then(res => {
-      if (!res.ok) throw new Error('Errore nella modifica della sottotask');
-      return res.json();
-    })
-    .then(() => {
-      const modal = bootstrap.Modal.getInstance(document.getElementById('modificaSottoTaskModal'));
-      modal.hide();
-      caricaSottoTask(taskIdCorrente, '', true);
-      sottoTaskDaModificare = null;
-      taskIdCorrente = null;
-    })
-    .catch(err => alert('Errore nella modifica della sottotask: ' + err.message));
-}
 
-// === FUNZIONE CONFERMA ELIMINAZIONE SOTTOTASK ===
-function confermaEliminaSottoTask() {
-  fetch(`https://localhost:7000/api/SottoTask/${sottoTaskDaEliminare}`, {
-    method: 'DELETE'
-  })
     .then(res => {
       if (!res.ok) throw new Error('Errore nell\'eliminazione della sottotask');
       return res.json();
@@ -1751,3 +1750,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
