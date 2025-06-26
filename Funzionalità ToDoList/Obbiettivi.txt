@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 -sistemare contatore
 
 CREATE OR ALTER TRIGGER trg_AggiornaSottoTaskStato
@@ -21,3 +22,7 @@ BEGIN
     INNER JOIN deleted d ON d.Id = i.Id
     WHERE i.Stato = 0 AND d.Stato <> 0;
 END;
+=======
+-aggiungere la possibilita di eliminare,modificare,spuntar le sottotask e di non visualizzare la modifica e l'aggiunta enlle completate
+https://codenames.game/room/bow-cook-waitress
+>>>>>>> Stashed changes
