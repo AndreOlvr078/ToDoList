@@ -206,6 +206,8 @@ function caricaSottoTask(taskId, keepOpenInputValue = '', forceUpdate = false) {
   const card = document.querySelector(`.card[data-task-id='${taskId}']`);
   if (!card) return;
 
+  const isCompletatePage = window.location.pathname.endsWith('completate.html');
+
   const nextElem = card.nextElementSibling;
   if (nextElem && nextElem.classList.contains('sottotask-container')) {
     if (!forceUpdate) {
@@ -233,48 +235,48 @@ function caricaSottoTask(taskId, keepOpenInputValue = '', forceUpdate = false) {
             li.className = 'mb-1 ps-2 d-flex align-items-center justify-content-between';
             li.innerHTML = `
               <span class="d-flex align-items-center gap-2">
-                <input type="checkbox" class="form-check-input me-2" style="transform: scale(1.4);" ${st.stato ? 'checked' : ''} onchange="toggleStatoSottoTask(${st.id}, this.checked, ${taskId}, this)">
+                <input type="checkbox" class="form-check-input me-2" style="transform: scale(1.4);" ${st.stato ? 'checked' : ''} ${isCompletatePage ? 'disabled' : ''} onchange="${isCompletatePage ? '' : `toggleStatoSottoTask(${st.id}, this.checked, ${taskId}, this)`}">
                 <span>${st.titolo}</span>
               </span>
               <span class="d-flex gap-2">
-                <button class="btn btn-light rounded-circle btn-sm" title="Modifica sottotask" onclick="modificaSottoTask(${st.id}, ${taskId}, this)">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-light rounded-circle btn-sm" title="Elimina sottotask" onclick="eliminaSottoTask(${st.id}, ${taskId}, this)">
-                  <i class="bi bi-trash"></i>
-                </button>
+                ${isCompletatePage ? '' : `<button class=\"btn btn-light rounded-circle btn-sm\" title=\"Modifica sottotask\" onclick=\"modificaSottoTask(${st.id}, ${taskId}, this)\"><i class=\"bi bi-pencil\"></i></button>`}
+                <button class=\"btn btn-light rounded-circle btn-sm\" title=\"Elimina sottotask\" onclick=\"eliminaSottoTask(${st.id}, ${taskId}, this)\"><i class=\"bi bi-trash\"></i></button>
               </span>
             `;
             lista.appendChild(li);
           });
         }
         // Input + pulsante
-        const inputRow = document.createElement('div');
-        inputRow.className = 'd-flex align-items-center gap-2 mt-2';
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.placeholder = 'Aggiungi una nuova sotto-task';
-        input.className = 'form-control form-control-sm';
-        input.style.maxWidth = '320px';
-        input.style.fontSize = '0.9rem';
-        if (keepOpenInputValue) input.value = keepOpenInputValue;
-        const btn = document.createElement('button');
-        btn.className = 'btn btn-outline-secondary p-0 d-flex align-items-center justify-content-center';
-        btn.style.width = '24px';
-        btn.style.height = '24px';
-        btn.style.borderRadius = '50%';
-        btn.innerHTML = `<i class="bi bi-plus-lg" style="font-size: 0.9rem;"></i>`;
-        btn.title = 'Aggiungi sotto-task';
-        btn.onclick = () => {
-          const titolo = input.value.trim();
-          if (!titolo) return;
-          aggiungiSottoTask(taskId, titolo);
-        };
-        inputRow.appendChild(input);
-        inputRow.appendChild(btn);
-        container.appendChild(lista);
-        container.appendChild(inputRow);
-        input.focus();
+        if (!isCompletatePage) {
+          const inputRow = document.createElement('div');
+          inputRow.className = 'd-flex align-items-center gap-2 mt-2';
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.placeholder = 'Aggiungi una nuova sotto-task';
+          input.className = 'form-control form-control-sm';
+          input.style.maxWidth = '320px';
+          input.style.fontSize = '0.9rem';
+          if (keepOpenInputValue) input.value = keepOpenInputValue;
+          const btn = document.createElement('button');
+          btn.className = 'btn btn-outline-secondary p-0 d-flex align-items-center justify-content-center';
+          btn.style.width = '24px';
+          btn.style.height = '24px';
+          btn.style.borderRadius = '50%';
+          btn.innerHTML = `<i class=\"bi bi-plus-lg\" style=\"font-size: 0.9rem;\"></i>`;
+          btn.title = 'Aggiungi sotto-task';
+          btn.onclick = () => {
+            const titolo = input.value.trim();
+            if (!titolo) return;
+            aggiungiSottoTask(taskId, titolo);
+          };
+          inputRow.appendChild(input);
+          inputRow.appendChild(btn);
+          container.appendChild(lista);
+          container.appendChild(inputRow);
+          input.focus();
+        } else {
+          container.appendChild(lista);
+        }
       })
       .catch(() => {
         nextElem.innerHTML = '<div class="text-danger px-4 py-2">Errore nel caricamento delle sotto-task.</div>';
@@ -303,49 +305,51 @@ function caricaSottoTask(taskId, keepOpenInputValue = '', forceUpdate = false) {
           li.className = 'mb-1 ps-2 d-flex align-items-center justify-content-between';
           li.innerHTML = `
             <span class="d-flex align-items-center gap-2">
-              <input type="checkbox" class="form-check-input me-2" style="transform: scale(1.4);" ${st.stato ? 'checked' : ''} onchange="toggleStatoSottoTask(${st.id}, this.checked, ${taskId}, this)">
+              <input type="checkbox" class="form-check-input me-2" style="transform: scale(1.4);" ${st.stato ? 'checked' : ''} ${isCompletatePage ? 'disabled' : ''} onchange="${isCompletatePage ? '' : `toggleStatoSottoTask(${st.id}, this.checked, ${taskId}, this)`}">
               <span>${st.titolo}</span>
             </span>
             <span class="d-flex gap-2">
-              <button class="btn btn-light rounded-circle btn-sm" title="Modifica sottotask" onclick="modificaSottoTask(${st.id}, ${taskId}, this)">
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn btn-light rounded-circle btn-sm" title="Elimina sottotask" onclick="eliminaSottoTask(${st.id}, ${taskId}, this)">
-                <i class="bi bi-trash"></i>
-              </button>
+              ${isCompletatePage ? '' : `<button class=\"btn btn-light rounded-circle btn-sm\" title=\"Modifica sottotask\" onclick=\"modificaSottoTask(${st.id}, ${taskId}, this)\"><i class=\"bi bi-pencil\"></i></button>`}
+              <button class=\"btn btn-light rounded-circle btn-sm\" title=\"Elimina sottotask\" onclick=\"eliminaSottoTask(${st.id}, ${taskId}, this)\"><i class=\"bi bi-trash\"></i></button>
             </span>
           `;
           lista.appendChild(li);
         });
       }
-      // Input + pulsante
-      const inputRow = document.createElement('div');
-      inputRow.className = 'd-flex align-items-center gap-2 mt-2';
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.placeholder = 'Aggiungi una nuova sotto-task';
-      input.className = 'form-control form-control-sm';
-      input.style.maxWidth = '320px';
-      input.style.fontSize = '0.9rem';
-      if (keepOpenInputValue) input.value = keepOpenInputValue;
-      const btn = document.createElement('button');
-      btn.className = 'btn btn-outline-secondary p-0 d-flex align-items-center justify-content-center';
-      btn.style.width = '24px';
-      btn.style.height = '24px';
-      btn.style.borderRadius = '50%';
-      btn.innerHTML = `<i class="bi bi-plus-lg" style="font-size: 0.9rem;"></i>`;
-      btn.title = 'Aggiungi sotto-task';
-      btn.onclick = () => {
-        const titolo = input.value.trim();
-        if (!titolo) return;
-        aggiungiSottoTask(taskId, titolo);
-      };
-      inputRow.appendChild(input);
-      inputRow.appendChild(btn);
-      container.appendChild(lista);
-      container.appendChild(inputRow);
+      if (!isCompletatePage) {
+        const inputRow = document.createElement('div');
+        inputRow.className = 'd-flex align-items-center gap-2 mt-2';
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Aggiungi una nuova sotto-task';
+        input.className = 'form-control form-control-sm';
+        input.style.maxWidth = '320px';
+        input.style.fontSize = '0.9rem';
+        if (keepOpenInputValue) input.value = keepOpenInputValue;
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-outline-secondary p-0 d-flex align-items-center justify-content-center';
+        btn.style.width = '24px';
+        btn.style.height = '24px';
+        btn.style.borderRadius = '50%';
+        btn.innerHTML = `<i class=\"bi bi-plus-lg\" style=\"font-size: 0.9rem;\"></i>`;
+        btn.title = 'Aggiungi sotto-task';
+        btn.onclick = () => {
+          const titolo = input.value.trim();
+          if (!titolo) return;
+          aggiungiSottoTask(taskId, titolo);
+        };
+        inputRow.appendChild(input);
+        inputRow.appendChild(btn);
+        container.appendChild(lista);
+        container.appendChild(inputRow);
+        input.focus();
+      } else {
+        container.appendChild(lista);
+      }
       card.parentNode.insertBefore(container, card.nextSibling);
-      input.focus();
+      if (!isCompletatePage && container.querySelector('input[type="text"]')) {
+        container.querySelector('input[type="text"]').focus();
+      }
     })
     .catch(() => {
       const errorBox = document.createElement('div');

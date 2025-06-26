@@ -1,5 +1,3 @@
--togliere dalle completate aggiunta e modific
--sistemare pulsante sotto task per farlo chieder e quando ri premuto
 -sistemare contatore
 
 CREATE OR ALTER TRIGGER trg_AggiornaSottoTaskStato
