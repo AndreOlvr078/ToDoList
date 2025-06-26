@@ -188,6 +188,32 @@ namespace ToDoListAPI.Controllers
             return Ok(risultato);
         }
 
+        [HttpGet("CountUtCatDaFare/{UtenteId}/{CategoriaId}")]
+        public IActionResult ContaDaFareUtCat(int UtenteId, int CategoriaId)
+        {
+            var risultato = _context.Set<CountResultDto>()
+                .FromSqlRaw("EXEC CountUtenteCategoriaNo @UtenteId, @CategoriaId", 
+                new SqlParameter("@UtenteId", UtenteId),
+                new SqlParameter("@CategoriaId", CategoriaId))
+                .AsEnumerable()
+                .FirstOrDefault();
+
+            return Ok(risultato);
+        }
+        [HttpGet("CountUtCatCompletate/{UtenteId}/{CategoriaId}")]
+        public IActionResult ContaCompletateUtCat(int UtenteId, int CategoriaId)
+        {
+            var risultato = _context.Set<CountResultDto>()
+                .FromSqlRaw("EXEC CountUtenteCategoriaSi @UtenteId, @CategoriaId",
+                new SqlParameter("@UtenteId", UtenteId),
+                new SqlParameter("@CategoriaId", CategoriaId))
+                .AsEnumerable()
+                .FirstOrDefault();
+
+            return Ok(risultato);
+        }
+
+
         [HttpGet("CountUtCompletate/{UtenteId}")]
         public IActionResult ContaCompletateUt(int UtenteId)
         {
