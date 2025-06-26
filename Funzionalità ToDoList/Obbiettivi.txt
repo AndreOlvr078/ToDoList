@@ -26,3 +26,9 @@ END;
 -aggiungere la possibilita di eliminare,modificare,spuntar le sottotask e di non visualizzare la modifica e l'aggiunta enlle completate
 https://codenames.game/room/bow-cook-waitress
 >>>>>>> Stashed changes
+
+
+
+
+
+https://codenames.game/room/bow-cook-waitress
